@@ -2,38 +2,36 @@
 
 from time import sleep
 import RPi.GPIO as GPIO
-##pip3 install gpiozero
-##import gpiozero as gpio
+import board
+from adafruit_bme280 import basic as adafruit_bme280
 
 # research needed
 # Reading input
 # have to install library on pi
 class GPIOReader():
 
-    ## PIN CONSTANTS
-    PINS = {
-        "PIN_CONST" = (4)
-    }
+    __bme280 = None
 
-    ## Private Method for seting up variables and inputs on pins
+    def __readBME280(self):
+        ## TODO: Store Values in CSV file for external use ##
+        print("Temperature: %0.1f C" % __bme280.temperature)
+        print("Humidity: %0.1f %%" % __bme280.humidity)
+        print("Pressure: %0.1f hPa" % __bme280.pressure)
+    
+
+    ## Private Method for setting up variables and inputs on pins
     def __setup(self):
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(PIN_CONST, GPIO.IN)
-        return
 
-    ## Private Method for reading an individual pins value (either pin is high: 1 or low: 0)
-    def __readPin(self, pin):
-        return GPIO.input(pin)
+        print("Initializing Board Setup.....")
 
-    def __cleanUp(self):
-        GPIO.cleanup()
-        return
+        i2c = board.I2C() ## Uses board.SCL and board.SDA
+
+        ## SETUP BME 280 SENSOR
+        __bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
 
     ## Public Method to be called externally to grab data from sensors
     def retrieveData(self):
-        for pin in PINS:
-            input_value = __readPin(PINS[pin])
-            print
+        __readBME280()
 
 
     def __init__(self):
