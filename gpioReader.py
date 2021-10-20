@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from time import sleep
-import RPi.GPIO as GPIO
 import board
 import adafruit_lsm9ds1
 from adafruit_bme280 import basic as adafruit_bme280
@@ -23,10 +22,10 @@ class GPIOReader():
     
     def __readLSM9DS1(self):
         ## TODO: Store Values in CSV file for external use ##
-        print("Acceleration (m/s^2): ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*__lsm9ds1.Acceleration)
-        print("Magnetometer (gauss: ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*__lsm9ds1.Magnetometer)
-        print("Gyroscope (degrees/sec): ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*__lsm9ds1.Gyroscope)
-        print("Temperature: {0:0.3f}".format(__lsm9ds1.Temperature)
+        print("Acceleration (m/s^2): ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*__lsm9ds1.Acceleration))
+        print("Magnetometer (gauss: ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*__lsm9ds1.Magnetometer))
+        print("Gyroscope (degrees/sec): ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*__lsm9ds1.Gyroscope))
+        print("Temperature: {0:0.3f}".format(__lsm9ds1.Temperature))
 
 
     ## Private Method for setting up variables and inputs on pins
@@ -43,6 +42,7 @@ class GPIOReader():
     ## Public Method to be called externally to grab data from sensors
     def retrieveData(self):
         __readBME280()
+        __readLSM8DS1()
 
 
     def __init__(self):
