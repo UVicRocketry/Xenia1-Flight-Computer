@@ -38,17 +38,17 @@ class SensorDataObject:
 
         self.time = 0; 
 
-    def self.set_bme(self,humdity, temperature,pressure):
-        return
+    # def self.set_bme(self,humdity, temperature,pressure):
+    #     return
 
-    def self.set_imu():
-        return
+    # def self.set_imu():
+    #     return
 
-    def self.set_strain_gauges():
-        return
+    # def self.set_strain_gauges():
+    #     return
 
-    def self.convert_to_csv():
-        return
+    # def self.convert_to_csv():
+    #     return
     
     
 
