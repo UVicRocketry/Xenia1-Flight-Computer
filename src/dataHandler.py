@@ -1,17 +1,17 @@
 from rocketData import RocketData as rd
 #similar to a json object 
 
-class SensorDataObject:
+class SendData:
     def __init__(self):
         rocket_data = rd()
     
-    def bme():
+    def send_bme():
         return
 
-    def set_imu():
+    def send_imu():
         return
 
-    def set_strain_gauges():
+    def send_strain_gauges():
         return
 
     def convert_to_csv():
