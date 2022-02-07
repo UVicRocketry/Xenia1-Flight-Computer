@@ -4,7 +4,7 @@ from time import time
 
 class RocketData:
     """
-    A class used to represent rocket data. This only deals with manipulating the rocketdata
+    A class used to represent rocket data. This only deals with manipulating the rocketdata. If you don't set everything right away you will error out
 
     ...
 
@@ -27,11 +27,21 @@ class RocketData:
 
     for setting all data use rocket_data = [imu_t, imu_h, imu_p, bme_y, bme_p, bme_r, bme_a, bme_v, sg_1, sg_2, sg_3, sg_4, sg_5, sg_6, sg_7, sg_8, sg_9, sg_10, sg_11, sg_12, e, ts]
     
+    def data_dict_set(self, rd)
+        Description:
+            updates the self._data with a dictionary. Differnet from setters 
+            because it does it updates the whole object not just individual 
+            attributes 
+        Parm:
+            rd: updated _data object. 
+
     data_to_json() 
-        Converts the dictionary to a Json format
+        Desciption: 
+            Converts the dictionary to a Json format
     
     print_json_data()
-        prints the current state of the json to the terminal
+        Desciption:
+            prints the current state of the json to the terminal
 
     """
     def __init__(self):
@@ -148,7 +158,10 @@ class RocketData:
         self.strain_gauges([sg_1, sg_2, sg_3, sg_4, sg_5, sg_6, sg_7, sg_8, sg_9, sg_10, sg_11, sg_12])
         self.encoders(e)
         self.time_stamp(ts)
-
+    
+    def data_dict_set(self, rd):
+        self._data.update(rd)
+        
     def data_to_json(self):
         rocketData = json.dumps(self._data, indent = 4)
         print(rocketData)
