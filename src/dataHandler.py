@@ -63,8 +63,10 @@ class SendData:
         return
     
     def send_all_data(self, sendingTo):
+        return
        
-    def format_to_send(self, sendingTo, dataToFomat)
+    def format_to_send(self, sendingTo, dataToFomat):
+        return
 
     
 
