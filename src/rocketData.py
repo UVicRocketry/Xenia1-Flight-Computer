@@ -4,7 +4,7 @@ from time import time
 
 class RocketData:
     """
-    A class used to represent rocket data
+    A class used to represent rocket data. This only deals with manipulating the rocketdata
 
     ...
 
