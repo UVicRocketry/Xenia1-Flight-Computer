@@ -158,7 +158,10 @@ class RocketData:
         jsonData = self.data_to_json(self._data)
         print(jsonData)
     
-    #convert json data to csv format and send it   
+    #TODO: convert json data to csv format and send it   
     def convert_to_csv(self)
         jsonData = self.data_to_json()
         
+    #TODO: convert json data to format that antenna needs
+    def convert_antenna_format(self)
+        jsonData = self.data_to_json()    
