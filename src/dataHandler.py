@@ -1,10 +1,8 @@
 from rocketData import RocketData as rd
-#similar to a json object 
-
 class SendData:
     """
-    This only deals with manipulating the rocketdata
-
+    This only deals with sending the rocketdata. RocketData class in src/rocketData.py deals with manipulating the data.  
+    
     ...
 
     Attributes
@@ -47,9 +45,13 @@ class SendData:
     
     -------
     """
-    def __init__(self):
-        rocket_data = rd()
+    def __init__(self, rd):
+        rocket_data = rd
     
+    # TODO: parm rd is a dict of updated 
+    def update_rocket_data(self, rocketData):
+        rocket_data = rd.data_dict_set(rocketData)
+        
     def send_bme(self, sendingTo):
         # call format data
         return
