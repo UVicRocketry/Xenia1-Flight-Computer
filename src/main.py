@@ -10,17 +10,38 @@
 
 
 def initialize():
+    
     return 0 
 
 
 if __name__ == "__main__":
+    
     ### Main code goes here###
+    
+    test_mode = True
+    running = True 
+      
+    if(test_mode):
+        
+        while(running):
+            ## Use mocks instead of Read GPIO Input
+            
+            ## Update rocketData object
+            
+            ## Do airbrakes stuff
+            
+            ## Send rocketData to datahandler call send function
 
-    ## Setup a loop that continues until we tell it to stop
-        ## Read GPIO Input
+    else:
+        
+        while(running):
+        ## Setup a loop that continues until we tell it to stop
+            ## Read GPIO Input
+            
+            ## Update rocketData object
+            
+            ## Send GPIO rocketData to datahandler for output
 
-        ## Send GPIO data to datahandler for output
-
-        ## Do air brakes math (to be implemented later with kris)
+            ## Do air brakes math (to be implemented later with kris)
 
     exit(0)
