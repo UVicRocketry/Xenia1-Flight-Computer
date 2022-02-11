@@ -39,7 +39,7 @@ for classes:
 ## File structure
 
 The Project is broken into two folders a source folder (src) and a tests folder. 
-
+'''
 > Xenia1-flight-computer
   > src 
     > airbrakes.py
@@ -50,8 +50,7 @@ The Project is broken into two folders a source folder (src) and a tests folder.
 
   > tests (currently empty)
     > 
-
---- 
+'''
 
 1. src/airbrakes.py
    
