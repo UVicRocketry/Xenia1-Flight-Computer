@@ -71,3 +71,5 @@ The Project is broken into two folders a source folder (src) and a tests folder.
 5. src/rocketData.py
 
    This class holds all the data of the rocket and has functions to manipulate the data. 
+   
+   Test editing for dicord bot
