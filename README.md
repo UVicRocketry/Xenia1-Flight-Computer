@@ -25,7 +25,6 @@ for classes:
      
   Methods
   -------
-  (varaible)
     Description:
       write description
      Parm:
