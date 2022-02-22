@@ -1,6 +1,6 @@
 ---
 name: X1-AV-<#> <Description>
-about: Describe this issue template's purpose here.
+about: Flight Computer issue template
 title: ''
 labels: help wanted
 assignees: ''
@@ -13,5 +13,10 @@ assignees: ''
 **Acceptance Criteria**
  <Write specifically what is need for this issue to be completed>
 
+**Dev Notes**
+[for assignee]<write down your thought process when developing this issue>
+
 **Linked issues**
  <If there are any related issues>
+
+<Add to milestone>
