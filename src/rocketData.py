@@ -173,7 +173,31 @@ class RocketData:
     
     #TODO: convert json data to csv format 
     def convert_to_csv(self)
-        jsonData = self.data_to_json()
+        #jsonData = self.data_to_json()
+        dataToConvert = [ self._data['imu']['temperature'],
+                        self._data['imu']['humidity'], 
+                        self._data['imu']['pressure'], 
+                        self._data['bme']['yaw'], 
+                        self._data['bme']['pitch'], 
+                        self._data['bme']['roll'], 
+                        self._data['bme']['linear_acceleration'], 
+                        self._data['bme']['linear_velocity'], 
+                        self._data['strain_gauges'][1], 
+                        self._data['strain_gauges'][2], 
+                        self._data['strain_gauges'][3], 
+                        self._data['strain_gauges'][4], 
+                        self._data['strain_gauges'][5], 
+                        self._data['strain_gauges'][6], 
+                        self._data['strain_gauges'][7], 
+                        self._data['strain_gauges'][8], 
+                        self._data['strain_gauges'][9], 
+                        self._data['strain_gauges'][10], 
+                        self._data['strain_gauges'][11], 
+                        self._data['strain_gauges'][12], 
+                        self._data['encoders']['position'], 
+                        self._data['time_stamp'] ]
+        
+        return dataToConvert
         
     #TODO: convert json data to format that antenna needs
     def convert_antenna_format(self)
