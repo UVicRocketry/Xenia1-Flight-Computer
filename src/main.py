@@ -2,6 +2,8 @@
 # run this script once were good to go
 # A lot of try catch baby
 
+from xmlrpc.client import boolean
+from gpioReader import GPIOReader
 
 #TODO: 
 # - Implement initialize() for any setup
@@ -17,14 +19,15 @@ def initialize():
 if __name__ == "__main__":
     
     ### Main code goes here###
+    test_mode = bool(input("Activate Test Mode (True/False):"))
     
-    test_mode = True
     running = True 
       
-    if(test_mode):
-        
+    if(test_mode): 
         while(running):
-            ## Use mocks instead of Read GPIO Input
+            #retrieves random data from GPIOReader
+            gpio = GPIOReader(test_mode)
+            gpio.retrieveData()
             
             ## Update rocketData object
             
@@ -37,7 +40,7 @@ if __name__ == "__main__":
         while(running):
         ## Setup a loop that continues until we tell it to stop
             ## Read GPIO Input
-            
+            print("")
             ## Update rocketData object
             
             ## Send GPIO rocketData to datahandler for output
