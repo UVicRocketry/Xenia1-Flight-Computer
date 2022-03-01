@@ -2,7 +2,6 @@
 # run this script once were good to go
 # A lot of try catch baby
 
-from xmlrpc.client import boolean
 from gpioReader import GPIOReader
 
 #TODO: 
@@ -19,7 +18,7 @@ def initialize():
 if __name__ == "__main__":
     
     ### Main code goes here###
-    test_mode = bool(input("Activate Test Mode (True/False):"))
+    test_mode = (input("Activate Test Mode (True/False):")=="True")
     
     running = True 
       

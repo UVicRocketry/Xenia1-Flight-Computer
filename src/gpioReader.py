@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 
 from time import sleep
-import math
-#import board
-#import adafruit_lsm9ds1
-#from adafruit_bme280 import basic as adafruit_bme280
 from unittest.mock import Mock
 import random
 
@@ -16,19 +12,15 @@ import random
 class GeneralLSMObject :
 
     data={
-    'a': float,
-    'b': float,
-    'c': float
+        'a': float,
+        'b': float,
+        'c': float
     }
     
 
 
 class GPIOReader():
     def __initializeRandomLSMObject(self):
-        # lsmobject = GeneralLSMObject()
-        # lsmobject.data['a'] = random.uniform(0,100)
-        # lsmobject.data['b'] = random.uniform(0,100)
-        # lsmobject.data['c'] = random.uniform(0,100)
         lsmobject = [random.uniform(0,100),random.uniform(0,100),random.uniform(0,100)]
         return lsmobject
 
