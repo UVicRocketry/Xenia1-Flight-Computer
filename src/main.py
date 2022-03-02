@@ -3,6 +3,7 @@
 # A lot of try catch baby
 
 from gpioReader import GPIOReader
+import sys
 
 #TODO: 
 # - Implement initialize() for any setup
@@ -18,7 +19,12 @@ def initialize():
 if __name__ == "__main__":
     
     ### Main code goes here###
-    test_mode = (input("Activate Test Mode (True/False):")=="True")
+    test_mode = False #use "python main.py test" to initialize test mode
+
+    if len(sys.argv)>1:
+        if sys.argv[1]=="test":
+            test_mode=True
+
     
     running = True 
       
