@@ -21,9 +21,9 @@ if __name__ == "__main__":
     ### Main code goes here###
     test_mode = False #use "python main.py test" to initialize test mode
 
-    if len(sys.argv)>1:
-        if sys.argv[1]=="test":
-            test_mode=True
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "test":
+            test_mode = True
 
     
     running = True 
