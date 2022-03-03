@@ -85,16 +85,29 @@ class Airbrakes:
     sleep(self.step_delay)
     GPIO.output(self.step_pin, GPIO.LOW)
 
-  def deployBrakesPercent(self, percent):
+  def deployBrakes(self, percent):
 
-    # TODO get the value of the potentiometer
+    # TODO get library for ADC to read potentiometer
 
     # Convert percent to potentiometer value
-    #pot_value = ADC.read() or something
-    target_pot = (percent/100)*(self.__max_pot_val-self.__min_pot_val)
+    target_pot = __min_pot_val + (percent/100)*(self.__max_pot_val-self.__min_pot_val)
     
     steps = 0
-    while steps < self.__max_steps_to_open:
+    curr_error = target_pot-ADC.read()
+    max_error  = 10 # TODO set this based on the resolution of ADC
+
+    # Move stepper to target position within some error
+    # Prevent infinite loop by never stepping more than the max
+    while abs(curr_error) > max_err and steps < self.__max_steps_to_open:
+      
+      if curr_error < 0:
+        self.__singleStep(True)
+      else
+        self.__singleStep(False)
+
+      curr_error = target_pot-ADC.read()
+      steps += 1
+
       
 
     
