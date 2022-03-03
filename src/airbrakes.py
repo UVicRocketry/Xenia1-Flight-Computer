@@ -27,20 +27,62 @@ class KalmanFilter:
 
 
 """
-This class provides a simple way to interface with the airbrakes hardware.
-It is used by the KalmanFilter class.
+
+Airbrakes: This class provides a simple way to interface with the airbrakes
+hardware. It is used by the KalmanFilter class.
 
 
 Attributes
 ----------
 
+__max_pot_val: Value of the potentiometer as read by the ADC when brakes are
+fully deployed. Set by calibrate().
+
+__min_pot_val: Value of the potentiometer as read by the ADC when brakes are
+fully closed. Set by calibrate().
+
+pot_pin: # TODO update this when ADC is known
+step_pin: GPIO pin that controls stepping of A4988 stepper driver
+dir_pin: GPIO pin that controls direction of A4988 stepper driver
+
+motor_direction: If motor is turning the wrong direction when testing,
+invert the value of this (True/False).
+
+step_delay: Delay in seconds between pulses of step_pin
+step_angle: Step angle in degrees of stepper motor
+microsteps: 2 (half), 4 (quarter), 16 (sixteenth) etc.
+gear_ratio: (# of motor turns) / (# of gearbox output turns)
+
+__max_steps_to_open: Maximum numper of steps needed to fully open the brakes.
+This is calculated from the motor parameters: step_angle, microsteps, gear_ratio
 
 
 Methods
 -------
 
+__singleStep():
+  Steps Airbrakes stepper motor once in specified direction.
+  Returns nothing.
 
+  Param: step_direction
+    Passing step_direction=True opens Airbrakes one step
+    Passing step_direction=False closes Airbrakes one step
 
+calibrate(): 
+  Sets __max_pot_val by reading potentiometer in the fully open state
+  and sets __min_pot_val by reading the potentiometer in the closed state
+  Returns nothing.
+
+  Must be called before launch (on the launch pad) to calibrate the system.
+
+deployBrakes():
+  Opens the brakes to the specifed percentage of fully open.
+
+  Note: This uses the potentiometer for feedback so there will be a small
+  error associated with this. Adjust this error by changing max_error in
+  method body.
+
+  Returns value of potentiometer at final position.
 
 """
 class Airbrakes:
@@ -54,7 +96,7 @@ class Airbrakes:
                step_delay_micro_sec=75, gear_box_ratio=14):
 
     # GPIO pins
-    self.pot_pin = potentiometer_pin
+    self.pot_pin = potentiometer_pin # TODO change if needed depending on ADC used
     self.step_pin = stepper_pin
     self.dir_pin  = direction_pin
 
@@ -85,9 +127,22 @@ class Airbrakes:
     sleep(self.step_delay)
     GPIO.output(self.step_pin, GPIO.LOW)
 
+  def calibrate(self):
+    
+    # Fully open brakes
+    for i in range(self.__max_steps_to_open)
+      __singleStep(True)
+    self.__max_pot_val = ADC.read()
+
+    # Fully close brakes
+    for i in range(self.__max_steps_to_open)
+      __singleStep(False)
+    self.__min_pot_val = ADC.read()
+
   def deployBrakes(self, percent):
 
-    # TODO get library for ADC to read potentiometer
+    # TODO get library for ADC to read potentiometer and change every instance
+    # of ADC.read() whatever is needed to read the value of the pot
 
     # Convert percent to potentiometer value
     target_pot = __min_pot_val + (percent/100)*(self.__max_pot_val-self.__min_pot_val)
@@ -107,6 +162,9 @@ class Airbrakes:
 
       curr_error = target_pot-ADC.read()
       steps += 1
+    
+    # Return the final potentiometer value
+    return ADC.read()
 
       
 
