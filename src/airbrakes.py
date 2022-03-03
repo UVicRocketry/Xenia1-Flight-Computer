@@ -3,6 +3,15 @@ from pydoc import doc
 import RPi.GPIO as GPIO
 from time import sleep
 
+# These libraries are required for the ADS1115 ADC
+# pip install Adafruit-Blinka
+# pip install adafruit-circuitpython-ads1x15
+import board
+import busio
+import adafruit_ads1x15.ads1115 as ADS
+from adafruit_ads1x15.analog_in import AnalogIn
+
+
 """
 This class implements a Kalman filter to determine how far the airbrakes
 flaps should be deployed, based on sensor data and previous flight data.
@@ -41,7 +50,7 @@ fully deployed. Set by calibrate().
 __min_pot_val: Value of the potentiometer as read by the ADC when brakes are
 fully closed. Set by calibrate().
 
-pot_pin: # TODO update this when ADC is known
+pot_pin: ADS1115 pin that is connected to potentiometer
 step_pin: GPIO pin that controls stepping of A4988 stepper driver
 dir_pin: GPIO pin that controls direction of A4988 stepper driver
 
@@ -68,6 +77,9 @@ __singleStep():
     Passing step_direction=True opens Airbrakes one step
     Passing step_direction=False closes Airbrakes one step
 
+    Note: If passing True closes Airbrakes, invert the value of 
+    step_direction when initializing Airbrakes object
+
 calibrate(): 
   Sets __max_pot_val by reading potentiometer in the fully open state
   and sets __min_pot_val by reading the potentiometer in the closed state
@@ -91,12 +103,11 @@ class Airbrakes:
   __max_pot_val = None
   __min_pot_val = None
 
-  def __init__(self, potentiometer_pin, stepper_pin, direction_pin,
+  def __init__(self, ads_pot_pin=0, stepper_pin, direction_pin,
                direction: bool, step_angle=1.8, microsteps=16,
                step_delay_micro_sec=75, gear_box_ratio=14):
 
     # GPIO pins
-    self.pot_pin = potentiometer_pin # TODO change if needed depending on ADC used
     self.step_pin = stepper_pin
     self.dir_pin  = direction_pin
 
@@ -109,7 +120,7 @@ class Airbrakes:
    
     # Max steps to go from fully closed to fully open with 1.25 FoS
     # Division by 6 is because airbrakes only require 1/6 of a turn to open
-    self.__max_steps_to_open = 1.25*(self.gear_ratio*(360/self.step_angle)*self.microsteps)/(6)
+    self.__max_steps_to_open = 1.25*(self.gear_ratio*(360/self.step_angle)*self.microsteps)/6
 
     # Use numbering that appears on PCB
     GPIO.setmode(GPIO.BOARD)
@@ -117,6 +128,11 @@ class Airbrakes:
     # Set the pins as outputs
     GPIO.setup(self.step_pin, GPIO.OUT)
     GPIO.setup(self.dir_pin, GPIO.OUT)
+
+    # Initialize ADC (ADS1115)
+    self.ads = ADS.ADS1115(i2c)
+    self.potentiometer = AnalogIn(ads, ads_pot_pin)
+    self.i2c = busio.I2C(board.SCL, board.SDA)
 
   def __singleStep(self, step_direction: bool):
 
@@ -131,28 +147,25 @@ class Airbrakes:
     
     # Fully open brakes
     for i in range(self.__max_steps_to_open)
+    self.__max_pot_val = self.potentiometer.value
       __singleStep(True)
-    self.__max_pot_val = ADC.read()
 
     # Fully close brakes
     for i in range(self.__max_steps_to_open)
       __singleStep(False)
-    self.__min_pot_val = ADC.read()
+    self.__min_pot_val = self.potentiometer.value
 
   def deployBrakes(self, percent):
-
-    # TODO get library for ADC to read potentiometer and change every instance
-    # of ADC.read() whatever is needed to read the value of the pot
 
     # Convert percent to potentiometer value
     target_pot = __min_pot_val + (percent/100)*(self.__max_pot_val-self.__min_pot_val)
     
-    steps = 0
-    curr_error = target_pot-ADC.read()
-    max_error  = 10 # TODO set this based on the resolution of ADC
+    curr_error = target_pot-self.potentiometer.value
+    max_error  = 10 # TODO set this based on the resolution of ADC/pot (requires testing)
 
     # Move stepper to target position within some error
-    # Prevent infinite loop by never stepping more than the max
+    # Prevent infinite loop by never stepping more than the max to open
+    steps = 0
     while abs(curr_error) > max_err and steps < self.__max_steps_to_open:
       
       if curr_error < 0:
@@ -160,13 +173,13 @@ class Airbrakes:
       else
         self.__singleStep(False)
 
-      curr_error = target_pot-ADC.read()
+      curr_error = target_pot-self.potentiometer.value
       steps += 1
     
     # Return the final potentiometer value
-    return ADC.read()
-
+    return self.potentiometer.value
       
+
 
     
 
