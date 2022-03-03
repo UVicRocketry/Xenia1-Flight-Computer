@@ -103,8 +103,8 @@ class Airbrakes:
   __max_pot_val = None
   __min_pot_val = None
 
-  def __init__(self, ads_pot_pin=0, stepper_pin, direction_pin,
-               direction: bool, step_angle=1.8, microsteps=16,
+  def __init__(self,  stepper_pin, direction_pin, direction: bool,
+               ads_pot_pin=0, step_angle=1.8, microsteps=16,
                step_delay_micro_sec=75, gear_box_ratio=14):
 
     # GPIO pins
@@ -130,35 +130,36 @@ class Airbrakes:
     GPIO.setup(self.dir_pin, GPIO.OUT)
 
     # Initialize ADC (ADS1115)
-    self.ads = ADS.ADS1115(i2c)
-    self.potentiometer = AnalogIn(ads, ads_pot_pin)
     self.i2c = busio.I2C(board.SCL, board.SDA)
+    self.ads = ADS.ADS1115(self.i2c)
+    self.potentiometer = AnalogIn(self.ads, ads_pot_pin)
 
   def __singleStep(self, step_direction: bool):
 
     # ^ XORs the direction (inverting it if motor_direction dictates it)
     GPIO.output(self.dir_pin, step_direction ^ self.motor_direction)
 
+    # Pulse step pin
     GPIO.output(self.step_pin, GPIO.HIGH)
     sleep(self.step_delay)
     GPIO.output(self.step_pin, GPIO.LOW)
 
   def calibrate(self):
     
-    # Fully open brakes
-    for i in range(self.__max_steps_to_open)
+    # Fully open brakes and record pot value
+    for _ in range(self.__max_steps_to_open):
+      self._singleStep(True)
     self.__max_pot_val = self.potentiometer.value
-      __singleStep(True)
 
-    # Fully close brakes
-    for i in range(self.__max_steps_to_open)
-      __singleStep(False)
+    # Fully close brakes and record pot value
+    for _ in range(self.__max_steps_to_open):
+      self.__singleStep(False)
     self.__min_pot_val = self.potentiometer.value
 
   def deployBrakes(self, percent):
 
     # Convert percent to potentiometer value
-    target_pot = __min_pot_val + (percent/100)*(self.__max_pot_val-self.__min_pot_val)
+    target_pot = self.__min_pot_val + (percent/100)*(self.__max_pot_val-self.__min_pot_val)
     
     curr_error = target_pot-self.potentiometer.value
     max_error  = 10 # TODO set this based on the resolution of ADC/pot (requires testing)
@@ -166,11 +167,11 @@ class Airbrakes:
     # Move stepper to target position within some error
     # Prevent infinite loop by never stepping more than the max to open
     steps = 0
-    while abs(curr_error) > max_err and steps < self.__max_steps_to_open:
+    while abs(curr_error) > max_error and steps < self.__max_steps_to_open:
       
       if curr_error < 0:
         self.__singleStep(True)
-      else
+      else:
         self.__singleStep(False)
 
       curr_error = target_pot-self.potentiometer.value
@@ -178,15 +179,3 @@ class Airbrakes:
     
     # Return the final potentiometer value
     return self.potentiometer.value
-      
-
-
-    
-
-
-
-
-
-
-
-
