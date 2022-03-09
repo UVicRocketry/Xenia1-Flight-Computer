@@ -1,4 +1,4 @@
-# 10K-flight-Computer
+# Xenia1-flight-Computer
 
 ## Style
 
@@ -73,4 +73,4 @@ The Project is broken into two folders a source folder (src) and a tests folder.
    
 ## Air Brakes
 
-# Kalman Filter
+### Kalman Filter
