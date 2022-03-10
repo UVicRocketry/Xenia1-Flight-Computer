@@ -74,3 +74,5 @@ The Project is broken into two folders a source folder (src) and a tests folder.
 ## Air Brakes
 
 ### Kalman Filter
+
+![Kalman Filter Image](/KalmanFilter.drawio.png)
