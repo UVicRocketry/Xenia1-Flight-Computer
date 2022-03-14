@@ -44,25 +44,25 @@ hardware. It is used by the KalmanFilter class.
 Attributes
 ----------
 
-__max_pot_val: Value of the potentiometer as read by the ADC when brakes are
+__max_pot_val [double]: Value of the potentiometer as read by the ADC when brakes are
 fully deployed. Set by calibrate().
 
-__min_pot_val: Value of the potentiometer as read by the ADC when brakes are
+__min_pot_val [double]: Value of the potentiometer as read by the ADC when brakes are
 fully closed. Set by calibrate().
 
-pot_pin: ADS1115 pin that is connected to potentiometer
-step_pin: GPIO pin that controls stepping of A4988 stepper driver
-dir_pin: GPIO pin that controls direction of A4988 stepper driver
+pot_pin [int]: ADS1115 pin that is connected to potentiometer
+step_pin [int]: GPIO pin that controls stepping of A4988 stepper driver
+dir_pin [int]: GPIO pin that controls direction of A4988 stepper driver
 
-motor_direction: If motor is turning the wrong direction when testing,
+motor_direction [bool]: If motor is turning the wrong direction when testing,
 invert the value of this (True/False).
 
-step_delay: Delay in seconds between pulses of step_pin
-step_angle: Step angle in degrees of stepper motor
-microsteps: 2 (half), 4 (quarter), 16 (sixteenth) etc.
-gear_ratio: (# of motor turns) / (# of gearbox output turns)
+step_delay [int]: Delay in seconds between pulses of step_pin
+step_angle [int]: Step angle in degrees of stepper motor
+microsteps [int]: 2 (half), 4 (quarter), 16 (sixteenth) etc.
+gear_ratio [int]: (# of motor turns) / (# of gearbox output turns)
 
-__max_steps_to_open: Maximum numper of steps needed to fully open the brakes.
+__max_steps_to_open [int]: Maximum numper of steps needed to fully open the brakes.
 This is calculated from the motor parameters: step_angle, microsteps, gear_ratio
 
 
@@ -71,6 +71,7 @@ Methods
 
 __singleStep():
   Steps Airbrakes stepper motor once in specified direction.
+
   Returns nothing.
 
   Param: step_direction
@@ -83,6 +84,7 @@ __singleStep():
 calibrate(): 
   Sets __max_pot_val by reading potentiometer in the fully open state
   and sets __min_pot_val by reading the potentiometer in the closed state
+
   Returns nothing.
 
   Must be called before launch (on the launch pad) to calibrate the system.
@@ -90,11 +92,12 @@ calibrate():
 deployBrakes():
   Opens the brakes to the specifed percentage of fully open.
 
+  Returns value of potentiometer at final position.
+
   Note: This uses the potentiometer for feedback so there will be a small
   error associated with this. Adjust this error by changing max_error in
   method body.
 
-  Returns value of potentiometer at final position.
 
 """
 class Airbrakes:
