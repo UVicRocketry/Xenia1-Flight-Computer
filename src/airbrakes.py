@@ -54,15 +54,16 @@ pot_pin [int]: ADS1115 pin that is connected to potentiometer
 step_pin [int]: GPIO pin that controls stepping of A4988 stepper driver
 dir_pin [int]: GPIO pin that controls direction of A4988 stepper driver
 
-motor_direction [bool]: If motor is turning the wrong direction when testing,
-invert the value of this (True/False).
+motor_direction [bool]: This value is XOR'd with the direction passed to
+__singleStep(). For the user, this means if the flaps are opening in the wrong
+direction when testing, invert the value of motor_direction.
 
 step_delay [int]: Delay in seconds between pulses of step_pin
 step_angle [int]: Step angle in degrees of stepper motor
 microsteps [int]: 2 (half), 4 (quarter), 16 (sixteenth) etc.
 gear_ratio [int]: (# of motor turns) / (# of gearbox output turns)
 
-__max_steps_to_open [int]: Maximum numper of steps needed to fully open the brakes.
+__max_steps_to_open [int]: Maximum number of steps needed to fully open the brakes.
 This is calculated from the motor parameters: step_angle, microsteps, gear_ratio
 
 
@@ -106,9 +107,15 @@ class Airbrakes:
   __max_pot_val = None
   __min_pot_val = None
 
-  def __init__(self,  stepper_pin, direction_pin, direction: bool,
-               ads_pot_pin=0, step_angle=1.8, microsteps=16,
-               step_delay_micro_sec=75, gear_box_ratio=14):
+  def __init__(self,
+      stepper_pin,
+      direction_pin, 
+      direction: bool,
+      ads_pot_pin=0,
+      step_angle=1.8,
+      microsteps=16,
+      step_delay_micro_sec=75,
+      gear_box_ratio=14):
 
     # GPIO pins
     self.step_pin = stepper_pin
@@ -121,11 +128,10 @@ class Airbrakes:
     self.microsteps = microsteps
     self.gear_ratio = gear_box_ratio
    
-    # Max steps to go from fully closed to fully open with 1.25 FoS
+    # Max steps to go from fully closed to fully open with 1.25 safety factor 
     # Division by 6 is because airbrakes only require 1/6 of a turn to open
     self.__max_steps_to_open = 1.25*(self.gear_ratio*(360/self.step_angle)*self.microsteps)/6
 
-    # Use numbering that appears on PCB
     GPIO.setmode(GPIO.BOARD)
 
     # Set the pins as outputs
@@ -142,7 +148,7 @@ class Airbrakes:
     # ^ XORs the direction (inverting it if motor_direction dictates it)
     GPIO.output(self.dir_pin, step_direction ^ self.motor_direction)
 
-    # Pulse step pin
+    # Pulse step pin (raise to 5V, then lower to 0V) to step the motor
     GPIO.output(self.step_pin, GPIO.HIGH)
     sleep(self.step_delay)
     GPIO.output(self.step_pin, GPIO.LOW)
