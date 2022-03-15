@@ -1,0 +1,33 @@
+General
+-Learn protocols
+	-Watch videos on protocals.^
+
+BME 280
+-Get Data sheet. ^
+-Put in KiCad ^
+-Connect wires.
+IMU
+-Get data sheet ^
+-Put in KiCad^
+-Connect wires.
+Pi
+-Import library. ^
+-Place in diagram.
+Camera
+-Get data sheet. ^
+-Make sensor called camera.^
+-Connect wires.
+HX711
+-Get diagram from JJ. ^ 
+-Add to Kicad.
+-Add pin reservations.
+Antennae
+-Add transmitter, 
+Raven 4
+-Get data sheet. ^
+-Make KiCad model^
+-Add to diagram.
+GPS
+-Get data sheet. ^
+-Put in Kicad.
+-Add to diagram.
