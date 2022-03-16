@@ -122,15 +122,21 @@ class Airbrakes:
     self.dir_pin  = direction_pin
 
     # Stepper motor specs
-    self.motor_direction: bool = direction
-    self.step_delay = step_delay_micro_sec/1000000.0
-    self.step_angle = step_angle
-    self.microsteps = microsteps
-    self.gear_ratio = gear_box_ratio
+    self.stepper_motor = {
+      "direction": bool(direction),
+      "step_delay": step_delay_micro_sec/1000000.0,
+      "step_angle": step_angle,
+      "microsteps": microsteps,
+      "gear_ratio": gear_box_ratio
+    }
    
     # Max steps to go from fully closed to fully open with 1.25 safety factor 
     # Division by 6 is because airbrakes only require 1/6 of a turn to open
-    self.__max_steps_to_open = 1.25*(self.gear_ratio*(360/self.step_angle)*self.microsteps)/6
+    self.__max_steps_to_open = (1.25
+                                * (self.stepper_motor["gear_ratio"]
+                                   *(360/self.stepper_motor["step_angle"])
+                                   * self.stepper_motor["microsteps"])
+                                /6)
 
     GPIO.setmode(GPIO.BOARD)
 
@@ -138,7 +144,7 @@ class Airbrakes:
     GPIO.setup(self.step_pin, GPIO.OUT)
     GPIO.setup(self.dir_pin, GPIO.OUT)
 
-    # Initialize ADC (ADS1115)
+    # Initialize ADC (ADS1115) for reading the potentiometer 
     self.i2c = busio.I2C(board.SCL, board.SDA)
     self.ads = ADS.ADS1115(self.i2c)
     self.potentiometer = AnalogIn(self.ads, ads_pot_pin)
@@ -146,7 +152,7 @@ class Airbrakes:
   def __singleStep(self, step_direction: bool):
 
     # ^ XORs the direction (inverting it if motor_direction dictates it)
-    GPIO.output(self.dir_pin, step_direction ^ self.motor_direction)
+    GPIO.output(self.dir_pin, step_direction ^ self.stepper_motor["direction"])
 
     # Pulse step pin (raise to 5V, then lower to 0V) to step the motor
     GPIO.output(self.step_pin, GPIO.HIGH)
