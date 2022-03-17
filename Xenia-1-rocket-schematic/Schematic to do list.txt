@@ -19,7 +19,7 @@ Camera
 -Connect wires.
 HX711
 -Get diagram from JJ. ^ 
--Add to Kicad.
+-Add to Kicad.^
 -Add pin reservations.
 Antennae
 -Add transmitter, 
