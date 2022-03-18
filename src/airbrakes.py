@@ -108,14 +108,14 @@ class Airbrakes:
   __min_pot_val = None
 
   def __init__(self,
-      stepper_pin,
-      direction_pin, 
-      direction: bool,
-      ads_pot_pin=0,
-      step_angle=1.8,
-      microsteps=16,
-      step_delay_micro_sec=75,
-      gear_box_ratio=14):
+              stepper_pin,
+              direction_pin, 
+              direction: bool,
+              ads_pot_pin=0,
+              step_angle=1.8,
+              microsteps=16,
+              step_delay_micro_sec=75,
+              gear_box_ratio=14):
 
     # GPIO pins
     self.step_pin = stepper_pin
@@ -155,15 +155,18 @@ class Airbrakes:
     GPIO.output(self.dir_pin, step_direction ^ self.stepper_motor["direction"])
 
     # Pulse step pin (raise to 5V, then lower to 0V) to step the motor
+    # For most stepper drivers the recommended pulse time is 5 microseconds
+    # but 7 seems to work a bit smoother.
     GPIO.output(self.step_pin, GPIO.HIGH)
-    sleep(self.step_delay)
+    sleep(7e-6)
     GPIO.output(self.step_pin, GPIO.LOW)
+    sleep(self.stepper_motor["step_delay"] - 7e-6)
 
   def calibrate(self):
     
     # Fully open brakes and record pot value
     for _ in range(self.__max_steps_to_open):
-      self._singleStep(True)
+      self.__singleStep(True)
     self.__max_pot_val = self.potentiometer.value
 
     # Fully close brakes and record pot value
@@ -177,7 +180,9 @@ class Airbrakes:
     target_pot = self.__min_pot_val + (percent/100)*(self.__max_pot_val-self.__min_pot_val)
     
     curr_error = target_pot-self.potentiometer.value
-    max_error  = 10 # TODO set this based on the resolution of ADC/pot (requires testing)
+
+    # TODO set this based on the resolution of ADC/pot, slop in gears, etc. (requires testing)
+    max_error  = 10 
 
     # Move stepper to target position within some error
     # Prevent infinite loop by never stepping more than the max to open
@@ -189,7 +194,7 @@ class Airbrakes:
       else:
         self.__singleStep(False)
 
-      curr_error = target_pot-self.potentiometer.value
+      curr_error = target_pot - self.potentiometer.value
       steps += 1
     
     # Return the final potentiometer value
