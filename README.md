@@ -52,8 +52,8 @@ The Project is broken into two folders a source folder (src) and a tests folder.
 ```
 
 1. src/airbrakes.py
+   Computes a the next value to set the airbrakes to position to. Also provides a simple interface for controlling the hardware that Airbrakes uses to  deploy the brakes. It does this through a kalman filter algorithm. Please look at the kalman filter algorithm connected    to the issue X1-AV-6 [](https://github.com/UVicRocketry/Xenia1-flight-Computer/issues/14)
    
-   Computes a the next value to set the airbrakes to position to. It does this through a kalman filter algorithm. Please look at the kalman filter algorithm connected    to the issue X1-AV-6 [](https://github.com/UVicRocketry/Xenia1-flight-Computer/issues/14)
    
 2. src/dataHandler.py
 
