@@ -5,11 +5,11 @@ General
 BME 280
 -Get Data sheet. ^
 -Put in KiCad ^
--Connect wires.
+-Connect wires.^
 IMU
 -Get data sheet ^
 -Put in KiCad^
--Connect wires.
+-Connect wires.^
 Pi
 -Import library. ^
 -Place in diagram.
@@ -20,7 +20,7 @@ Camera
 HX711
 -Get diagram from JJ. ^ 
 -Add to Kicad.^
--Add pin reservations.
+-Add pin reservations.^
 Antennae
 -Add transmitter, 
 Raven 4
