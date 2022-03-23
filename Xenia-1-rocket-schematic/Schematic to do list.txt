@@ -12,7 +12,7 @@ IMU
 -Connect wires.^
 Pi
 -Import library. ^
--Place in diagram.
+-Place in diagram.^
 Camera
 -Get data sheet. ^
 -Make sensor called camera.^
