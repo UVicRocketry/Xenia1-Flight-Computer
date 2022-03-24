@@ -3,6 +3,7 @@
 from time import sleep
 from unittest.mock import Mock
 import random
+import pytest
 
 # research needed
 # Reading input
@@ -57,16 +58,17 @@ class GPIOReader():
         self.__readLSM9DS1()
 
 
-    def __init__(self, test):
-        if test:
+    def __init__(self, test, t, h, p, a, m, g,t2):
+        if test and not t:
             self.__bme280 = Mock(temperature = random.uniform(-40,100),humidity = random.uniform(0,100), pressure = random.uniform(0,1000))
             lsm = self.__initializeRandomLSMObject()
             self.__lsm9ds1 = Mock(Acceleration = lsm, Magnetometer = lsm, Gyroscope = lsm, Temperature = random.uniform(0,100))
+        elif test:
+            self.__bme280 = Mock(temperature = t,humidity = h, pressure = p)
+            lsm = self.__initializeRandomLSMObject()
+            self.__lsm9ds1 = Mock(Acceleration = a, Magnetometer = m, Gyroscope = g, Temperature = t2)
         else:
         ## INITIALIZE PINS
             self.__bme280 = None
             self.__lsm9ds1 = None
             self.setup()
-
-    
-    
