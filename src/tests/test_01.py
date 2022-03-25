@@ -1,4 +1,5 @@
 import pytest
+#This block of code allows access to the src folder and the files that need to be tested within
 import sys
 sys.path.append(r"C:\Users\jackw\uvic\rocketry\Xenia1-flight-Computer\src")
 from gpioReader import GPIOReader

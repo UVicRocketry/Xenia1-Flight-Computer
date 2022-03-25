@@ -58,15 +58,16 @@ class GPIOReader():
         self.__readLSM9DS1()
 
 
-    def __init__(self, test, t, h, p, a, m, g,t2):
-        if test and not t:
+    def __init__(self, test, BMETemperature, BMEHumidity, BMEPressure, LSMAcceleration, LSMMagnetometer, LSMGyroscope, LSMTemperature):
+        if test and not BMETemperature:
+            #Generalized test mode is activated. Random numbers will be generated for BME and LSM sensors and program will run on a loop.
             self.__bme280 = Mock(temperature = random.uniform(-40,100),humidity = random.uniform(0,100), pressure = random.uniform(0,1000))
             lsm = self.__initializeRandomLSMObject()
             self.__lsm9ds1 = Mock(Acceleration = lsm, Magnetometer = lsm, Gyroscope = lsm, Temperature = random.uniform(0,100))
         elif test:
-            self.__bme280 = Mock(temperature = t,humidity = h, pressure = p)
-            lsm = self.__initializeRandomLSMObject()
-            self.__lsm9ds1 = Mock(Acceleration = a, Magnetometer = m, Gyroscope = g, Temperature = t2)
+            #Pytest test mode is activated. A single function will be tested using specific input.
+            self.__bme280 = Mock(temperature = BMETemperature,humidity = BMEHumidity, pressure = BMEPressure)
+            self.__lsm9ds1 = Mock(Acceleration = LSMAcceleration, Magnetometer = LSMMagnetometer, Gyroscope = LSMGyroscope, Temperature = LSMTemperature)
         else:
         ## INITIALIZE PINS
             self.__bme280 = None
