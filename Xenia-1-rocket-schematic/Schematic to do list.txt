@@ -31,3 +31,9 @@ GPS
 -Get data sheet. ^
 -Put in Kicad.
 -Add to diagram.
+Analog to digital converter
+-Get data sheet.^
+-Put in KiCad.^
+Black Box
+-Put in KiCad.^
+-Place in Schematic.^
