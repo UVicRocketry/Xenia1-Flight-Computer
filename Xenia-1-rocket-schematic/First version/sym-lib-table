@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name Xena-1-sensors)(type Legacy)(uri ${KIPRJMOD}/Xena-1-sensors.lib)(options "")(descr ""))
-)
