@@ -63,6 +63,9 @@ class SendData:
         return
     
     def send_all_data(self, sendingTo):
+        if(sendingTo == blackbox){
+        
+        }
         return
        
     def format_to_send(self, sendingTo, dataToFomat):
