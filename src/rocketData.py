@@ -1,4 +1,5 @@
 import json
+from json import encoder
 from time import time
 
 
@@ -73,7 +74,8 @@ class RocketData:
                 12: float
             },
             'encoders': {
-                'position': float
+                'position': float,
+                'percent': float
             },
             'time_stamp': float
         }
@@ -134,11 +136,13 @@ class RocketData:
 
     @property
     def encoders(self):
-        return self._data['encoders']['position']
+        return self._data['encoders']
     
     @encoders.setter
     def encoders(self, p):
-        self._data['encoders']['position'] = p
+        pos, perc = p
+        self._data['encoders']['position'] = pos
+        self._data['encoders']['percent'] = perc 
 
     @property
     def time_stamp(self):
