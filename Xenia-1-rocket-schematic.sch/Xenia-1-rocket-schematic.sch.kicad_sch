@@ -1026,7 +1026,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 167f4b97-9888-478b-a3db-fbf68e855602)
   )
-  (text "Barometer" (at 153.67 40.64 0)
+  (text "Barometric Pressure Sensor" (at 153.67 40.64 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid d61b6138-5aae-496f-a480-ac9d4645c5f1)
   )
