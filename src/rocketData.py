@@ -1,6 +1,4 @@
 import json
-from time import time
-
 
 class RocketData:
     """
@@ -63,20 +61,20 @@ class RocketData:
                 'gyroscope_z': float,
                 'temperature': float
             },
-            'strain_gauges': {
-                1: float,
-                2: float,
-                3: float,
-                4: float,
-                5: float,
-                6: float,
-                7: float,
-                8: float,
-                9: float,
-                10: float,
-                11: float,
-                12: float
-            },
+            'strain_gauges': [
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float
+            ],
             'encoders': {
                 'position': float
             },
@@ -94,18 +92,20 @@ class RocketData:
 
     @lsm.setter
     def lsm(self, vals):
-        ax, ay, az, mx, my, mz, gx, gy, gz, t = vals
-        self._data['lsm']['acceleration_x'] = ax
-        self._data['lsm']['acceleration_y'] = ay
-        self._data['lsm']['acceleration_z'] = az
-        self._data['lsm']['magentometer_x'] = mx
-        self._data['lsm']['magentometer_y'] = my
-        self._data['lsm']['magentometer_z'] = mz
-        self._data['lsm']['gyroscope_x'] = gx
-        self._data['lsm']['gyroscope_y'] = gy
-        self._data['lsm']['gyroscope_z'] = gz
-        self._data['lsm']['temperature'] = t
-
+        if len(vals) == 10:
+            ax, ay, az, mx, my, mz, gx, gy, gz, t = vals
+            self._data['lsm']['acceleration_x'] = ax
+            self._data['lsm']['acceleration_y'] = ay
+            self._data['lsm']['acceleration_z'] = az
+            self._data['lsm']['magentometer_x'] = mx
+            self._data['lsm']['magentometer_y'] = my
+            self._data['lsm']['magentometer_z'] = mz
+            self._data['lsm']['gyroscope_x'] = gx
+            self._data['lsm']['gyroscope_y'] = gy
+            self._data['lsm']['gyroscope_z'] = gz
+            self._data['lsm']['temperature'] = t
+        else: 
+            print("LSM accepts 10 values in this order: Acceleration (x, y, z), magentometer (x, y, z), gyroscope (x, y, z")
 
     @lsm.setter
     def lsm_temp(self, t):
@@ -118,9 +118,12 @@ class RocketData:
     @bme.setter
     def bme(self, vals):
         t, h, p = vals
-        self._data['bme']['temperature'] = t
-        self._data['bme']['humidity'] = h
-        self._data['bme']['pressure'] = p
+        if len(vals) == 3:
+            self._data['bme']['temperature'] = t
+            self._data['bme']['humidity'] = h
+            self._data['bme']['pressure'] = p
+        else:
+            print("BME accept exactly 3 values in this order: temperature, Humidity, Pressure")
 
     @bme.setter
     def bme_temp(self, t):
@@ -132,19 +135,10 @@ class RocketData:
 
     @strain_gauges.setter
     def strain_gauges(self, vals):
-        one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve = vals
-        self._data['strain_gauges'][1] = one
-        self._data['strain_gauges'][2] = two
-        self._data['strain_gauges'][3] = three
-        self._data['strain_gauges'][4] = four
-        self._data['strain_gauges'][5] = five
-        self._data['strain_gauges'][6] = six
-        self._data['strain_gauges'][7] = seven
-        self._data['strain_gauges'][8] = eight
-        self._data['strain_gauges'][9] = nine
-        self._data['strain_gauges'][10] = ten
-        self._data['strain_gauges'][11] = eleven
-        self._data['strain_gauges'][12] = twelve
+        if len(vals) == 12:
+            self._data['strain_gauges'] = vals
+        else:
+            print("Strain gauges must be exactly 12 values")
 
     @property
     def encoders(self):
@@ -185,7 +179,7 @@ class RocketData:
         jsonData = self.data_to_json(self._data)
         print(jsonData)
 
-    def convert_to_csv(self)
+    def convert_to_csv(self):
         dataToConvert = [
             self._data['lsm']['acceleration_x'],
             self._data['lsm']['acceleration_y'],
@@ -200,6 +194,7 @@ class RocketData:
             self._data['bme']['temperature'],
             self._data['bme']['humidity'],
             self._data['bme']['pressure'],
+            self._data['strain_gauges'][0],
             self._data['strain_gauges'][1],
             self._data['strain_gauges'][2],
             self._data['strain_gauges'][3],
@@ -211,11 +206,10 @@ class RocketData:
             self._data['strain_gauges'][9],
             self._data['strain_gauges'][10],
             self._data['strain_gauges'][11],
-            self._data['strain_gauges'][12],
             self._data['encoders']['position'],
             self._data['time_stamp']
         ]
         return dataToConvert
     #TODO: convert json data to format that antenna needs
-    def convert_antenna_format(self)
+    def convert_antenna_format(self):
         jsonData = self.data_to_json()
