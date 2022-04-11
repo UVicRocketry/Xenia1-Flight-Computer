@@ -220,14 +220,14 @@ def readRaw(result: """long equivalent"""):
     
     if isReady():
         
-        for i in range(24):
+        for bits in range(24):
             
             digitalWrite(PD_SCK, HIGH) # digitalWrite_equivalent(PD_SCK, HIGH)
             delayMicroseconds(1)       # delayMicroseconds_equivalent(1)
             
             if result != None:
-                for j in range(COUNT):
-                    # bitWrite_equivalent(result[j], 23 - i, digitalRead_equivalent(DOUT[j]))
+                for gauges in range(COUNT):
+                    # bitWrite_equivalent(result[gauges], 23 - bits, digitalRead_equivalent(DOUT[gauges]))
                     
             digitalWrite(PD_SCK, LOW)  # digitalWrite_equivalent(PD_SCK, LOW)
             delayMicroseconds(1)       # delayMicrosecond_equivalent(1)
@@ -240,7 +240,7 @@ def readRaw(result: """long equivalent"""):
         
         if result != None:
             
-            for j in range(COUNT):
+            for gauges in range(COUNT):
                 
                 # this stuff is currently beyond me. Investigate further
             
