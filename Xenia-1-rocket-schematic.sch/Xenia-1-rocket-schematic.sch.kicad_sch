@@ -1037,6 +1037,7 @@
     )
   )
 
+
   (junction (at 16.51 30.48) (diameter 0) (color 0 0 0 0)
     (uuid b42cfd7a-34bf-42cc-9c2a-8c410e74c4bb)
   )
@@ -1047,13 +1048,18 @@
     (uuid fc854c6b-6685-4ac8-b678-1467af47b1bc)
   )
 
+  (no_connect (at 140.97 106.68) (uuid 3ca0de6f-9baf-4257-84cf-7559670ae3c6))
+  (no_connect (at 140.97 114.3) (uuid 3ca0de6f-9baf-4257-84cf-7559670ae3c6))
   (no_connect (at 40.64 87.63) (uuid 437e85ba-ae7f-4ed0-9fc9-8ac0e7991c2d))
   (no_connect (at 40.64 91.44) (uuid 437e85ba-ae7f-4ed0-9fc9-8ac0e7991c2d))
+  (no_connect (at 95.25 99.06) (uuid 58ad9df6-a7d8-45f5-8df3-90c5c0e0c63e))
+  (no_connect (at 140.97 93.98) (uuid 5edc236b-f9ee-44c8-8d4a-454dbf40edb9))
+  (no_connect (at 140.97 104.14) (uuid 5edc236b-f9ee-44c8-8d4a-454dbf40edb9))
+  (no_connect (at 140.97 96.52) (uuid 5edc236b-f9ee-44c8-8d4a-454dbf40edb9))
   (no_connect (at -8.89 105.41) (uuid ad73347d-1d5c-42b6-ab42-3c782b289dfc))
   (no_connect (at 40.64 99.06) (uuid ad73347d-1d5c-42b6-ab42-3c782b289dfd))
   (no_connect (at 40.64 102.87) (uuid ad73347d-1d5c-42b6-ab42-3c782b289dfe))
   (no_connect (at 40.64 106.68) (uuid ad73347d-1d5c-42b6-ab42-3c782b289dff))
-  (no_connect (at 137.16 26.67) (uuid b79e5df4-129f-4fb0-a094-757abe1b9174))
   (no_connect (at 97.79 25.4) (uuid b79e5df4-129f-4fb0-a094-757abe1b9174))
   (no_connect (at 97.79 52.07) (uuid b79e5df4-129f-4fb0-a094-757abe1b9174))
   (no_connect (at 137.16 38.1) (uuid b79e5df4-129f-4fb0-a094-757abe1b9174))
@@ -1061,6 +1067,15 @@
   (no_connect (at 97.79 40.64) (uuid b79e5df4-129f-4fb0-a094-757abe1b9174))
   (no_connect (at 97.79 44.45) (uuid b79e5df4-129f-4fb0-a094-757abe1b9174))
   (no_connect (at 97.79 48.26) (uuid b79e5df4-129f-4fb0-a094-757abe1b9174))
+  (no_connect (at 137.16 26.67) (uuid b79e5df4-129f-4fb0-a094-757abe1b9174))
+  (no_connect (at 140.97 124.46) (uuid c5bde293-c609-446e-9f32-0937eb865e95))
+  (no_connect (at 140.97 121.92) (uuid c5bde293-c609-446e-9f32-0937eb865e95))
+  (no_connect (at 140.97 127) (uuid c5bde293-c609-446e-9f32-0937eb865e95))
+  (no_connect (at 140.97 132.08) (uuid c5bde293-c609-446e-9f32-0937eb865e95))
+  (no_connect (at 140.97 119.38) (uuid c5bde293-c609-446e-9f32-0937eb865e95))
+  (no_connect (at 95.25 124.46) (uuid c5bde293-c609-446e-9f32-0937eb865e95))
+  (no_connect (at 95.25 111.76) (uuid c5bde293-c609-446e-9f32-0937eb865e95))
+  (no_connect (at 95.25 139.7) (uuid c5bde293-c609-446e-9f32-0937eb865e95))
 
   (wire (pts (xy 16.51 34.29) (xy 21.59 34.29))
     (stroke (width 0) (type default) (color 0 0 0 0))
@@ -1455,7 +1470,7 @@
   (symbol (lib_id "power:GND") (at 85.09 101.6 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid 0d6c1a1a-175e-40e8-b2c5-e7836f213148)
-    (property "Reference" "#PWR?" (id 0) (at 85.09 107.95 0)
+    (property "Reference" "#PWR0102" (id 0) (at 85.09 107.95 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (id 1) (at 85.09 106.0434 0))
@@ -2010,7 +2025,7 @@
   (symbol (lib_id "power:+3V3") (at 95.25 91.44 0) (unit 1)
     (in_bom yes) (on_board yes) (fields_autoplaced)
     (uuid f507a0b9-6ce9-4ad3-8580-7bb9f0fa1d69)
-    (property "Reference" "#PWR?" (id 0) (at 95.25 95.25 0)
+    (property "Reference" "#PWR0101" (id 0) (at 95.25 95.25 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3V3" (id 1) (at 95.25 87.8642 0))
@@ -2128,11 +2143,11 @@
     (path "/fb6e9173-28d5-4054-9860-955f43f247ce"
       (reference "#PWR022") (unit 1) (value "GND") (footprint "")
     )
-    (path "/0d6c1a1a-175e-40e8-b2c5-e7836f213148"
-      (reference "#PWR?") (unit 1) (value "GND") (footprint "")
-    )
     (path "/f507a0b9-6ce9-4ad3-8580-7bb9f0fa1d69"
-      (reference "#PWR?") (unit 1) (value "+3V3") (footprint "")
+      (reference "#PWR0101") (unit 1) (value "+3V3") (footprint "")
+    )
+    (path "/0d6c1a1a-175e-40e8-b2c5-e7836f213148"
+      (reference "#PWR0102") (unit 1) (value "GND") (footprint "")
     )
     (path "/07586f57-2849-4baa-92f1-2a6ff9d8d68e"
       (reference "A1") (unit 1) (value "rPi0w2") (footprint "ADA3708_RPI-ZERO")
