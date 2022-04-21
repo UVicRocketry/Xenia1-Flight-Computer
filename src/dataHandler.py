@@ -1,4 +1,5 @@
 from rocketData import RocketData as rd
+import csv
 class SendData:
     """
     This only deals with sending the rocketdata. RocketData class in src/rocketData.py deals with manipulating the data.  
@@ -66,8 +67,8 @@ class SendData:
         if(sendingTo == blackbox):
             data = self.convert_to_csv()
             f = open('', 'a')
-            f.write(data)
-            f.write("\n")
+            writer = csv.writer(f)
+            writer.writerow(data)
             f.close()
         
         return
