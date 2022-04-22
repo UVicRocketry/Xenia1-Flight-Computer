@@ -46,8 +46,8 @@ isReady()
         When output data is not ready for retrieval:
         - Digital output pin (DOUT) is high (5V)
         - Serial clock input (PD_SCK) should be low. 
-        When DOUT goes to low (0V):
-        - Indicates that data is ready for retrieval
+        When ready for retrieval:
+        -  DOUT goes to low (0V):
 
     Returns True if HX711 is ready, False otherwise.
 
