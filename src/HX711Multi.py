@@ -63,8 +63,7 @@ __powerUp()
     
 tare()
     Sets __offsets[] for each chip. This checks for excessive deviations
-    in readings and fails if standard deviation of readings is greater than
-    max_std_dev
+    in readings and fails if more than 20% of readings lie outside the std dev.
 
     Returns True if offsets are calculated, False if high deviation occurs.
     
@@ -75,8 +74,8 @@ tare()
         their standard deviation
 
     max_std_dev [float]
-        Maximum allowable standard deviation of the values read before tare()
-        will return False.
+        Maximum allowable standard deviation of a value from the mean before
+        tare() will reject it.
 
 read()
     Gets a reading from all HX711s. NOTE: isReady() must return True before
@@ -115,7 +114,8 @@ class HX711_Multi:
         self.__debug_enabled = debug
         self.__num_of_HX711s = len(self.__DOUT_pins)
 
-        GPIO.setmode(GPIO.BOARD)
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
 
         # Set the pins as outputs
         GPIO.setup(self.__PD_SCK_pin, GPIO.OUT)
@@ -123,38 +123,62 @@ class HX711_Multi:
             GPIO.setup(pin, GPIO.IN)
             
         self.__setGain(gain)
+        self.__powerUp()
 
     def isReady(self):
 
         # DOUT pin goes low (0V) when it is ready to send a reading
         for data_pin in self.__DOUT_pins:
             if GPIO.input(data_pin) == GPIO.HIGH:
+                if self.__debug_enabled:
+                    print("HX711 on pin", data_pin, "not ready")
+                    continue
                 return False
                 
         return True
 
-    def tare(self, num_of_samples: int, max_std_dev: float):
+    def tare(self, num_of_samples: int, max_std_dev_from_mean: float):
 
-        samples = [self.read_raw() for _ in range(num_of_samples)]
-
-        # Create matrix where each row is readings from a single HX711
-        samples_matrix = np.matrix(samples).T
-
-        # Transpose the matrix and calculate standard deviation of each row.
-        std_devs = [np.std(row) for row in samples_matrix]
-                
-	# Reject excessive deviations
-        if max(std_devs) >= max_std_dev:
-            if self.__debug_enabled:
-                print("Max standard deviation", max(std_devs),
-                      "is greater than allowable (", max_std_dev, ")\n")
-
-                print("Check HX711 connected to GPIO pin", 
-                      self.__DOUT_pins[np.argmax(std_devs)])
+        if num_of_samples < 100:
+            print("Cannot tare with less than 100 samples!")
             return False
         
-        avg_samples = [np.average(row) for row in samples_matrix]
+        samples = []
+        while len(samples) < num_of_samples:
+            if self.isReady():
+                samples.append(self.readRaw())
+
+        """
+            Do some fat stats to reject outlier data points based on
+            https://www.adamsmith.haus/python/answers/how-to-remove-
+            outliers-from-a-numpy-array-in-python
+        """
+
+        samples = np.array(samples).T
+        means = np.mean(samples, axis=1).reshape(-1,1)
+        std_devs = np.std(samples, axis=1).reshape(-1,1)
+        dists_from_means = abs(samples - means)
+
+        # True/false mask to extract non outlier values
+        no_outliers = dists_from_means <= (max_std_dev_from_mean * std_devs)
+        clean_data = [row[no_outliers[i]] for i,row in enumerate(samples)]
+
+        clean_data_length = 0
+        for data_list in clean_data:
+            clean_data_length += len(data_list)
+
+        if len(clean_data) < 0.8*len(samples):
+            if self.__debug_enabled:
+                print("Failed to tare. Excessive deviations measured.")
+            return false
+            
+        # Calculate offsets from clean data
+        avg_samples = [np.average(row) for row in clean_data]
         self.__offsets = avg_samples
+
+        if self.__debug_enabled:
+            print("Tared, offsets:")
+            print(self.__offsets)
 
         return True
 
@@ -168,40 +192,41 @@ class HX711_Multi:
 
     def readRaw(self):
 
-        if not self.isReady():
-            if self.__debug_enabled:
-                print("HX711s are not ready! Ensure isReady() returns True",
-                      "before calling read() or readRaw()")
-            return False
+        if self.__debug_enabled and not self.isReady():
+            print("HX711s are not ready! Ensure isReady() returns True",
+                  "before calling read() or readRaw()")
 
-        readings = []
-        
-        # Signal to the HX711s they are going to be read from
-        GPIO.output(self.__PD_SCK_pin, GPIO.HIGH)
+        # Read value from every HX711. Each cycle of PD_SCK shifts one bit
+        # out in twos complement.
+        readings = [0]*self.__num_of_HX711s
 
-        # Read value from every HX711
-        for data_pin in self.__DOUT_pins:
-            for bits in range(24):
-                reading = (reading << 1) | GPIO.input(data_pin)
+        for bits in range(24):
 
-            readings.append(reading)
-                    
+            GPIO.output(self.__PD_SCK_pin, GPIO.HIGH)
+            GPIO.output(self.__PD_SCK_pin, GPIO.LOW)
+
+            for i, data_pin in enumerate(self.__DOUT_pins):
+                readings[i] = readings[i] << 1
+                readings[i] |= GPIO.input(data_pin)
+
+        # Gain for the next reading is set by cycling the PD_SCK pin
+        # __gain number of times.
         GPIO.output(self.__PD_SCK_pin, GPIO.LOW)
 
-        # Gain for the next reading is set by cycling the PD_SCK pin a
-        # certain number of times.
         for _ in range(self.__gain):
             GPIO.output(self.__PD_SCK_pin, GPIO.HIGH)
             GPIO.output(self.__PD_SCK_pin, GPIO.LOW)
             
         # Calculate int from 2's complement as this is the form the HX711
-        # sends its data according to the datasheet.
-        for (i, reading) in enumerate(readings):
-            if (reading & 0x800000):
-                readings[i] = -(reading ^ 0xffffff) + 1
+        # sends its data according to the datasheet. Readings are 24bit.
+        for reading in readings:
+            if (reading & (1 << (24 - 1))) != 0:
+                reading = reading - (1 << 24)
+
+        return readings
 
     def __powerUp(self):
-        GPIO.output(self.PD_SCK, GPIO.LOW)
+        GPIO.output(self.__PD_SCK_pin, GPIO.LOW)
 
     def __setGain(self, gain):
 
