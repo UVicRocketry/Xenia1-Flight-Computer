@@ -21,7 +21,7 @@ __DOUT_pins List[int]: GPIO pins connected to data pins of each HX711
 (Pin 11 labeled DOUT in datasheet)
 
 __gain [int]: HX711 features programmable gain settings of 64 or 128 for
-channel A which is what we use. 128 is used by default. NOTE: __gain stores
+channel A which is used on the strain gauge pcb. 128 is used by default. NOTE: __gain stores
 the number of cycles of the PD_SCK pin needed to set the gain for the HX711. For
 128, __gain = 3, for 64, __gain = 2. This is outlined in the datasheet for the
 HX711.
