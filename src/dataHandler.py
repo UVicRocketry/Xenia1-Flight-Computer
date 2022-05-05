@@ -33,9 +33,10 @@ class SendData:
             
     send_all_data(self, sendingTo)
         Desciption:
-            Calls all send_[sensor] methods and sends an updated 
+            For sending to blackbox: Calls convert_to_csv to get a list of all the data and saves it to a csv 
         Parm:
             sendingTo can either be "blackbox", "antenna"
+            destination: the name of the csv file to save to
             
     format_to_send(self, sendingTo)
         Description:
