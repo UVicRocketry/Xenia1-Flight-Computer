@@ -63,7 +63,7 @@ class SendData:
     def send_strain_gauges(self, sendingTo):
         return
     
-    def send_all_data(self, sendingTo):
+    def send_all_data(self, sendingTo, destination):
         if(sendingTo == blackbox):
             data = self.convert_to_csv()
             f = open('theNameOfTheFile.csv', 'a')
