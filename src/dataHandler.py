@@ -71,7 +71,6 @@ class SendData:
             writer.writerow(data)
             f.close()
         
-        return
        
     def format_to_send(self, sendingTo, dataToFomat):
         return
