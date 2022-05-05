@@ -64,7 +64,7 @@ class SendData:
         return
     
     def send_all_data(self, sendingTo, destination):
-        if(sendingTo == blackbox):
+        if sendingTo == 'blackbox':
             data = self.convert_to_csv()
             f = open('theNameOfTheFile.csv', 'a')
             writer = csv.writer(f)
