@@ -1,5 +1,6 @@
+import csv
 import json
-from time import time
+#from time import time
 
 
 class RocketData:
@@ -42,6 +43,14 @@ class RocketData:
     print_json_data()
         Desciption:
             prints the current state of the json to the terminal
+
+    all_rocket_data(self)
+        Description:
+            returns all data currently in self._data as an array
+
+    convert_to_csv_string(self):
+        Desciption:
+            returns a single csv string that contains all the data in self._data
 
     """
     def __init__(self):
@@ -172,7 +181,7 @@ class RocketData:
         print(jsonData)
 
     def all_rocket_data(self):
-        allRocketData = [
+        all_data = [
             self._data['imu']['temperature'],
             self._data['imu']['humidity'],
             self._data['imu']['pressure'],
@@ -196,15 +205,15 @@ class RocketData:
             self._data['encoders']['position'],
             self._data['time_stamp']
         ]
-        return allRocketData
+        return all_data
 
     def convert_to_csv_string(self):
-        dToConvert = self.all_rocket_data()
-        csvString = str(dToConvert[0])
-        for d in dToConvert[1:]:
-            csvString += "," + str(d)
+        data_to_convert = self.all_rocket_data()
+        csv_string = str(data_to_convert[0])
+        for data in data_to_convert[1:]:
+            csv_string += "," + str(data)
 
-        return csvString
+        return csv_string
 
     #TODO: convert json data to format that antenna needs
     def convert_antenna_format(self):
