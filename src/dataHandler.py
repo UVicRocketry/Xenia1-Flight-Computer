@@ -66,7 +66,7 @@ class SendData:
     
     def send_all_data(self, sendingTo, destination):
         if sendingTo == 'blackbox':
-            data = self.convert_to_csv()
+            data = self.rocket_data.convert_to_csv()
             f = open(destination, 'a')
             writer = csv.writer(f)
             writer.writerow(data)
