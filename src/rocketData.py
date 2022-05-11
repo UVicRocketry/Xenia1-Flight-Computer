@@ -198,5 +198,5 @@ class RocketData:
         ]
         return dataToConvert
     #TODO: convert json data to format that antenna needs
-    def convert_antenna_format(self)
+    def convert_antenna_format(self):
         jsonData = self.data_to_json()
