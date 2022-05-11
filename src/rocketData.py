@@ -171,7 +171,7 @@ class RocketData:
         jsonData = self.data_to_json(self._data)
         print(jsonData)
     
-    def convert_to_csv(self)
+    def convert_to_csv(self):
         dataToConvert = [
             self._data['imu']['temperature'],
             self._data['imu']['humidity'],
