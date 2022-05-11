@@ -46,11 +46,11 @@ class SendData:
     -------
     """
     def __init__(self, rd):
-        rocket_data = rd
+        self.rocket_data = rd
     
     # TODO: parm rd is a dict of updated 
     def update_rocket_data(self, rocketData):
-        rocket_data = rd.data_dict_set(rocketData)
+        self.rocket_data = rd.data_dict_set(rocketData)
         
     def send_bme(self, sendingTo):
         # call format data
