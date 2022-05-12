@@ -105,7 +105,7 @@ class RocketData:
             self._data['lsm']['gyroscope_z'] = gz
             self._data['lsm']['temperature'] = t
         else: 
-            print("LSM accepts 10 values in this order: Acceleration (x, y, z), magentometer (x, y, z), gyroscope (x, y, z")
+            print("LSM accepts 10 values in this order: Acceleration (x, y, z), magentometer (x, y, z), gyroscope (x, y, z)")
 
     @lsm.setter
     def lsm_temp(self, t):
