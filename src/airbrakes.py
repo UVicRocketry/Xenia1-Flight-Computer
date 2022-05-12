@@ -93,7 +93,7 @@ calibrate():
 deployBrakes():
   Opens the brakes to the specifed percentage of fully open.
 
-  Returns value of potentiometer at final position.
+  Returns value of potentiometer/percent open at final position.
 
   Note: This uses the potentiometer for feedback so there will be a small
   error associated with this. Adjust this error by changing max_error in
@@ -197,5 +197,8 @@ class Airbrakes:
       curr_error = target_pot - self.potentiometer.value
       steps += 1
     
-    # Return the final potentiometer value
-    return self.potentiometer.value
+    percent_deployed = ((self.potentiometer.value-self.__min_pot_val)/
+              (self.__max_pot_val-self.__min_pot_val))
+
+    # Return the final potentiometer value and percentage open
+    return (self.potentiometer.value, percent_deployed)

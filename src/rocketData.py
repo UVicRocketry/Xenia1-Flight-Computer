@@ -1,4 +1,9 @@
+import csv
 import json
+from json import encoder
+from time import time
+
+
 
 class RocketData:
     """
@@ -41,6 +46,14 @@ class RocketData:
         Desciption:
             prints the current state of the json to the terminal
 
+    all_rocket_data(self)
+        Description:
+            returns all data currently in self._data as an array
+
+    convert_to_csv_string(self):
+        Desciption:
+            returns a single csv string that contains all the data in self._data
+
     """
     def __init__(self):
         self._data = {
@@ -76,7 +89,8 @@ class RocketData:
                 float
             ],
             'encoders': {
-                'position': float
+                'position': float,
+                'percent': float
             },
             'time_stamp': float
         }
@@ -141,12 +155,18 @@ class RocketData:
             print("Strain gauges must be exactly 12 values")
 
     @property
-    def encoders(self):
+    def encoders_position(self):
         return self._data['encoders']['position']
 
+    @property
+    def encoders_percent(self):
+        return self._data['encoder']['percent]
+    
     @encoders.setter
     def encoders(self, p):
-        self._data['encoders']['position'] = p
+        pos, perc = p
+        self._data['encoders']['position'] = pos
+        self._data['encoders']['percent'] = perc 
 
     @property
     def time_stamp(self):
@@ -179,9 +199,9 @@ class RocketData:
         jsonData = self.data_to_json(self._data)
         print(jsonData)
 
-    def convert_to_csv(self):
-        dataToConvert = [
-            self._data['lsm']['acceleration_x'],
+    def all_rocket_data(self):
+        all_data = [
+          self._data['lsm']['acceleration_x'],
             self._data['lsm']['acceleration_y'],
             self._data['lsm']['acceleration_z'],
             self._data['lsm']['magentometer_x'],
@@ -209,7 +229,12 @@ class RocketData:
             self._data['encoders']['position'],
             self._data['time_stamp']
         ]
-        return dataToConvert
-    #TODO: convert json data to format that antenna needs
-    def convert_antenna_format(self):
-        jsonData = self.data_to_json()
+        return all_data
+
+    def convert_to_csv_string(self):
+        data_to_convert = self.all_rocket_data()
+        csv_string = str(data_to_convert[0])
+        for data in data_to_convert[1:]:
+            csv_string += "," + str(data)
+
+        return csv_string

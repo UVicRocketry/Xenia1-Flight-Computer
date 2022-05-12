@@ -77,11 +77,4 @@ The Project is broken into two folders a source folder (src) and a tests folder.
 
 ![Kalman Filter Image](/KalmanFilter.drawio.png)
 
-## Test Mode
 
-Tests are initialized by passing test and test file name as arguments in the command line. 
-```
-Tests will be pass/fail.
-A test will be determined as a pass or fail if data is read and written correctly. 
-
-```
