@@ -57,32 +57,37 @@ class RocketData:
     """
     def __init__(self):
         self._data = {
-            'imu': {
+            'bme': {
                 'temperature': float,
                 'humidity': float,
                 'pressure': float,
             },
-            'bme': {
-                'yaw': float,
-                'pitch': float,
-                'roll': float,
-                'linear_acceleration': float,
-                'linear_velocity': float
+            'lsm': {
+                'acceleration_x': float,
+                'acceleration_y': float,
+                'acceleration_z': float,
+                'magentometer_x': float,
+                'magentometer_y': float,
+                'magentometer_z': float,
+                'gyroscope_x': float,
+                'gyroscope_y': float,
+                'gyroscope_z': float,
+                'temperature': float
             },
-            'strain_gauges': {
-                1: float,
-                2: float,
-                3: float,
-                4: float,
-                5: float,
-                6: float,
-                7: float,
-                8: float,
-                9: float,
-                10: float,
-                11: float,
-                12: float
-            },
+            'strain_gauges': [
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float,
+                float
+            ],
             'encoders': {
                 'position': float,
                 'percent': float
@@ -96,20 +101,29 @@ class RocketData:
         return self._data
 
     @property
-    def imu(self):
-        return self._data['imu']
+    def lsm(self):
+        return self._data['lsm']
 
-    @imu.setter
-    def imu(self, vals):
-        t, h, p = vals
-        self._data['imu']['temperature'] = t
-        self._data['imu']['humidity'] = h
-        self._data['imu']['pressure'] = p
+    @lsm.setter
+    def lsm(self, vals):
+        if len(vals) == 10:
+            ax, ay, az, mx, my, mz, gx, gy, gz, t = vals
+            self._data['lsm']['acceleration_x'] = ax
+            self._data['lsm']['acceleration_y'] = ay
+            self._data['lsm']['acceleration_z'] = az
+            self._data['lsm']['magentometer_x'] = mx
+            self._data['lsm']['magentometer_y'] = my
+            self._data['lsm']['magentometer_z'] = mz
+            self._data['lsm']['gyroscope_x'] = gx
+            self._data['lsm']['gyroscope_y'] = gy
+            self._data['lsm']['gyroscope_z'] = gz
+            self._data['lsm']['temperature'] = t
+        else: 
+            print("LSM accepts 10 values in this order: Acceleration (x, y, z), magentometer (x, y, z), gyroscope (x, y, z)")
 
-    @imu.setter
-    def imu_temp(self, t):
-        self._data['imu']['temperature'] = t
-
+    @lsm.setter
+    def lsm_temp(self, t):
+        self._data['lsm']['temperature'] = t
 
     @property
     def bme(self):
@@ -117,12 +131,17 @@ class RocketData:
 
     @bme.setter
     def bme(self, vals):
-        y, p, r, a, v = vals
-        self._data['bme']['yaw'] = y
-        self._data['bme']['pitch'] = p
-        self._data['bme']['roll'] = r
-        self._data['bme']['linear_acceleration'] = a
-        self._data['bme']['linear_velocity'] = v
+        t, h, p = vals
+        if len(vals) == 3:
+            self._data['bme']['temperature'] = t
+            self._data['bme']['humidity'] = h
+            self._data['bme']['pressure'] = p
+        else:
+            print("BME accept exactly 3 values in this order: temperature, Humidity, Pressure")
+
+    @bme.setter
+    def bme_temp(self, t):
+        self._data['bme']['temperature'] = t
 
     @property
     def strain_gauges(self):
@@ -130,24 +149,19 @@ class RocketData:
 
     @strain_gauges.setter
     def strain_gauges(self, vals):
-        one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve = vals
-        self._data['strain_gauges'][1] = one
-        self._data['strain_gauges'][2] = two
-        self._data['strain_gauges'][3] = three
-        self._data['strain_gauges'][4] = four
-        self._data['strain_gauges'][5] = five
-        self._data['strain_gauges'][6] = six
-        self._data['strain_gauges'][7] = seven
-        self._data['strain_gauges'][8] = eight
-        self._data['strain_gauges'][9] = nine
-        self._data['strain_gauges'][10] = ten
-        self._data['strain_gauges'][11] = eleven
-        self._data['strain_gauges'][12] = twelve
+        if len(vals) == 12:
+            self._data['strain_gauges'] = vals
+        else:
+            print("Strain gauges must be exactly 12 values")
 
     @property
-    def encoders(self):
-        return self._data['encoders']
+    def encoders_position(self):
+        return self._data['encoders']['position']
 
+    @property
+    def encoders_percent(self):
+        return self._data['encoder']['percent]
+    
     @encoders.setter
     def encoders(self, p):
         pos, perc = p
@@ -165,10 +179,10 @@ class RocketData:
     #Set all sensor data
     @data.setter
     def set_data(self, vals):
-        imu_t, imu_h, imu_p, bme_y, bme_p, bme_r, bme_a, bme_v, sg_1, sg_2, sg_3, sg_4, sg_5, sg_6, sg_7, sg_8, sg_9, sg_10, sg_11, sg_12, e, ts = vals
-        print(imu_t)
-        self.imu([imu_t, imu_h, imu_p])
-        self.bme([bme_y, bme_p, bme_r, bme_a, bme_v])
+        lsm_ax, lsm_ay, lsm_az, lsm_mx, lsm_my, lsm_mz, lsm_gx, lsm_gy, lsm_gz, lsm_t, bme_t, bme_h, bme_p, sg_1, sg_2, sg_3, sg_4, sg_5, sg_6, sg_7, sg_8, sg_9, sg_10, sg_11, sg_12, e, ts = vals
+        print(lsm_t)
+        self.imu([lsm_ax, lsm_ay, lsm_az, lsm_mx, lsm_my, lsm_mz, lsm_gx, lsm_gy, lsm_gz, lsm_t])
+        self.bme([bme_t, bme_h, bme_p])
         self.strain_gauges([sg_1, sg_2, sg_3, sg_4, sg_5, sg_6, sg_7, sg_8, sg_9, sg_10, sg_11, sg_12])
         self.encoders(e)
         self.time_stamp(ts)
@@ -187,14 +201,20 @@ class RocketData:
 
     def all_rocket_data(self):
         all_data = [
-            self._data['imu']['temperature'],
-            self._data['imu']['humidity'],
-            self._data['imu']['pressure'],
-            self._data['bme']['yaw'],
-            self._data['bme']['pitch'],
-            self._data['bme']['roll'],
-            self._data['bme']['linear_acceleration'],
-            self._data['bme']['linear_velocity'],
+          self._data['lsm']['acceleration_x'],
+            self._data['lsm']['acceleration_y'],
+            self._data['lsm']['acceleration_z'],
+            self._data['lsm']['magentometer_x'],
+            self._data['lsm']['magentometer_y'],
+            self._data['lsm']['magentometer_z'],
+            self._data['lsm']['gyroscope_x'],
+            self._data['lsm']['gyroscope_y'],
+            self._data['lsm']['gyroscope_z'],
+            self._data['lsm']['temperature'],
+            self._data['bme']['temperature'],
+            self._data['bme']['humidity'],
+            self._data['bme']['pressure'],
+            self._data['strain_gauges'][0],
             self._data['strain_gauges'][1],
             self._data['strain_gauges'][2],
             self._data['strain_gauges'][3],
@@ -206,7 +226,6 @@ class RocketData:
             self._data['strain_gauges'][9],
             self._data['strain_gauges'][10],
             self._data['strain_gauges'][11],
-            self._data['strain_gauges'][12],
             self._data['encoders']['position'],
             self._data['time_stamp']
         ]
@@ -219,7 +238,3 @@ class RocketData:
             csv_string += "," + str(data)
 
         return csv_string
-
-    #TODO: convert json data to format that antenna needs
-    def convert_antenna_format(self):
-        jsonData = self.data_to_json()
