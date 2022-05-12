@@ -18,21 +18,19 @@ class GeneralLSMObject :
     }
     
 
-
+#TODO: write issue to change from print statements to updating rocketData in main (make read functions return objects ...)
 class GPIOReader():
     def __initializeRandomLSMObject(self):
         lsmobject = [random.uniform(0,100),random.uniform(0,100),random.uniform(0,100)]
         return lsmobject
 
     def __readBME280(self):
-        ## TODO: Store Values in CSV file for external use ##
         print("Temperature: %0.1f C" % self.__bme280.temperature)
         print("Humidity: %0.1f %%" % self.__bme280.humidity)
         print("Pressure: %0.1f hPa" % self.__bme280.pressure)
 
     
     def __readLSM9DS1(self):
-        ## TODO: Store Values in CSV file for external use ##
         print("Acceleration (m/s^2): ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*self.__lsm9ds1.Acceleration))
         print("Magnetometer (gauss: ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*self.__lsm9ds1.Magnetometer))
         print("Gyroscope (degrees/sec): ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*self.__lsm9ds1.Gyroscope))
@@ -66,7 +64,4 @@ class GPIOReader():
         ## INITIALIZE PINS
             self.__bme280 = None
             self.__lsm9ds1 = None
-            self.setup()
-
-    
-    
+            self.__setup()
