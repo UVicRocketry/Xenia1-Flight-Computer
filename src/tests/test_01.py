@@ -9,6 +9,7 @@ from gpioReader import GPIOReader
 #this test is an example of how to write tests
 
 #tests must have the word "test" in them so pytest can identify it is a test function
+#capsys captures system input/output such as outputting to console or writing in a file
 def test_gpioReader_01(capsys):
     #input the values that you wish to simulate coming from the BME and LSM sensors. The input goes as follows:
     #   first value must be <True> to initialise testing mode
