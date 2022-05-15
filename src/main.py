@@ -31,7 +31,7 @@ if __name__ == "__main__":
     if(test_mode): 
         while(running):
             #retrieves random data from GPIOReader
-            gpio = GPIOReader(test_mode)
+            gpio = GPIOReader(test_mode, False, False, False, False, False, False, False)
             gpio.retrieveData()
             
             ## Update rocketData object
