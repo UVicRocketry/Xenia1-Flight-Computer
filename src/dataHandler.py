@@ -14,25 +14,25 @@ class SendData:
     Methods
     -------
     send_bme(self, sendingTo)
-        Desciption:
+        Description:
             only called in send_all
         Parm:
             sendingTo can either be "blackbox", "antenna"
             
     send_imu(self, sendingTo)
-        Desciption:
+        Description:
             only called in send_all
         Parm:
             sendingTo can either be "blackbox", "antenna"
             
     send_strain_gauges(self, sendingTo)
-         Desciption:
+         Description:
             only called in send_all
         Parm:
             sendingTo can either be "blackbox", "antenna"
             
     send_all_data(self, sendingTo)
-        Desciption:
+        Description:
             For sending to blackbox: Calls convert_to_csv to get a list of all the data and saves it to a csv 
         Parm:
             sendingTo can either be "blackbox", "antenna"
