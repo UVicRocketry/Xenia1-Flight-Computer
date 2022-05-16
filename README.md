@@ -1,5 +1,10 @@
 # Xenia1-flight-Computer
 
+## Requirements/ Imports
+To pip install all the necessary imports run
+$ pip install -r requirements.txt
+*Please Update requirements.txt with new imports if you add any*
+
 ## Style
 
 - Class names: starting with capital then camel 
