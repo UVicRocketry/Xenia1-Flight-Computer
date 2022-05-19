@@ -16,7 +16,7 @@ assignees: ''
 
 # Acceptance Criteria
  <Write specifically what is need for this issue to be completed>
- - [ ]
+- [ ]    AC 1
 
 # Dev Notes
 [for assignee]<write down your thought process when developing this issue>
