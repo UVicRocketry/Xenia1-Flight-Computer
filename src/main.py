@@ -4,7 +4,7 @@
 
 from gpioReader import GPIOReader
 import sys
-
+from rocketData import RocketData as rd
 #TODO: 
 # - Implement initialize() for any setup
 # - Implement main loop for mid flight controls
@@ -12,7 +12,7 @@ import sys
 
 
 def initialize():
-    
+    rocket_data = rd()
     return 0 
 
 
@@ -20,6 +20,8 @@ if __name__ == "__main__":
     
     ### Main code goes here###
     test_mode = False #use "python main.py test" to initialize test mode
+
+
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "test":
@@ -32,11 +34,13 @@ if __name__ == "__main__":
         while(running):
             #retrieves random data from GPIOReader
             gpio = GPIOReader(test_mode, False, False, False, False, False, False, False)
-            gpio.retrieveData()
+            gpio.retrieveData() 
             
-            ## Update rocketData object
-            
-            ## Do airbrakes stuff
+            ## Update rocketData object 
+
+            # rocket_data = gpio.retrieveData() TODO: uncomment when X1-AV-43 is merged
+
+            ## Do airbrakes 
             
             ## Send rocketData to datahandler call send function
 
@@ -45,9 +49,10 @@ if __name__ == "__main__":
         while(running):
         ## Setup a loop that continues until we tell it to stop
             ## Read GPIO Input
-            print("")
             ## Update rocketData object
             
+            # rocket_data = gpio.retrieveData() TODO: uncomment when X1-AV-43 is merged
+
             ## Send GPIO rocketData to datahandler for output
 
             ## Do air brakes math (to be implemented later with kris)

@@ -2,8 +2,162 @@ import csv
 import json
 from json import encoder
 from time import time
+from turtle import position
 
+#helper functions - these are used to create objects to be set in rocketData
 
+class Bme:
+    """
+    bme sensor object
+
+    ...
+
+    Attributes
+    ----------
+
+    acceleration_x : float 
+        acceleration in the x direction
+
+    acceleration_y : float
+        humidity in _ units
+
+    acceleration_z : float 
+        temperature in _ units
+
+    """
+    temperature = float
+    humidity = float
+    pressure = float
+    __bme = {}
+
+    def __init__(self, t, h, p):
+        self.temperature = t
+        self.humidity = h
+        self.pressure = p
+        self.__bme = {
+            'temperature': self.temperature,
+            'humidity': self.humidity,
+            'pressure': self.pressure
+        }
+    
+    def __getattribute__(self, _bme: object) -> object:
+        pass
+        
+#TODO: add units
+class Lsm: 
+    """
+    lsm sensor object
+
+    ...
+
+    Attributes 
+    ----------
+
+    acceleration_x : float 
+        acceleration in the x direction
+
+    acceleration_y : float
+        acceleration in the y direction
+
+    acceleration_z : float 
+        acceleration in the z direction
+
+    magnetometer_x : float
+        magnetometer in the x direction
+
+    magnetometer_y : float
+        magnetometer in the y direction
+
+    magnetometer_z : float
+        magnetometer in the z direction
+
+    gyroscope_x : float
+        gyroscope in the x direction
+
+    gyroscope_y : float
+        gyroscope in the y direction
+
+    gyroscope_z : float
+        gyroscope in the z direction
+
+    temperature : float
+        temperature in _ units TODO: what units are we reading?
+    
+    __lsm : object
+        object that holds all the readings
+
+    """
+    acceleration_x = float
+    acceleration_y = float
+    acceleration_z = float
+    magnetometer_x = float
+    magnetometer_y = float
+    magnetometer_z = float
+    gyroscope_x = float
+    gyroscope_y = float
+    gyroscope_z = float
+    temperature = float
+    __lsm = {}
+    
+    def __init__(self, ax, ay, az, mx, my, mz, gx, gy, gz, t):
+        self.acceleration_x = ax
+        self.acceleration_y = ay
+        self.acceleration_z = az
+        self.magnetometer_x = mx
+        self.magnetometer_y = my
+        self.magnetometer_z = mz
+        self.gyroscope_x = gx
+        self.gyroscope_y = gy
+        self.gyroscope_z = gz
+        self.temperature = t
+        self.__lsm = {
+            'acceleration_x': self.acceleration_x,
+            'acceleration_y': self.acceleration_y,
+            'acceleration_z': self.acceleration_z,
+            'magnetometer_x': self.magnetometer_x,
+            'magnetometer_y': self.magnetometer_y,
+            'magnetoneter_z': self.magnetometer_z,
+            'gyroscope_x': self.gyroscope_x,
+            'gyroscope_y': self.gyroscope_y,
+            'gyroscope_z': self.gyroscope_z,
+            'temperature': self.temperature
+        }
+
+    def __getattribute__(self, __lsm: object) -> object:
+        pass
+    
+class Encoder: 
+    """
+    lsm sensor object
+
+    ...
+
+    Attributes TODO: add units
+    ----------
+
+    position : float 
+        current position reading of the encoder
+
+    percent : float
+        current percent reading of the encdoder
+    
+    __encoder : object
+
+    """
+    position = float
+    percent = float
+    __encoder = {}
+    
+    def __init__(self, pos, per):
+        self.position = pos
+        self.percent = per
+        self.__encoder = {
+            'position': self.position,
+            'percent': self.percent
+        }
+    
+    def __getattribute__(self, __encoder: object) -> object:
+        pass
 
 class RocketData:
     """
@@ -55,6 +209,7 @@ class RocketData:
             returns a single csv string that contains all the data in self._data
 
     """
+    data = {}
     def __init__(self):
         self._data = {
             'bme': {
@@ -160,7 +315,7 @@ class RocketData:
 
     @property
     def encoders_percent(self):
-        return self._data['encoder']['percent]
+        return self._data['encoder']['percent']
     
     @encoders.setter
     def encoders(self, p):

@@ -54,16 +54,6 @@ class SendData:
     def update_rocket_data(self, rocketData):
         self.rocket_data = rd.data_dict_set(rocketData)
         
-    def send_bme(self, sendingTo):
-        # call format data
-        return
-
-    def send_imu(self, sendingTo):
-        return
-
-    def send_strain_gauges(self, sendingTo):
-        return
-    
     def send_all_data(self, sendingTo, destination):
         if sendingTo == 'blackbox':
             data = self.rocket_data.convert_to_csv()
@@ -72,9 +62,3 @@ class SendData:
             writer.writerow(data)
             f.close()
         
-       
-    def format_to_send(self, sendingTo, dataToFomat):
-        return
-
-    
-
