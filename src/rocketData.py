@@ -221,9 +221,9 @@ class RocketData:
                 'acceleration_x': float,
                 'acceleration_y': float,
                 'acceleration_z': float,
-                'magentometer_x': float,
-                'magentometer_y': float,
-                'magentometer_z': float,
+                'magnetometer_x': float,
+                'magnetometer_y': float,
+                'magnetometer_z': float,
                 'gyroscope_x': float,
                 'gyroscope_y': float,
                 'gyroscope_z': float,
@@ -266,15 +266,15 @@ class RocketData:
             self._data['lsm']['acceleration_x'] = ax
             self._data['lsm']['acceleration_y'] = ay
             self._data['lsm']['acceleration_z'] = az
-            self._data['lsm']['magentometer_x'] = mx
-            self._data['lsm']['magentometer_y'] = my
-            self._data['lsm']['magentometer_z'] = mz
+            self._data['lsm']['magnetometer_x'] = mx
+            self._data['lsm']['magnetometer_y'] = my
+            self._data['lsm']['magnetometer_z'] = mz
             self._data['lsm']['gyroscope_x'] = gx
             self._data['lsm']['gyroscope_y'] = gy
             self._data['lsm']['gyroscope_z'] = gz
             self._data['lsm']['temperature'] = t
         else: 
-            print("LSM accepts 10 values in this order: Acceleration (x, y, z), magentometer (x, y, z), gyroscope (x, y, z)")
+            print("LSM accepts 10 values in this order: Acceleration (x, y, z), magnetometer (x, y, z), gyroscope (x, y, z)")
 
     @lsm.setter
     def lsm_temp(self, t):
@@ -359,9 +359,9 @@ class RocketData:
           self._data['lsm']['acceleration_x'],
             self._data['lsm']['acceleration_y'],
             self._data['lsm']['acceleration_z'],
-            self._data['lsm']['magentometer_x'],
-            self._data['lsm']['magentometer_y'],
-            self._data['lsm']['magentometer_z'],
+            self._data['lsm']['magnetometer_x'],
+            self._data['lsm']['magnetometer_y'],
+            self._data['lsm']['magnetometer_z'],
             self._data['lsm']['gyroscope_x'],
             self._data['lsm']['gyroscope_y'],
             self._data['lsm']['gyroscope_z'],
