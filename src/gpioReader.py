@@ -4,6 +4,9 @@ from time import sleep
 from unittest.mock import Mock
 import random
 import pytest
+import board
+import adafruit_lsm9ds1
+from adafruit_bme280 import basic as adafruit_bme280
 
 # research needed
 # Reading input
@@ -26,9 +29,11 @@ class GPIOReader():
         return lsmobject
 
     def __readBME280(self):
-        print("Temperature: %0.1f C" % self.__bme280.temperature)
-        print("Humidity: %0.1f %%" % self.__bme280.humidity)
-        print("Pressure: %0.1f hPa" % self.__bme280.pressure)
+        return {
+            'temperature' : self.__bme280.temperature,
+            'humidity' : self.__bme280.humidity,
+            'pressure' : self.__bme280.pressure
+        }
 
     
     def __readLSM9DS1(self):
@@ -36,6 +41,9 @@ class GPIOReader():
         print("Magnetometer (gauss: ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*self.__lsm9ds1.Magnetometer))
         print("Gyroscope (degrees/sec): ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*self.__lsm9ds1.Gyroscope))
         print("Temperature: {0:0.3f}".format(self.__lsm9ds1.Temperature))
+        return {
+            'acceleration' : 
+        }
 
 
     # Private Method for setting up variables and inputs on pins
