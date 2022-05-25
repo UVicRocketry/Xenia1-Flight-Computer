@@ -7,18 +7,33 @@ import sys
 from gpioReader import GPIOReader
 from rocketData import RocketData
 
-def initialize():
+def initialize(test_mode):
     """Initialize and setup all data.
 
     In this stage we should take extreme care with errors in file loading and
     such. This method should only ever fail in extreme cases.
+
+    Params
+    ------
+
+    * `test_mode` - If true, then this method will return fake controllers.
+
+
+    Returns
+    -------
+
+    The data controllers to access and control the rocket. If test_mode is set
+    then these controllers will be mocked controllers that run a simulation.
     """
 
     # TODO: Can this fail? If so, make it not.
+    # TODO: In test mode this should be fake.
     rocket_data = RocketData()
 
+    # TODO: For the GpioReader class, this is where a fake one would be initted.
+
     # TODO: !MC - Suborbit should be initialized in here.
-    # TODO: Actually initialize everything.
+    # TODO: Actually initialize everything. (Like gpio reader)
 
     return (rocket_data)
 
