@@ -1,14 +1,7 @@
-#!/usr/bin/env python
-
 from time import sleep
 from unittest.mock import Mock
 import random
 import pytest
-
-# research needed
-# Reading input
-# have to install library on pi
-
 
 class GeneralLSMObject :
 
@@ -17,7 +10,6 @@ class GeneralLSMObject :
         'b': float,
         'c': float
     }
-    
 
 #TODO: write issue to change from print statements to updating rocketData in main (make read functions return objects ...)
 class GPIOReader():

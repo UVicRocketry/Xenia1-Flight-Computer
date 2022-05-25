@@ -303,7 +303,7 @@ class RocketData:
     def encoders(self, p):
         pos, perc = p
         self.data['encoders']['position'] = pos
-        self.data['encoders']['percent'] = perc 
+        self.data['encoders']['percent'] = perc
 
     @property
     def time_stamp(self):

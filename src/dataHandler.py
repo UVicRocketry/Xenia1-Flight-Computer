@@ -44,7 +44,6 @@ class SendData:
         Parm:
             sendingTo: can either be "blackbox", "ground"
             dataToFomat: Which sensor is needed to be called
-   test 
     -------
     """
     def __init__(self, rd):
