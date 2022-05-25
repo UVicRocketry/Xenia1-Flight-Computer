@@ -2,59 +2,137 @@
 # run this script once were good to go
 # A lot of try catch baby
 
-from gpioReader import GPIOReader
 import sys
-from rocketData import RocketData as rd
-#TODO: 
-# - Implement initialize() for any setup
-# - Implement main loop for mid flight controls
-# - Implement error handling to avoid systems failure mid flight
 
+from gpioReader import GPIOReader
+from rocketData import RocketData
 
 def initialize():
-    rocket_data = rd()
-    return 0 
+    """Initialize and setup all data.
+
+    In this stage we should take extreme care with errors in file loading and
+    such. This method should only ever fail in extreme cases.
+    """
+
+    # TODO: Can this fail? If so, make it not.
+    rocket_data = RocketData()
+
+    # TODO: !MC - Suborbit should be initialized in here.
+    # TODO: Actually initialize everything.
+
+    return (rocket_data)
+
+
+def standby():
+    """Sitting on the rail, waiting for launch.
+
+    The rocket may be in this state for up to 6 hours, and will not get a
+    heads up before the rocket launches.
+
+    This state should be looking and waiting for detection of motors being
+    fired. We will have to detect this through means other than a direct
+    signal (Something like a large acceleration spike).
+
+    Once launch is detected, this method will return.
+    """
+    # TODO: Implement this state
+    pass
+
+
+def powered_flight():
+    """This is when the rocket motor is actively firing.
+
+    This should only last around three seconds.
+
+    The flight computer should stay in this state until either we detect motor
+    burnout, or a manual limit is reached (such as 5s)
+
+    During this stage there should be **no airbrakes**
+    """
+    # TODO: Implement this state
+    pass
+
+
+def coast_flight():
+    """This is when the rocket is still moving upwards to apogee, but after
+    motor burnout.
+
+    This phase will last roughly 27s.
+
+    The flight computer should stay in this state until either we detect apogee,
+    or a manual limit is reached (such as 45s).
+
+    This state will be responsible for Airbrakes!
+    """
+    # TODO: Implement this state
+    pass
+
+
+def recovery():
+    """This is the final state after apogee.
+
+    This phase is of unknown length (to Mateo. Should ask around to confirm.).
+
+    The flight computer should stay in this state until recovered. This is
+    forever as far as the FC is concerned.
+    """
+    # TODO: Implement this state
+    pass
+
+
+def main(test_mode):
+    """Main loop of the program.
+
+    This is where most of the magic happens and where all states are controlled.
+    """
+
+    # This is the initialization state
+    (rocket_data) = initialize()
+
+    # At this point we are sitting on the rail and waiting for a detection of
+    # motor ignition.
+    standby()
+
+    # These are the in-flight stages.
+    powered_flight()
+    coast_flight()
+    recovery()
+
+    # And that's a wrap.
+    print("Thank you for flying Air Xenia. Hope you enjoyed your flight.")
+
+
+def process_cli_args():
+    """Process the supplied command line arguments.
+
+
+    Flags
+    -----
+
+    * `--test` or `-t` : Run the program is test mode.
+
+
+    Returns
+    -------
+
+    The return values is a struct of (boolean), where the first element is
+    whether or not to run in test mode.
+    """
+    test_mode = False
+
+    for arg in sys.argv:
+        if arg == "--test" or arg == "-t":
+            test_mode = True
+        else:
+            # NOTE: We explicitely DO NOT fail here because this is a rocket.
+            #       An incorrect argument is not a reason to fail completely.
+            print("Warning: Unkown argument supplied: ", arg)
+
+    return (test_mode)
 
 
 if __name__ == "__main__":
-    
-    ### Main code goes here###
-    test_mode = False #use "python main.py test" to initialize test mode
+    (test_mode) = process_cli_args()
 
-
-
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "test":
-            test_mode = True
-
-    
-    running = True 
-      
-    if(test_mode): 
-        while(running):
-            #retrieves random data from GPIOReader
-            gpio = GPIOReader(test_mode, False, False, False, False, False, False, False)
-            gpio.retrieveData() 
-            
-            ## Update rocketData object 
-
-            # rocket_data = gpio.retrieveData() TODO: uncomment when X1-AV-43 is merged
-
-            ## Do airbrakes 
-            
-            ## Send rocketData to datahandler call send function
-
-    else:
-        
-        while(running):
-        ## Setup a loop that continues until we tell it to stop
-            ## Read GPIO Input
-            ## Update rocketData object
-            
-            # rocket_data = gpio.retrieveData() TODO: uncomment when X1-AV-43 is merged
-
-            ## Send GPIO rocketData to datahandler for output
-
-            ## Do air brakes math (to be implemented later with kris)
-
+    main(test_mode)
     exit(0)
