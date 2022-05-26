@@ -1,14 +1,7 @@
-#!/usr/bin/env python
-
 from time import sleep
 from unittest.mock import Mock
 import random
 import pytest
-
-# research needed
-# Reading input
-# have to install library on pi
-
 
 class GeneralLSMObject :
 
@@ -17,7 +10,6 @@ class GeneralLSMObject :
         'b': float,
         'c': float
     }
-    
 
 #TODO: write issue to change from print statements to updating rocketData in main (make read functions return objects ...)
 class GPIOReader():
@@ -30,7 +22,7 @@ class GPIOReader():
         print("Humidity: %0.1f %%" % self.__bme280.humidity)
         print("Pressure: %0.1f hPa" % self.__bme280.pressure)
 
-    
+
     def __readLSM9DS1(self):
         print("Acceleration (m/s^2): ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*self.__lsm9ds1.Acceleration))
         print("Magnetometer (gauss: ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*self.__lsm9ds1.Magnetometer))
@@ -49,7 +41,7 @@ class GPIOReader():
         __bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
         __lsm9ds1 = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
 
-    
+
     ## Public Method to be called externally to grab data from sensors
     def retrieveData(self):
         self.__readBME280()
@@ -71,4 +63,3 @@ class GPIOReader():
             self.__bme280 = None
             self.__lsm9ds1 = None
             self.__setup()
-
