@@ -1,7 +1,6 @@
 csv
 json
 time
-gpioReader
 sys
 ast
 typing

@@ -1,7 +1,7 @@
 import sys
 
 # TODO: Uncomment these once the modules don't have errors.
-# from gpioReader import GPIOReader
+from gpioReader import GPIOReader
 # from rocketData import RocketData
 
 def initialize():
@@ -30,8 +30,11 @@ def initialize():
     # rocket_data = RocketData()
     rocket_data = None
     # TODO: For the GpioReader class, this is where a fake one would be initted.
-    # gpio = GPIOReader(TEST_MODE, False, False, False, False, False, False, False)
-    # gpio.retrieveData() 
+
+    # TODO: This only runs in test mode because it currently is broken in not-test mode.
+    if TEST_MODE:
+        gpio = GPIOReader(TEST_MODE, False, False, False, False, False, False, False)
+        gpio.retrieveData()
 
     # TODO: !MC - Suborbit should be initialized in here.
     # TODO: Actually initialize everything. (Like gpio reader)
