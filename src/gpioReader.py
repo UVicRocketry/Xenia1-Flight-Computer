@@ -5,6 +5,7 @@ import pytest
 import board
 import adafruit_lsm9ds1
 from adafruit_bme280 import basic as adafruit_bme280
+from rocketData import Bme, Lsm
 
 class GeneralLSMObject :
 
@@ -21,21 +22,20 @@ class GPIOReader():
         return lsmobject
 
     def __readBME280(self):
-        return {
-            'temperature' : self.__bme280.temperature,
-            'humidity' : self.__bme280.humidity,
-            'pressure' : self.__bme280.pressure
-        }
+        bme = Bme()
+        bme.temperature = self.__bme280.temperature
+        bme.humidity = self.__bme280.humidity
+        bme.pressure = self.__bme280.pressure
+        return bme
 
     
     def __readLSM9DS1(self):
-        print("Acceleration (m/s^2): ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*self.__lsm9ds1.Acceleration))
-        print("Magnetometer (gauss: ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*self.__lsm9ds1.Magnetometer))
-        print("Gyroscope (degrees/sec): ({0:0.3f}, {1:0.3f}, {2:0.3f})".format(*self.__lsm9ds1.Gyroscope))
-        print("Temperature: {0:0.3f}".format(self.__lsm9ds1.Temperature))
-        return {
-            'acceleration' : 
-        }
+        lsm = Lsm()
+        acceleration_x, acceleration_y, acceleration_z = self.__lsm9ds1.Acceleration
+        magnetometer_x, magnetometer_y, magnetometer_z = self.__lsm9ds1.Magnetometer
+        gyroscope_x, gyroscope_y, gyroscope_z = self.__lsm9ds1.Gyroscope
+        temperature = self.__lsm9ds1.Temperature
+        return lsm
 
 
     # Private Method for setting up variables and inputs on pins
