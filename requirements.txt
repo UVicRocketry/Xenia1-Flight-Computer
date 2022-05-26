@@ -13,5 +13,8 @@ picamera
 pydoc
 RPi.GPIO
 numpy
+board
+adafruit_lsm9ds1
+adafruit_bme280 
 
-#last updated 2022-05-13 by J.L
+#last updated 2022-05-25 by Sydney
