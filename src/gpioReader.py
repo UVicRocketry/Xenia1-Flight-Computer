@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from time import sleep
 from unittest.mock import Mock
 import random
@@ -8,11 +6,6 @@ import board
 import adafruit_lsm9ds1
 from adafruit_bme280 import basic as adafruit_bme280
 
-# research needed
-# Reading input
-# have to install library on pi
-
-
 class GeneralLSMObject :
 
     data={
@@ -20,7 +13,6 @@ class GeneralLSMObject :
         'b': float,
         'c': float
     }
-    
 
 #TODO: write issue to change from print statements to updating rocketData in main (make read functions return objects ...)
 class GPIOReader():
