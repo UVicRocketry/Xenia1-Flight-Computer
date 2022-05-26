@@ -31,10 +31,10 @@ class GPIOReader():
     
     def __readLSM9DS1(self):
         lsm = Lsm()
-        acceleration_x, acceleration_y, acceleration_z = self.__lsm9ds1.Acceleration
-        magnetometer_x, magnetometer_y, magnetometer_z = self.__lsm9ds1.Magnetometer
-        gyroscope_x, gyroscope_y, gyroscope_z = self.__lsm9ds1.Gyroscope
-        temperature = self.__lsm9ds1.Temperature
+        lsm.acceleration_x, lsm.acceleration_y, lsm.acceleration_z = self.__lsm9ds1.Acceleration
+        lsm.magnetometer_x, lsm.magnetometer_y, lsm.magnetometer_z = self.__lsm9ds1.Magnetometer
+        lsm.gyroscope_x, lsm.gyroscope_y, lsm.gyroscope_z = self.__lsm9ds1.Gyroscope
+        lsm.temperature = self.__lsm9ds1.Temperature
         return lsm
 
 
