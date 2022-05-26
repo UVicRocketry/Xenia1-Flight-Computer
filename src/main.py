@@ -1,11 +1,8 @@
-# loop that just keeps going (as long as the computer is engaged)
-# run this script once were good to go
-# A lot of try catch baby
-
 import sys
 
-from gpioReader import GPIOReader
-from rocketData import RocketData
+# TODO: Uncomment these once the modules don't have errors.
+# from gpioReader import GPIOReader
+# from rocketData import RocketData
 
 def initialize(test_mode):
     """Initialize and setup all data.
@@ -28,7 +25,10 @@ def initialize(test_mode):
 
     # TODO: Can this fail? If so, make it not.
     # TODO: In test mode this should be fake.
-    rocket_data = RocketData()
+
+    # TODO: Include gpioReader once we have a working GPIO_READER.
+    # rocket_data = RocketData()
+    rocket_data = None
 
     # TODO: For the GpioReader class, this is where a fake one would be initted.
 
@@ -47,6 +47,10 @@ def standby():
     This state should be looking and waiting for detection of motors being
     fired. We will have to detect this through means other than a direct
     signal (Something like a large acceleration spike).
+
+    If possible, only one sensor should be active to conserve power. This will
+    most likely be some sort of accelerometer. Aila will have more information
+    on what sensor should be used here.
 
     Once launch is detected, this method will return.
     """
@@ -80,6 +84,8 @@ def coast_flight():
     This state will be responsible for Airbrakes!
     """
     # TODO: Implement this state
+    # TODO: This is where we will have to deal with threading for the airbrakes
+    #       controls.
     pass
 
 
@@ -101,8 +107,10 @@ def main(test_mode):
     This is where most of the magic happens and where all states are controlled.
     """
 
+    print("test_mode is", test_mode, "but TEST_MODE is", TEST_MODE)
+
     # This is the initialization state
-    (rocket_data) = initialize()
+    (rocket_data) = initialize(test_mode)
 
     # At this point we are sitting on the rail and waiting for a detection of
     # motor ignition.
@@ -138,6 +146,8 @@ def process_cli_args():
     for arg in sys.argv:
         if arg == "--test" or arg == "-t":
             test_mode = True
+        elif arg == "main.py":
+            pass
         else:
             # NOTE: We explicitely DO NOT fail here because this is a rocket.
             #       An incorrect argument is not a reason to fail completely.
@@ -148,6 +158,9 @@ def process_cli_args():
 
 if __name__ == "__main__":
     (test_mode) = process_cli_args()
+
+    global TEST_MODE
+    TEST_MODE = test_mode
 
     main(test_mode)
     exit(0)
