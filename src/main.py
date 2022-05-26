@@ -4,7 +4,7 @@ import sys
 # from gpioReader import GPIOReader
 # from rocketData import RocketData
 
-def initialize(test_mode):
+def initialize():
     """Initialize and setup all data.
 
     In this stage we should take extreme care with errors in file loading and
@@ -29,8 +29,9 @@ def initialize(test_mode):
     # TODO: Include gpioReader once we have a working GPIO_READER.
     # rocket_data = RocketData()
     rocket_data = None
-
     # TODO: For the GpioReader class, this is where a fake one would be initted.
+    # gpio = GPIOReader(TEST_MODE, False, False, False, False, False, False, False)
+    # gpio.retrieveData() 
 
     # TODO: !MC - Suborbit should be initialized in here.
     # TODO: Actually initialize everything. (Like gpio reader)
@@ -101,16 +102,14 @@ def recovery():
     pass
 
 
-def main(test_mode):
+def main():
     """Main loop of the program.
 
     This is where most of the magic happens and where all states are controlled.
     """
 
-    print("test_mode is", test_mode, "but TEST_MODE is", TEST_MODE)
-
     # This is the initialization state
-    (rocket_data) = initialize(test_mode)
+    (rocket_data) = initialize()
 
     # At this point we are sitting on the rail and waiting for a detection of
     # motor ignition.
@@ -143,11 +142,12 @@ def process_cli_args():
     """
     test_mode = False
 
-    for arg in sys.argv:
+    for (i, arg) in enumerate(sys.argv):
+        if i == 0:
+            continue
+
         if arg == "--test" or arg == "-t":
             test_mode = True
-        elif arg == "main.py":
-            pass
         else:
             # NOTE: We explicitely DO NOT fail here because this is a rocket.
             #       An incorrect argument is not a reason to fail completely.
@@ -162,5 +162,5 @@ if __name__ == "__main__":
     global TEST_MODE
     TEST_MODE = test_mode
 
-    main(test_mode)
+    main()
     exit(0)
