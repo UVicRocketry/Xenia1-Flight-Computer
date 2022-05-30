@@ -1,7 +1,6 @@
 csv
 json
 time
-gpioReader
 sys
 ast
 typing
@@ -13,6 +12,7 @@ picamera
 pydoc
 RPi.GPIO
 numpy
+pytest
 board
 adafruit_lsm9ds1
 adafruit_bme280 

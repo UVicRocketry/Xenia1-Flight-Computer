@@ -12,13 +12,13 @@ class Bme:
     Attributes
     ----------
 
-    acceleration_x : float 
+    acceleration_x : float
         acceleration in the x direction
 
     acceleration_y : float
         humidity in _ units
 
-    acceleration_z : float 
+    acceleration_z : float
         temperature in _ units
 
     """
@@ -36,27 +36,27 @@ class Bme:
             'humidity': self.humidity,
             'pressure': self.pressure
         }
-    
+
     def __getattribute__(self, bme: object) -> object:
         pass
-        
+
 #TODO: add units
-class Lsm: 
+class Lsm:
     """
     lsm sensor object
 
     ...
 
-    Attributes 
+    Attributes
     ----------
 
-    acceleration_x : float 
+    acceleration_x : float
         acceleration in the x direction
 
     acceleration_y : float
         acceleration in the y direction
 
-    acceleration_z : float 
+    acceleration_z : float
         acceleration in the z direction
 
     magnetometer_x : float
@@ -79,7 +79,7 @@ class Lsm:
 
     temperature : float
         temperature in _ units TODO: what units are we reading?
-    
+
     __lsm : object
         object that holds all the readings
 
@@ -95,7 +95,7 @@ class Lsm:
     gyroscope_z = float
     temperature = float
     lsm = {}
-    
+
     def __init__(self, ax, ay, az, mx, my, mz, gx, gy, gz, t):
         self.acceleration_x = ax
         self.acceleration_y = ay
@@ -122,8 +122,8 @@ class Lsm:
 
     def __getattribute__(self, lsm: object) -> object:
         pass
-    
-class Encoder: 
+
+class Encoder:
     """
     lsm sensor object
 
@@ -132,19 +132,19 @@ class Encoder:
     Attributes TODO: add units
     ----------
 
-    position : float 
+    position : float
         current position reading of the encoder
 
     percent : float
         current percent reading of the encdoder
-    
+
     __encoder : object
 
     """
     position = float
     percent = float
     encoder = {}
-    
+
     def __init__(self, pos, per):
         self.position = pos
         self.percent = per
@@ -152,7 +152,7 @@ class Encoder:
             'position': self.position,
             'percent': self.percent
         }
-    
+
     def __getattribute__(self, encoder: object) -> object:
         pass
 
@@ -255,7 +255,7 @@ class RocketData:
             self.data['lsm']['gyroscope_y'] = gy
             self.data['lsm']['gyroscope_z'] = gz
             self.data['lsm']['temperature'] = t
-        else: 
+        else:
             print("LSM accepts 10 values in this order: Acceleration (x, y, z), magnetometer (x, y, z), gyroscope (x, y, z)")
 
     @lsm.setter
@@ -298,7 +298,7 @@ class RocketData:
     @property
     def encoders_percent(self):
         return self.data['encoder']['percent']
-    
+
     @encoders.setter
     def encoders(self, p):
         pos, perc = p

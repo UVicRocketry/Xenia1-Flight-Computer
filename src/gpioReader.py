@@ -28,7 +28,7 @@ class GPIOReader():
         bme.pressure = self.__bme280.pressure
         return bme
 
-    
+
     def __readLSM9DS1(self):
         lsm = Lsm()
         lsm.acceleration_x, lsm.acceleration_y, lsm.acceleration_z = self.__lsm9ds1.Acceleration
@@ -49,7 +49,7 @@ class GPIOReader():
         __bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
         __lsm9ds1 = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
 
-    
+
     ## Public Method to be called externally to grab data from sensors
     def retrieveData(self):
         self.__readBME280()
@@ -71,4 +71,3 @@ class GPIOReader():
             self.__bme280 = None
             self.__lsm9ds1 = None
             self.__setup()
-
