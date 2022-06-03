@@ -71,13 +71,13 @@ class SendData:
     atmo_molar_mass = 0.289644
 
     #vapourization heat of water
-    H2O_vapour_heat = 2501000
+    h2o_vapour_heat = 2501000
 
     #specific gas constant of dry air
     specif_gas_const_dry = 287
     
     #specific gas constant of water vapour
-    specif_gas_const_H2O = 461.5
+    specif_gas_const_h2o = 461.5
     
     #specific heat of dry air
     specif_heat_dryair = 1003.5
@@ -108,13 +108,13 @@ class SendData:
         Returns:
             lapse_rate: float, lapse rate (... duh)
         """
-        numerator_numerator = H2O_vapour_heat * moist
-        numerator_denomenator = temp * specif_gas_const_H2O * (press - moist)
+        numerator_numerator = h2o_vapour_heat * moist
+        numerator_denomenator = temp * specif_gas_const_h2o * (press - moist)
 
         numerator = gravity * (1 + (numerator_numerator/numerator_denomenator))
 
-        denomenator_numerator = H2O_vapour_heat**2 * specif_gas_const_dry * moist
-        denomenator_denomenator = (specif_gas_const_H2O * temp)**2 * (press - moist)
+        denomenator_numerator = h2o_vapour_heat**2 * specif_gas_const_dry * moist
+        denomenator_denomenator = (specif_gas_const_h2o * temp)**2 * (press - moist)
 
         denomenator = specif_heat_dryair + (denomenator_numerator/denomenator_denomenator)
         
@@ -188,7 +188,7 @@ class SendData:
             alt_temp = prev_alt + dh
             prev_alt = alt_temp
 
-        elif T_c > T_p:
+        elif curr_temp > prev_temp:
             alt_temp = None
 
             prev_alt = prev_alt + prev_height_change
