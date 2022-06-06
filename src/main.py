@@ -58,8 +58,17 @@ def standby():
 
     Once launch is detected, this method will return.
     """
-    # TODO: Implement this state
-    pass
+  # TODO: Implement this state
+    gpio = GPIOReader(False)
+    RetrieveData = gpio.retrieveData()
+
+    lsm = RetrieveData.__readLSM9DS1()
+
+    while abs((lsm.acceleration_x + lsm.acceleration_y + lsm.acceleration_z)/3) < 10:
+        lsm = RetrieveData.__readLSM9DS1()
+    
+    return
+    
 
 
 def powered_flight():
