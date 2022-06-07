@@ -23,18 +23,40 @@ class GPIOReader():
 
     def __readBME280(self):
         bme = Bme()
-        bme.temperature = self.__bme280.temperature
-        bme.humidity = self.__bme280.humidity
-        bme.pressure = self.__bme280.pressure
+        try:
+            bme.temperature = self.__bme280.temperature
+        except:
+            bme.temperature = None
+        try:
+            bme.humidity = self.__bme280.humidity
+        except:
+            bme.humidity = None
+        try:
+            bme.pressure = self.__bme280.pressure
+        except:
+            bme.pressure = None
         return bme
 
 
     def __readLSM9DS1(self):
         lsm = Lsm()
-        lsm.acceleration_x, lsm.acceleration_y, lsm.acceleration_z = self.__lsm9ds1.Acceleration
-        lsm.magnetometer_x, lsm.magnetometer_y, lsm.magnetometer_z = self.__lsm9ds1.Magnetometer
-        lsm.gyroscope_x, lsm.gyroscope_y, lsm.gyroscope_z = self.__lsm9ds1.Gyroscope
-        lsm.temperature = self.__lsm9ds1.Temperature
+        prevLsm = Lsm()
+        try:
+            lsm.acceleration_x, lsm.acceleration_y, lsm.acceleration_z = self.__lsm9ds1.Acceleration
+        except:
+            lsm.acceleration_x, lsm.acceleration_y, lsm.acceleration_z = None
+        try:
+            lsm.magnetometer_x, lsm.magnetometer_y, lsm.magnetometer_z = self.__lsm9ds1.Magnetometer
+        except:
+            lsm.magnetometer_x, lsm.magnetometer_y, lsm.magnetometer_z = None
+        try:
+            lsm.gyroscope_x, lsm.gyroscope_y, lsm.gyroscope_z = self.__lsm9ds1.Gyroscope
+        except:
+            lsm.gyroscope_x, lsm.gyroscope_y, lsm.gyroscope_z = None
+        try:
+            lsm.temperature = self.__lsm9ds1.Temperature
+        except:
+            lsm.temperature = None
         return lsm
 
 
