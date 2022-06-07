@@ -37,6 +37,10 @@ class GPIOReader():
         lsm.gyroscope_x, lsm.gyroscope_y, lsm.gyroscope_z = self.__lsm9ds1.Gyroscope
         lsm.temperature = self.__lsm9ds1.Temperature
         return lsm
+    
+    def __readADXL375(self):
+        acceleration_x, acceleration_y, acceleration_z = self.__adxl375.acceleration
+        return acceleration_x, acceleration_y, acceleration_z
 
 
     # Private Method for setting up variables and inputs on pins
@@ -56,6 +60,7 @@ class GPIOReader():
     def retrieveData(self):
         self.__readBME280()
         self.__readLSM9DS1()
+        self.__readADXL375()
 
 
     def __init__(self, test, BMETemperature, BMEHumidity, BMEPressure, LSMAcceleration, LSMMagnetometer, LSMGyroscope, LSMTemperature):
