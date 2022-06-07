@@ -2,7 +2,10 @@ import sys
 
 # TODO: Uncomment these once the modules don't have errors.
 from gpioReader import GPIOReader
+import numpy as np
 # from rocketData import RocketData
+
+LAUNCH_ACCELERATION_THRESHOLD = 10
 
 def initialize():
     """Initialize and setup all data.
@@ -41,6 +44,8 @@ def initialize():
 
     return (rocket_data)
 
+def vec_len(v):
+    return np.sqrt(np.dot(v, v))
 
 def standby():
     """Sitting on the rail, waiting for launch.
@@ -58,16 +63,14 @@ def standby():
 
     Once launch is detected, this method will return.
     """
-  # TODO: Implement this state
+
     gpio = GPIOReader(False)
-    RetrieveData = gpio.retrieveData()
+    retrieve_data = gpio.retrieveData()
 
-    lsm = RetrieveData.__readLSM9DS1()
+    lsm = retrieve_data.__readLSM9DS1()
 
-    while abs((lsm.acceleration_x + lsm.acceleration_y + lsm.acceleration_z)/3) < 10:
-        lsm = RetrieveData.__readLSM9DS1()
-    
-    return
+    while vec_len(lsm.acceleration) < LAUNCH_ACCELERATION_THRESHOLD:
+        lsm = retrieve_data.__readLSM9DS1()
     
 
 

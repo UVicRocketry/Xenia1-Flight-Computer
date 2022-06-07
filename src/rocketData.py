@@ -248,6 +248,7 @@ class RocketData:
             self.data['lsm']['acceleration_x'] = ax
             self.data['lsm']['acceleration_y'] = ay
             self.data['lsm']['acceleration_z'] = az
+            self.data['lsm']['acceleration'] = [ax,ay,az]
             self.data['lsm']['magnetometer_x'] = mx
             self.data['lsm']['magnetometer_y'] = my
             self.data['lsm']['magnetometer_z'] = mz
