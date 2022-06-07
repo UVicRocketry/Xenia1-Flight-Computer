@@ -5,6 +5,7 @@ import pytest
 import board
 import adafruit_lsm9ds1
 from adafruit_bme280 import basic as adafruit_bme280
+import adafruit_adxl37x
 from rocketData import Bme, Lsm
 
 class GeneralLSMObject :
@@ -48,6 +49,7 @@ class GPIOReader():
         ## SETUP BME 280 SENSOR
         __bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
         __lsm9ds1 = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
+        __adxl375 = adafruit_adxl37x.ADXL375(i2c)
 
     
     ## Public Method to be called externally to grab data from sensors
