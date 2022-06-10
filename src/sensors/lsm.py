@@ -5,54 +5,56 @@ class Lsm:
 
     __lsm9ds1 = None
 
-    __gyroscope = None
-    __magnetometer = None
-    __acceleration = None
-    __temperature = None
+    gyroscope = None
+    magnetometer = None
+    acceleration = None
+    temperature = None
 
     def __init__(self):
         i2c = board.I2C()
         self.__lsm9ds1 = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
         # TODO: initialize pins (from wiring diagram)
 
-
-    def read_temperature(self):
+    @property
+    def temperature(self):
         """Safety first"""
-        return self.read_temperature_unsafe() or self.__temperature
+        return self.read_temperature_unsafe() or self.temperature
 
     def read_temperature_unsafe(self):
         try:
-            self.__temperature = self.__lsm9ds1.acceleration
-            return self.__temperature
+            self.temperature = self.__lsm9ds1.temperature
+            return self.temperature
         except:
             return None
 
-    def read_acceleration(self):
-        return self.__read_acceleration_unsafe() or self.__acceleration
+    def acceleration(self):
+        return self.__read_acceleration_unsafe() or self.acceleration
 
     def __read_acceleration_unsafe(self):
         try:
-            self.__acceleration = self.__lsm9ds1.acceleration
-            return self.__acceleration
+            self.acceleration = self.__lsm9ds1.acceleration
+            return self.acceleration
         except:
             return None
-
-    def read_magnetometer(self):
-        return self.__read_magnetometer_unsafe() or self.__magnetometer
+    
+    @property
+    def magnetometer(self):
+        return self.__read_magnetometer_unsafe() or self.magnetometer
 
     def __read_magnetometer_unsafe(self):
         try:
-            self.__magnetometer = self.__lsm9ds1.magnetometer
-            return self.__magnetometer
+            self.magnetometer = self.__lsm9ds1.magnetometer
+            return self.magnetometer
         except:
             return None
 
-    def read_gyroscope(self):
-        return self.__read_gyroscope_unsafe() or self.__gyroscope
+    @property
+    def gyroscope(self):
+        return self.__read_gyroscope_unsafe() or self.gyroscope
 
     def __read_gyroscope_unsafe(self):
         try:
-            self.__gyroscope = self.__lsm9ds1.gyroscope
-            return self.__gyroscope
+            self.gyroscope = self.__lsm9ds1.gyroscope
+            return self.gyroscope
         except:
             return None
