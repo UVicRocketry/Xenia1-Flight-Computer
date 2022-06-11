@@ -6940,7 +6940,7 @@
     (pin "1" (uuid a741eaa1-32d8-4253-af20-824460da44a2))
   )
 
-  (sheet (at 594.36 73.66) (size 748.03 304.8) (fields_autoplaced)
+  (sheet (at 594.36 73.66) (size 643.89 304.8) (fields_autoplaced)
     (stroke (width 0.1524) (type solid) (color 0 0 0 0))
     (fill (color 0 0 0 0.0000))
     (uuid a4e3abb8-e92d-445b-a6b2-118c22d4949d)
