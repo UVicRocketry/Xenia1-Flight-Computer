@@ -46,23 +46,18 @@ gource -s 0.1 \
        --stop-at-end \
        --output-ppm-stream - \
        --output-framerate 60 \
-    | ffmpeg -y -r 60 -f image2pipe -vcodec ppm -i - -b:v 65536K git_history.mp4
-
-echo -e "${YELLOW}Converting the output to a better video codec...${PLAIN}"
-ffmpeg -i git_history.mp4 \
-       -c:v libx264 \
-       -crf 20 \
-       -profile:v baseline \
-       -level 3.0 \
-       -pix_fmt yuv420p \
-       -movflags faststart \
-       git_history.mp4
-
-echo -e "${YELLOW}Shrinking that mp4 by reducing the quality...${PLAIN}"
-ffmpeg -i git_history.mp4 -vcodec libx264 -crf 23 git_history_small.mp4
+    | ffmpeg -y -r 60 \
+             -f image2pipe \
+             -vcodec ppm \
+             -i - \
+             -vcodec libx264 \
+             -preset medium \
+             -pix_fmt yuv420p \
+             -crf 23 \
+             -threads 0 \
+             -bf 0 \
+             git_history.mp4
 
 echo -e "${BLUE}Done exporting the video${PLAIN}"
-
-echo -e "There should not be two videos in the current directory: ${BLUE}'git_history.mp4'${PLAIN} and ${BLUE}'git_history_small.mp4'${PLAIN}"
-echo "The second one is just a slightly more compress version that you can post to things like Discord."
+echo -e "There should not be a video in the current directory: ${BLUE}'git_history.mp4'${PLAIN}"
 

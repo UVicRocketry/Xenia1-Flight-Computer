@@ -1,5 +1,4 @@
 **/__pycache__
 
-# These are videos exported from the script in script/gource_animation.sh
+# This is the video exported from the script in script/gource_animation.sh
 git_history.mp4
-git_history_small.mp4
