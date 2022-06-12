@@ -42,11 +42,11 @@ pins passed to __init__.
 Methods
 -------
 
-isReady()
+is_ready()
     Checks if the HX711 is ready to send data. From data sheet:
         When output data is not ready for retrieval:
         - Digital output pin (DOUT) is high (5V)
-        - Serial clock input (PD_SCK) should be low. 
+        - Serial clock input (PD_SCK) should be low.
         When ready for retrieval:
         -  DOUT goes to low (0V):
 
@@ -57,11 +57,11 @@ __setGain()
 
     Returns nothing.
 
-__powerUp()
+__power_up()
     Turn on the HX711s
-    
+
     Returns nothing.
-    
+
 tare()
     Sets __offsets[] for each chip. This checks for excessive deviations
     in readings and fails if more than 20% of readings lie outside the std dev.
@@ -69,9 +69,9 @@ tare()
     it before weighing ingredients.
 
     Returns True if offsets are calculated, False if high deviation occurs.
-    
+
     Params:
-    
+
     num_of_samples [int]
         Total number of readings to take from read_raw() before calculating
         their standard deviation
@@ -99,46 +99,46 @@ read_raw()
 
 """
 
-class HX711_Multi:
+class Hx711Multi:
 
-    __PD_SCK_pin = None
-    __DOUT_pins = []
+    __pd_sck_pin = None
+    __dout_pins = []
     __gain = None
     __debug_enabled = None
-    __offsets = [] 
+    __offsets = []
     __timeout = 300
-    __num_of_HX711s = None
+    __num_of_hx711s = None
 
-    def __init__(self, 
+    def __init__(self,
                 data_pins: List[int],
                 clock_pin: int,
                 gain: int = 128,
                 debug: bool = False):
 
-        self.__PD_SCK_pin = clock_pin
-        self.__DOUT_pins = data_pins
+        self.__pd_sck_pin = clock_pin
+        self.__dout_pins = data_pins
         self.__debug_enabled = debug
-        self.__num_of_HX711s = len(self.__DOUT_pins)
+        self.__num_of_hx711s = len(self.__dout_pins)
 
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.__PD_SCK_pin, GPIO.OUT)
-        for pin in self.__DOUT_pins:
+        GPIO.setup(self.__pd_sck_pin, GPIO.OUT)
+        for pin in self.__dout_pins:
             GPIO.setup(pin, GPIO.IN)
-            
-        self.__setGain(gain)
-        self.__powerUp()
 
-    def isReady(self):
+        self.__set_gain(gain)
+        self.__power_up()
+
+    def is_ready(self):
 
         # DOUT pin goes low (0V) when it is ready to send a reading
-        for data_pin in self.__DOUT_pins:
+        for data_pin in self.__dout_pins:
             if GPIO.input(data_pin) == GPIO.HIGH:
                 if self.__debug_enabled:
                     print("HX711 on pin", data_pin, "not ready")
                     continue
                 return False
-                
+
         return True
 
     def tare(self, num_of_samples: int, max_std_dev_from_mean: float):
@@ -146,11 +146,11 @@ class HX711_Multi:
         if num_of_samples < 100:
             print("Cannot tare with less than 100 samples!")
             return False
-        
+
         samples = []
         while len(samples) < num_of_samples:
-            if self.isReady():
-                samples.append(self.readRaw())
+            if self.is_ready():
+                samples.append(self.read_raw())
 
         """
             Do some fat stats to reject outlier data points based on
@@ -175,7 +175,7 @@ class HX711_Multi:
             if self.__debug_enabled:
                 print("Failed to tare. Excessive deviations measured.")
             return False
-            
+
         # Calculate offsets from averages of clean data
         self.__offsets = [ np.average(row) for row in clean_data ]
 
@@ -186,40 +186,40 @@ class HX711_Multi:
         return True
 
     def read(self):
-        raw_readings = self.readRaw()
-        
+        raw_readings = self.read_raw()
+
         if raw_readings == False:
-           return False 
+           return False
         else:
             return np.array(raw_readings) - np.array(self.__offsets)
 
-    def readRaw(self):
+    def read_raw(self):
 
-        if self.__debug_enabled and not self.isReady():
-            print("HX711s are not ready! Ensure isReady() returns True",
-                  "before calling read() or readRaw()")
+        if self.__debug_enabled and not self.is_ready():
+            print("HX711s are not ready! Ensure is_ready() returns True",
+                  "before calling read() or read_raw()")
 
         # Read value from every HX711. Each cycle of PD_SCK shifts one bit
         # out in twos complement.
-        readings = [0]*self.__num_of_HX711s
+        readings = [0]*self.__num_of_hx711s
 
         for bits in range(24):
 
-            GPIO.output(self.__PD_SCK_pin, GPIO.HIGH)
-            GPIO.output(self.__PD_SCK_pin, GPIO.LOW)
+            GPIO.output(self.__pd_sck_pin, GPIO.HIGH)
+            GPIO.output(self.__pd_sck_pin, GPIO.LOW)
 
-            for i, data_pin in enumerate(self.__DOUT_pins):
+            for i, data_pin in enumerate(self.__dout_pins):
                 readings[i] = readings[i] << 1
                 readings[i] |= GPIO.input(data_pin)
 
         # Gain for the next reading is set by cycling the PD_SCK pin
         # __gain number of times.
-        GPIO.output(self.__PD_SCK_pin, GPIO.LOW)
+        GPIO.output(self.__pd_sck_pin, GPIO.LOW)
 
         for _ in range(self.__gain):
-            GPIO.output(self.__PD_SCK_pin, GPIO.HIGH)
-            GPIO.output(self.__PD_SCK_pin, GPIO.LOW)
-            
+            GPIO.output(self.__pd_sck_pin, GPIO.HIGH)
+            GPIO.output(self.__pd_sck_pin, GPIO.LOW)
+
         # Calculate int from 2's complement as this is the form the HX711
         # sends its data according to the datasheet. Readings are 24bit.
         for reading in readings:
@@ -228,10 +228,10 @@ class HX711_Multi:
 
         return readings
 
-    def __powerUp(self):
-        GPIO.output(self.__PD_SCK_pin, GPIO.LOW)
+    def __power_up(self):
+        GPIO.output(self.__pd_sck_pin, GPIO.LOW)
 
-    def __setGain(self, gain):
+    def __set_gain(self, gain):
 
         assert gain == 128 or gain == 64, "Gain must be 128 or 64!"
 

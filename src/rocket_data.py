@@ -12,14 +12,14 @@ class Bme:
     Attributes
     ----------
 
-    acceleration_x : float
-        acceleration in the x direction
+    temperature : float
+        temperature in some unit.
 
-    acceleration_y : float
+    humidity : float
         humidity in _ units
 
-    acceleration_z : float
-        temperature in _ units
+    pressure : float
+        pressure in _ units
 
     """
     temperature = float
@@ -84,12 +84,15 @@ class Lsm:
         object that holds all the readings
 
     """
+    # TODO: Tuple??
     acceleration_x = float
     acceleration_y = float
     acceleration_z = float
+    # TODO: Tuple??
     magnetometer_x = float
     magnetometer_y = float
     magnetometer_z = float
+    # TODO: Tuple??
     gyroscope_x = float
     gyroscope_y = float
     gyroscope_z = float
@@ -107,6 +110,7 @@ class Lsm:
         self.gyroscope_y = gy
         self.gyroscope_z = gz
         self.temperature = t
+        # TODO: Why are we storing everything twice.
         self.lsm = {
             'acceleration_x': self.acceleration_x,
             'acceleration_y': self.acceleration_y,
@@ -148,6 +152,7 @@ class Encoder:
     def __init__(self, pos, per):
         self.position = pos
         self.percent = per
+        # TODO: Why are we storing everything twice.
         self.encoder = {
             'position': self.position,
             'percent': self.percent
@@ -206,6 +211,8 @@ class RocketData:
             returns a single csv string that contains all the data in self.data
 
     """
+    # TODO: These need arguments.
+    # TODO: If data is supposed to be a cache, then it should be named clearer.
     data = {}
     _lsm = Lsm()
     _bme = Bme()
@@ -215,7 +222,7 @@ class RocketData:
             'bme': self._bme,
             'lsm': self._lsm,
             'strain_gauges': [
-                float,
+                float, # TODO: Why are these types and not values?
                 float,
                 float,
                 float,

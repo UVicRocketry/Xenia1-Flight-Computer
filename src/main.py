@@ -1,7 +1,7 @@
 import sys
 
 # TODO: Uncomment these once the modules don't have errors.
-from gpioReader import GPIOReader
+from gpio_reader import GPIOReader
 # from rocketData import RocketData
 
 def initialize():
@@ -9,12 +9,6 @@ def initialize():
 
     In this stage we should take extreme care with errors in file loading and
     such. This method should only ever fail in extreme cases.
-
-    Params
-    ------
-
-    * `test_mode` - If true, then this method will return fake controllers.
-
 
     Returns
     -------
@@ -34,7 +28,7 @@ def initialize():
     # TODO: This only runs in test mode because it currently is broken in not-test mode.
     if TEST_MODE:
         gpio = GPIOReader(TEST_MODE, False, False, False, False, False, False, False)
-        gpio.retrieveData()
+        gpio.retrieve_data()
 
     # TODO: !MC - Suborbit should be initialized in here.
     # TODO: Actually initialize everything. (Like gpio reader)
