@@ -371,8 +371,11 @@ class RocketData:
 
     def convert_to_csv_string(self):
         data_to_convert = self.all_rocketdata()
-        csv_string = str(data_to_convert[0])
-        for data in data_to_convert[1:]:
-            csv_string += "," + str(data)
+        csv_string = ""
+        for data in data_to_convert[0:]:
+            if data is None:
+                csv_string += ","
+            else:
+                csv_string += "," + str(data)
 
         return csv_string
