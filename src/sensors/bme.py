@@ -13,7 +13,7 @@ This function can be called to send data to black box/ground station
 __read_/.../_unsafe(): Reads the sensor and returns None read was unsuccessful
 """
 
-class bme: 
+class Bme: 
 
     __bme280 = None
 

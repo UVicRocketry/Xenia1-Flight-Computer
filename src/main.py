@@ -1,13 +1,15 @@
 import sys
 
 # TODO: Uncomment these once the modules don't have errors.
-from gpioReader import GPIOReader
+from sensors.lsm import Lsm
+from sensors.bme import Bme
+from sensors.adx import Adx
 import numpy as np
 # from rocketData import RocketData
 
 LAUNCH_ACCELERATION_THRESHOLD = 10
 
-def initialize():
+def initialize(self):
     """Initialize and setup all data.
 
     In this stage we should take extreme care with errors in file loading and
@@ -35,9 +37,9 @@ def initialize():
     # TODO: For the GpioReader class, this is where a fake one would be initted.
 
     # TODO: This only runs in test mode because it currently is broken in not-test mode.
-    if TEST_MODE:
-        gpio = GPIOReader(TEST_MODE, False, False, False, False, False, False, False)
-        gpio.retrieveData()
+    #if TEST_MODE:
+    #    gpio = GPIOReader(TEST_MODE, False, False, False, False, False, False, False)
+    #    gpio.retrieveData()
 
     # TODO: !MC - Suborbit should be initialized in here.
     # TODO: Actually initialize everything. (Like gpio reader)
@@ -47,7 +49,7 @@ def initialize():
 def vec_len(v):
     return np.sqrt(np.dot(v, v))
 
-def standby():
+def standby(lsm):
     """Sitting on the rail, waiting for launch.
 
     The rocket may be in this state for up to 6 hours, and will not get a
@@ -63,15 +65,13 @@ def standby():
 
     Once launch is detected, this method will return.
     """
+    #TODO: initializing Lsm() in here for now but must be initialised in the initialize function later
+    #TODO: make sure Lsm() is properly initialized as we may never exit this function if lsm is using the backup function values
+    lsm = Lsm()
 
-    gpio = GPIOReader(False)
-    retrieve_data = gpio.retrieveData()
-
-    lsm = retrieve_data.__readLSM9DS1()
-
-    while vec_len(lsm.acceleration) < LAUNCH_ACCELERATION_THRESHOLD:
-        lsm = retrieve_data.__readLSM9DS1()
-    
+    while True:
+        if vec_len(lsm.read_acceleration_safe()) < LAUNCH_ACCELERATION_THRESHOLD:
+            break
 
 
 def powered_flight():
@@ -117,18 +117,18 @@ def recovery():
     pass
 
 
-def main():
+def main(self):
     """Main loop of the program.
 
     This is where most of the magic happens and where all states are controlled.
     """
 
     # This is the initialization state
-    (rocket_data) = initialize()
+    (rocket_data, lsm, bme, adx) = initialize()
 
     # At this point we are sitting on the rail and waiting for a detection of
     # motor ignition.
-    standby()
+    standby(lsm)
 
     # These are the in-flight stages.
     powered_flight()
