@@ -37,29 +37,29 @@ class RocketData:
     _lsm = None
     _bme = None
     _adx = None
-    _encoders = None
+    _encoder = None
 
     def __init__(self):
         self._bme = Bme()
         self._lsm = Lsm()
         self._adx = Adx()
-        self._encoders = Encoder() #there's no encoder class right now
+        self._encoder = Encoder() #there's no encoder class right now
 
         self.data = {
             # this might need to be restructured depending on how the sensor classes are done
-            'bme temperature': self._bme.read_temperature(),
-            'bme pressure': self._bme.read_pressure(),
-            'bme humidity': self._bme.read_humidity(),
-            'bme altitude': self._bme.read_altitude(),
+            'bme_temperature': self._bme.temperature(),
+            'bme_pressure': self._bme.pressure(),
+            'bme_humidity': self._bme.humidity(),
+            'bme_altitude': self._bme.altitude(),
 
-            'lsm temperature': self._lsm.read_temperature(),
-            'lsm acceleration': self._lsm.read_acceleration(),
-            'lsm gyroscope': self._lsm.read_gyroscope(),
-            'lsm magnetometer': self._lsm.read_magnetometer(),
+            'lsm_temperature': self._lsm.temperature(),
+            'lsm_acceleration': self._lsm.acceleration(),
+            'lsm_gyroscope': self._lsm.gyroscope(),
+            'lsm_magnetometer': self._lsm.magnetometer(),
 
-            'adx acceleration': self._adx.read_acceleration(),
+            'adx_acceleration': self._adx.acceleration(),
 
-            'strain gauges': [
+            'strain_gauges': [
                 float,
                 float,
                 float,
@@ -73,7 +73,7 @@ class RocketData:
                 float,
                 float,
             ],
-            'encoder': self._encoders,
+            'encoder': self._encoder,
             'timestamp': float
         }
 
@@ -84,43 +84,33 @@ class RocketData:
 
 
     @property
-    def time_stamp(self):
-        return self.data['time_stamp']
+    def timestamp(self):
+        return self.data['timestamp']
 
-    @time_stamp.setter
-    def time_stamp(self, ts):
-        self.data['time_stamp'] = ts
+    @timestamp.setter
+    def timestamp(self, ts):
+        self.data['timestamp'] = ts
 
 
     # Set all sensor data -> get rid of this or make it an update all values function? shouldn't need to manually set data
     @data.setter
-    def setdata(self, vals):
+    def set_data(self, vals):
+        pass
 
     def all_rocketdata(self):
         all_data = [
-            self.data['bme temperature'],
-            self.data['bme pressure'],
-            self.data['bme humidity'],
-            self.data['bme altitude'],
-            self.data['lsm temperature'],
-            self.data['lsm acceleration'],
-            self.data['lsm gyroscope'],
-            self.data['lsm magnetometer'],
-            self.data['adx acceleration'],
-            self.data['strain gauges'][0],
-            self.data['strain gauges'][1],
-            self.data['strain gauges'][2],
-            self.data['strain gauges'][3],
-            self.data['strain gauges'][4],
-            self.data['strain gauges'][5],
-            self.data['strain gauges'][6],
-            self.data['strain gauges'][7],
-            self.data['strain gauges'][8],
-            self.data['strain gauges'][9],
-            self.data['strain gauges'][10],
-            self.data['strain gauges'][11],
-            self.data['encoders']['position'],
-            self.data['encoders']['percent'],
+            self.data['bme_temperature'],
+            self.data['bme_pressure'],
+            self.data['bme_humidity'],
+            self.data['bme_altitude'],
+            self.data['lsm_temperature'],
+            self.data['lsm_acceleration'],
+            self.data['lsm_gyroscope'],
+            self.data['lsm_magnetometer'],
+            self.data['adx_acceleration'],
+            *self.data['strain_gauges'],
+            self.data['encoder']['position'],
+            self.data['encoder']['percent'],
             self.data['timestamp'],
         ]
         return all_data

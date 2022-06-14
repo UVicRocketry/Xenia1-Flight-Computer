@@ -8,7 +8,7 @@ class bme:
     __temperature = None
     __humidity = None
     __pressure = None
-    __altitude = None
+    altitude = None
 
     def __init__(self):
         i2c = board.I2C()
@@ -48,12 +48,12 @@ class bme:
         except:
             return None
 
-    def read_altitude(self):
+    def altitude(self):
         return self.__read_unsafe_altitude() or self.__altitude
 
     def __read_unsafe_altitude(self):
         try:
-            self.__altitude = self.__bme280.altitude
-            return self.__altitude
+            self.altitude = self.__bme280.altitude
+            return self.altitude
         except:
             return None
