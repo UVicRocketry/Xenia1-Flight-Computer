@@ -44,19 +44,21 @@ class RocketData:
         self._adx = Adx()
 
         self.data = {
-            # this might need to be restructured depending on how the sensor classes are done
-            'bme_temperature': self._bme.temperature(),
-            'bme_pressure': self._bme.pressure(),
-            'bme_humidity': self._bme.humidity(),
-            'bme_altitude': self._bme.altitude(),
-
-            'lsm_temperature': self._lsm.temperature(),
-            'lsm_acceleration': self._lsm.acceleration(),
-            'lsm_gyroscope': self._lsm.gyroscope(),
-            'lsm_magnetometer': self._lsm.magnetometer(),
-
-            'adx_acceleration': self._adx.acceleration(),
-
+            'bme': {
+                'temperature': self._bme.temperature(),
+                'pressure': self._bme.pressure(),
+                'humidity': self._bme.humidity(),
+                'altitude': self._bme.altitude(),
+            },
+            'lsm': {
+                'temperature': self._lsm.temperature(),
+                'acceleration': self._lsm.acceleration(),
+                'gyroscope': self._lsm.gyroscope(),
+                'magnetometer': self._lsm.magnetometer(),
+            },
+            'adx': {
+                'acceleration': self._adx.acceleration(),
+            },
             'strain_gauges': [
                 float,
                 float,
@@ -96,15 +98,15 @@ class RocketData:
 
     def all_rocketdata(self):
         all_data = [
-            self.data['bme_temperature'],
-            self.data['bme_pressure'],
-            self.data['bme_humidity'],
-            self.data['bme_altitude'],
-            self.data['lsm_temperature'],
-            self.data['lsm_acceleration'],
-            self.data['lsm_gyroscope'],
-            self.data['lsm_magnetometer'],
-            self.data['adx_acceleration'],
+            self.data.bme['temperature'],
+            self.data.bme['pressure'],
+            self.data.bme['humidity'],
+            self.data.bme['altitude'],
+            self.data.lsm['temperature'],
+            self.data.lsm['acceleration'],
+            self.data.lsm['gyroscope'],
+            self.data.lsm['magnetometer'],
+            self.data.adx['acceleration'],
             *self.data['strain_gauges'],
             self.data['timestamp'],
         ]
