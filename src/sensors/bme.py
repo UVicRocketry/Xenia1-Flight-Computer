@@ -2,6 +2,36 @@ import board
 from adafruit_bme280 import basic as adafruit_bme280
 
 class bme:
+    """
+    bme sensor object
+
+    ...
+
+    Attributes
+    ----------
+
+    __bme280 : object
+        Driver for bme sensor, holds methods
+        for each sensor value
+
+    temperature : float
+        Temperature value from the bme280
+
+    humidity : float
+        Humidity value from the bme280
+
+    pressure : float
+        Pressure value from the bme280
+
+    Methods
+    -------
+
+    read_unsafe_x() : float or None
+        Tries to return a sensor value reading
+        if the value doesn't read returns None
+
+    """
+
     __bme280 = None
 
     temperature = None
