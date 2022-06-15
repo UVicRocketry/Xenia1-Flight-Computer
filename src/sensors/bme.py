@@ -5,9 +5,9 @@ class bme:
 
     __bme280 = None
 
-    __temperature = None
-    __humidity = None
-    __pressure = None
+    temperature = None
+    humidity = None
+    pressure = None
     altitude = None
 
     def __init__(self):
@@ -18,33 +18,35 @@ class bme:
 
         # TODO: initialize pins (from wiring diagram)
 
-    def read_humidity(self):
-        return self.__read_unsafe_humidity() or self.__humidity
+    @property
+    def humidity(self):
+        return self.__read_unsafe_humidity() or self.humidity
 
     def __read_unsafe_humidity(self):
         try:
-            self.__humidity = self.__bme280.humidity
-            return self.__humidity
+            self.humidity = self.__bme280.humidity
+            return self.humidity
         except:
             return None
 
-    def read_pressure(self):
-        return self.__read_unsafe_pressure() or self.__pressure
+    @property
+    def pressure(self):
+        return self.__read_unsafe_pressure or self.pressure
 
     def __read_unsafe_pressure(self):
         try:
-            self.__pressure = self.__bme280.pressure
-            return self.__pressure
+            self.pressure = self.__bme280.pressure
+            return self.pressure
         except:
             return None
-
-    def read_temperature(self):
-        return self.__read_unsafe_temperature() or self.__temperature
+    @property
+    def temperature(self):
+        return self.__read_unsafe_temperature() or self.temperature
 
     def __read_unsafe_temperature(self):
         try:
-            self.__temperature = self.__bme280.temperature
-            return self.__temperature
+            self.temperature = self.__bme280.temperature
+            return self.temperature
         except:
             return None
 
