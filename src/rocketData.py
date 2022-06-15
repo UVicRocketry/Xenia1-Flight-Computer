@@ -37,13 +37,11 @@ class RocketData:
     _lsm = None
     _bme = None
     _adx = None
-    _encoder = None
 
     def __init__(self):
         self._bme = Bme()
         self._lsm = Lsm()
         self._adx = Adx()
-        self._encoder = Encoder() #there's no encoder class right now
 
         self.data = {
             # this might need to be restructured depending on how the sensor classes are done
@@ -73,7 +71,6 @@ class RocketData:
                 float,
                 float,
             ],
-            'encoder': self._encoder,
             'timestamp': float
         }
 
@@ -109,8 +106,6 @@ class RocketData:
             self.data['lsm_magnetometer'],
             self.data['adx_acceleration'],
             *self.data['strain_gauges'],
-            self.data['encoder']['position'],
-            self.data['encoder']['percent'],
             self.data['timestamp'],
         ]
         return all_data
