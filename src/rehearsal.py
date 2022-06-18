@@ -13,6 +13,7 @@ def startup():
     init_stepper()
     tare_hx711s()
     config_i2c()
+    beep()
 
 
 def init_stepper():
@@ -38,6 +39,12 @@ def tare_hx711s():
 
 def config_i2c():
     """Setup all sensors with i2c and setup."""
+    pass
+
+
+def beep():
+    """This method should buzz the buzzer to let the operator know that setup
+    is complete."""
     pass
 
 
