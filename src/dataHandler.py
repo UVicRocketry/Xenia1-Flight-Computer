@@ -87,7 +87,7 @@ class SendData:
     # just an estimate, actual data will be collected on site
 
     #previous calculated height change
-    previous_height_change = 0
+    prev_height_change = 0
     # previous change of height to compensate for Null case
 
     #lapse rate of the air
