@@ -180,7 +180,7 @@ class SendData:
             prev_height_change = dh
 
             alt_temperature = prev_alt + dh
-            prev_h = alt_temperature
+            #prev_alt = alt_temperature
 
         elif (type(curr_temperature) == None or type(prev_temperature) == None) and curr_temperature < prev_temperature:
             dh = prev_height_change
