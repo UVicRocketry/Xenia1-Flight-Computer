@@ -48,6 +48,8 @@ class SendData:
     """
     def __init__(self, rd):
         self.rocket_data = rd
+	self.prev_height_change = 0
+    	# previous change of height to compensate for Null case
     
     # TODO: parm rd is a dict of updated 
     def update_rocket_data(self, rocketData):
@@ -85,10 +87,6 @@ class SendData:
     #initialized altitude at launch pad
     INITIALIZED_ALTITUDE = 274.1
     # just an estimate, actual data will be collected on site
-
-    #previous calculated height change
-    prev_height_change = 0
-    # previous change of height to compensate for Null case
 
     #lapse rate of the air
     LAPSE_RATE = 0.0098
@@ -168,22 +166,17 @@ class SendData:
             alt_temperature: float, altitude from temperature
         """
 
-        # NOTE: need a previous height global variable alongside the prev_dh to prevent compounding errors,
-        # 			or a way to have the altitude reading be inputted as such
-
-        global prev_height_change
-
         if type(curr_temperature) != None and type(prev_temperature) != None and curr_temperature < prev_temperature:
             dT = curr_temperature - prev_temperature
             dh = -1 * (dT/LAPSE_RATE)
 
-            prev_height_change = dh
+            self.prev_height_change = dh
 
             alt_temperature = prev_alt + dh
             #prev_alt = alt_temperature
 
         elif (type(curr_temperature) == None or type(prev_temperature) == None) and curr_temperature < prev_temperature:
-            dh = prev_height_change
+            dh = self.prev_height_change
 
             alt_temperature = prev_alt + dh
             prev_alt = alt_temperature
@@ -191,7 +184,7 @@ class SendData:
         elif curr_temperature > prev_temperature:
             alt_temperature = None
 
-            prev_alt = prev_alt + prev_height_change
+            prev_alt = prev_alt + self.prev_height_change
 
 
         return alt_temperature
