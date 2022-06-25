@@ -210,5 +210,20 @@ class SendData:
         return alt_temperature
     
     
-    
-    
+
+
+    def get_velocity(current_alt, prev_alt, current_timestamp, prev_timestamp):
+	"""
+	
+	"""
+	
+	if current_alt != type(None) and prev_alt != type(None):
+		dh = current_alt - prev_alt
+		dt = current_timestamp - prev_timestamp
+		
+		velocity = dh/dt
+		
+	else:
+		velocity = None
+		
+	return velocity
