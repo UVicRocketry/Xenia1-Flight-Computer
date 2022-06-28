@@ -166,4 +166,4 @@ if __name__ == "__main__":
     TEST_MODE = test_mode
 
     main()
-    exit(0)
+    sys.exit(0)
