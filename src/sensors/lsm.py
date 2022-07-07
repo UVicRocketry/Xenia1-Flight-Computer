@@ -14,7 +14,41 @@ __read_/.../_unsafe(): Reads the sensor and returns None read was unsuccessful
 """
 
 class Lsm:
+    """
+    bme sensor object
 
+    ...
+
+    Attributes
+    ----------
+
+    __lsm9ds1 : object
+        Driver for lsm sensor, holds methods to
+        get each sensor value
+
+    temperature : float
+        Temperature reading from lsm
+
+    acceleration : tuple
+        three axis (x, y, z) of acceleration
+        reading from the lsm
+
+    gyroscope : tuple
+        three axis (x, y, z) of gyroscope
+        reading from the lsm
+
+    magnetometer : tuple
+        three axis (x, y, z) of magnetometer
+        reading from the lsm
+
+    Methods
+    -------
+
+    read_unsafe_x() : float or None
+        Tries to return a sensor value reading
+        if the value doesn't read returns None
+
+    """
     __lsm9ds1 = None
 
     __gyroscope = None
@@ -31,8 +65,8 @@ class Lsm:
         self.__lsm9ds1 = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
         # TODO: initialize pins (from wiring diagram)
 
-
-    def read_temperature_safe(self):
+    @property
+    def temperature(self):
         """Safety first"""
         self.__temperature_safe_value.update(self.__read_temperature_unsafe())
         return self.__temperature_safe_value.get_last_safe_value()
@@ -54,7 +88,7 @@ class Lsm:
     def get_acceleration_unsafe(self):
         return self.__acceleration_safe_value.get_last_unsafe_value()
 
-    def __read_acceleration_unsafe(self):
+    def read_unsafe_acceleration(self):
         try:
             self.__acceleration = self.__lsm9ds1.Acceleration
             return self.__acceleration
@@ -68,7 +102,7 @@ class Lsm:
     def get_magnetometer_unsafe(self):
         return self.__magnetometer_safe_value.get_last_unsafe_value()
 
-    def __read_magnetometer_unsafe(self):
+    def read_unsafe_magnetometer(self):
         try:
             self.__magnetometer = self.__lsm9ds1.Magnetometer
             return self.__magnetometer
@@ -82,7 +116,7 @@ class Lsm:
     def get_gyroscope_unsafe(self):
         return self.__gyroscope_safe_value.get_last_unsafe_value()
 
-    def __read_gyroscope_unsafe(self):
+    def read_unsafe_gyroscope(self):
         try:
             self.__gyroscope = self.__lsm9ds1.Gyroscope
             return self.__gyroscope

@@ -27,6 +27,9 @@ class Bme:
     def __init__(self):
         i2c = board.I2C()
         self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+        self.__bme280.sea_level_pressure = 1013.25
+        # the datasheet lists this as a generic value, but we should get an accurate one before launch
+
         # TODO: initialize pins (from wiring diagram)
     
     def read_humidity_safe(self):
