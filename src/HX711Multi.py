@@ -1,4 +1,3 @@
-from ast import Or
 from typing import List
 import RPi.GPIO as GPIO
 import numpy as np
