@@ -146,47 +146,6 @@ class SendData:
             alt_baro = None
 
         return alt_baro
-    
-
-    def altitude_temperature_v1(self, curr_temperature, prev_temperature, prev_alt): # or altTemp if needed
-        """
-        Takes current temperature measurement, previous temperature measurement, 
-        previous height, and previous height change to get altitude from temperature.
-
-        Parameters:
-            curr_temperature: float, current temperature reading
-            prev_temperature: float, previous temperature reading
-            prev_alt: float, previous height reading 
-                      (note: could either be previous height reading from this function or a previous accepted height reading)
-
-        Returns:
-            alt_temperature: float, altitude from temperature
-        """
-        
-        
-        if type(curr_temperature) != None and type(prev_temperature) != None and curr_temperature < prev_temperature:
-            dT = curr_temperature - prev_temperature
-            dh = -1 * (dT/LAPSE_RATE)
-
-            self.prev_height_change = dh
-
-            return prev_alt + dh
-            
-            #prev_alt = alt_temperature
-
-        elif (type(curr_temperature) == None or type(prev_temperature) == None) and curr_temperature < prev_temperature:
-            dh = self.prev_height_change
-
-            alt_temperature = prev_alt + dh
-            prev_alt = alt_temperature
-
-        elif curr_temperature > prev_temperature:
-            alt_temperature = None
-
-            prev_alt = prev_alt + self.prev_height_change
-
-
-        return alt_temperature
 
 
     def altitude_temperature_v2(curr_temperature, init_temperature): # or altTemp if needed
