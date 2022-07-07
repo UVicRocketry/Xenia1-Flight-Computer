@@ -3,6 +3,37 @@ from adafruit_bme280 import basic as adafruit_bme280
 
 class bme:
 
+    """
+    bme sensor object
+
+    ...
+
+    Attributes
+    ----------
+
+    __bme280 : object
+        Driver for bme sensor, holds methods
+        for each sensor value
+
+    temperature : float
+        Temperature value from the bme280
+
+    humidity : float
+        Humidity value from the bme280
+
+    pressure : float
+        Pressure value from the bme280
+
+    Methods
+    -------
+
+    read_unsafe_x() : float or None
+        Tries to return a sensor value reading
+        if the value doesn't read returns None
+
+    """
+
+
     __bme280 = None
 
     temperature = None
@@ -20,9 +51,9 @@ class bme:
 
     @property
     def humidity(self):
-        return self.__read_unsafe_humidity() or self.humidity
+        return self.read_unsafe_humidity() or self.humidity
 
-    def __read_unsafe_humidity(self):
+    def read_unsafe_humidity(self):
         try:
             self.humidity = self.__bme280.humidity
             return self.humidity
@@ -31,9 +62,9 @@ class bme:
 
     @property
     def pressure(self):
-        return self.__read_unsafe_pressure or self.pressure
+        return self.read_unsafe_pressure or self.pressure
 
-    def __read_unsafe_pressure(self):
+    def read_unsafe_pressure(self):
         try:
             self.pressure = self.__bme280.pressure
             return self.pressure
@@ -41,9 +72,9 @@ class bme:
             return None
     @property
     def temperature(self):
-        return self.__read_unsafe_temperature() or self.temperature
+        return self.read_unsafe_temperature() or self.temperature
 
-    def __read_unsafe_temperature(self):
+    def read_unsafe_temperature(self):
         try:
             self.temperature = self.__bme280.temperature
             return self.temperature
@@ -51,9 +82,9 @@ class bme:
             return None
 
     def altitude(self):
-        return self.__read_unsafe_altitude() or self.__altitude
+        return self.read_unsafe_altitude() or self.altitude
 
-    def __read_unsafe_altitude(self):
+    def read_unsafe_altitude(self):
         try:
             self.altitude = self.__bme280.altitude
             return self.altitude
