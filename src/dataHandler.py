@@ -1,5 +1,34 @@
 from rocketData import RocketData as rd
 import csv
+
+#gravitational acceleration 
+GRAVITY = 9.80665
+
+#gas constant
+GAS_CONSTANT = 8.3144598
+
+#earth atmospheric molar mass
+ATMOSPHERIC_MOLAR_MASS = 0.289644
+
+#vapourization heat of water
+H2O_VAPOUR_HEAT = 2501000
+
+#specific gas constant of dry air
+SPECIFIC_GAS_DRY = 287
+
+#specific gas constant of water vapour
+SPECIFIC_GAS_H2O = 461.5
+
+#specific heat of dry air
+SPECIFIC_HEAT_DRY_AIR = 1003.5
+
+#initialized altitude at launch pad
+INITIALIZED_ALTITUDE = 274.1
+# just an estimate, actual data will be collected on site
+
+#lapse rate of the air
+LAPSE_RATE = 0.0098
+
 class SendData:
     """
     This only deals with sending the rocketdata. RocketData class in src/rocketData.py deals with manipulating the data.  
@@ -46,10 +75,12 @@ class SendData:
             dataToFomat: Which sensor is needed to be called
     -------
     """
+
+    # this is the standard dry air lapse rate, altered by initializeLapseRate()
     def __init__(self, rd):
         self.rocket_data = rd
-	self.prev_height_change = 0
-    	# previous change of height to compensate for Null case
+        self.prev_height_change = 0
+        # previous change of height to compensate for Null case
     
     # TODO: parm rd is a dict of updated 
     def update_rocket_data(self, rocketData):
@@ -63,42 +94,13 @@ class SendData:
             writer.writerow(data)
             f.close()
 
-    #gravitational acceleration 
-    GRAVITY = 9.80665
-
-    #gas constant
-    GAS_CONSTANT = 8.3144598
-
-    #earth atmospheric molar mass
-    ATMOSPHERIC_MOLAR_MASS = 0.289644
-
-    #vapourization heat of water
-    H2O_VAPOUR_HEAT = 2501000
-
-    #specific gas constant of dry air
-    SPECIFIC_GAS_DRY = 287
-    
-    #specific gas constant of water vapour
-    SPECIFIC_GAS_H2O = 461.5
-    
-    #specific heat of dry air
-    SPECIFIC_HEAT_DRYAIR = 1003.5
-
-    #initialized altitude at launch pad
-    INITIALIZED_ALTITUDE = 274.1
-    # just an estimate, actual data will be collected on site
-
-    #lapse rate of the air
-    LAPSE_RATE = 0.0098
-    # this is the standard dry air lapse rate, altered by initializeLapseRate()
-
 
     def initialize_lapse_rate(moist, pressure, temperature):
         """
         Takes moistness, pressure, and temperature readings at launch site to find lapse rate. 
         This should not be run after the initialization phase
 
-        Paramaters:
+        Parameters:
             moist: float, water vapour pressure
             pressure: float, pressure reading
             temperature: float, temperature reading
@@ -107,21 +109,18 @@ class SendData:
             lapse_rate: float, lapse rate (... duh)
         """
         numerator_numerator = H2O_VAPOUR_HEAT * moist
-        numerator_denomenator = temperature * SPECIFIC_GAS_H2O * (pressure - moist)
+        numerator_denominator = temperature * SPECIFIC_GAS_H2O * (pressure - moist)
 
-        numerator = GRAVITY * (1 + (numerator_numerator/numerator_denomenator))
+        numerator = GRAVITY * (1 + (numerator_numerator/numerator_denominator))
 
-        denomenator_numerator = H2O_VAPOUR_HEAT**2 * SPECIFIC_GAS_DRY * moist
-        denomenator_denomenator = (SPECIFIC_GAS_H2O * temperature)**2 * (pressure - moist)
+        denominator_numerator = H2O_VAPOUR_HEAT**2 * SPECIFIC_GAS_DRY * moist
+        denominator_denominator = (SPECIFIC_GAS_H2O * temperature)**2 * (pressure - moist)
 
-        denomenator = SPECIFIC_HEAT_DRYAIR + (denomenator_numerator/denomenator_denomenator)
+        denominator = SPECIFIC_HEAT_DRY_AIR + (denominator_numerator/denominator_denominator)
         
-        lapse_rate = (numerator/denomenator)
+        lapse_rate = (numerator/denominator)
         
         return lapse_rate
-
-
-
 
 
     def altitude_barometric(pressure, init_pressure, init_temperature): # or altBaro, if needed
@@ -141,17 +140,15 @@ class SendData:
             exponent = (-1 * GAS_CONSTANT * LAPSE_RATE) / (GRAVITY * ATMOSPHERIC_MOLAR_MASS)
             pressure_component = (pressure / init_pressure)**exponent
 
-            alt_baro = (pressure_component * init_temperature / LAPSE_RATE) + INITIALIZED_ALTITUDE - init_temp
+            alt_baro = (pressure_component * init_temperature / LAPSE_RATE) + INITIALIZED_ALTITUDE - init_temperature
 
         elif type(pressure) == None:
             alt_baro = None
 
         return alt_baro
-	
+    
 
-
-
-    def altitude_temperature_v1(curr_temperature, prev_temperature, prev_alt): # or altTemp if needed
+    def altitude_temperature_v1(self, curr_temperature, prev_temperature, prev_alt): # or altTemp if needed
         """
         Takes current temperature measurement, previous temperature measurement, 
         previous height, and previous height change to get altitude from temperature.
@@ -165,14 +162,16 @@ class SendData:
         Returns:
             alt_temperature: float, altitude from temperature
         """
-
+        
+        
         if type(curr_temperature) != None and type(prev_temperature) != None and curr_temperature < prev_temperature:
             dT = curr_temperature - prev_temperature
             dh = -1 * (dT/LAPSE_RATE)
 
             self.prev_height_change = dh
 
-            alt_temperature = prev_alt + dh
+            return prev_alt + dh
+            
             #prev_alt = alt_temperature
 
         elif (type(curr_temperature) == None or type(prev_temperature) == None) and curr_temperature < prev_temperature:
@@ -190,8 +189,6 @@ class SendData:
         return alt_temperature
 
 
-
-
     def altitude_temperature_v2(curr_temperature, init_temperature): # or altTemp if needed
         """
         Takes current temperature measurement and initialized temperature measurement change to get altitude from temperature.
@@ -202,28 +199,18 @@ class SendData:
             init_temperature: float, initialized temperature, should not be altered after initialization phase
 
         Returns:
-            alt_temeraturep: float, altitude from temperature
+            alt_temperature: float, altitude from temperature
         """
 
         alt_temperature = -1 * ((curr_temperature - init_temperature)/LAPSE_RATE)
 
         return alt_temperature
-    
-    
 
 
     def get_velocity(current_alt, prev_alt, current_timestamp, prev_timestamp):
-	"""
-	
-	"""
-	
-	if current_alt != type(None) and prev_alt != type(None):
-		dh = current_alt - prev_alt
-		dt = current_timestamp - prev_timestamp
-		
-		velocity = dh/dt
-		
-	else:
-		velocity = None
-		
-	return velocity
+        if current_alt != type(None) and prev_alt != type(None):
+            dh = current_alt - prev_alt
+            dt = current_timestamp - prev_timestamp
+            return dh/dt  
+        else:
+            return None
