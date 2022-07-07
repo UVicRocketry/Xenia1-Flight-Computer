@@ -2,6 +2,7 @@ import board
 from adafruit_bme280 import basic as adafruit_bme280
 
 class bme:
+
     """
     bme sensor object
 
@@ -32,15 +33,20 @@ class bme:
 
     """
 
+
     __bme280 = None
 
     temperature = None
     humidity = None
     pressure = None
+    altitude = None
 
     def __init__(self):
         i2c = board.I2C()
         self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+        self.__bme280.sea_level_pressure = 1013.25
+        # the datasheet lists this as a generic value, but we should get an accurate one before launch
+
         # TODO: initialize pins (from wiring diagram)
 
     @property
@@ -72,5 +78,15 @@ class bme:
         try:
             self.temperature = self.__bme280.temperature
             return self.temperature
+        except:
+            return None
+
+    def altitude(self):
+        return self.read_unsafe_altitude() or self.altitude
+
+    def read_unsafe_altitude(self):
+        try:
+            self.altitude = self.__bme280.altitude
+            return self.altitude
         except:
             return None
