@@ -86,6 +86,7 @@ class RocketData:
     def timestamp(self):
         return self.data['timestamp']
 
+
     @timestamp.setter
     def timestamp(self, ts):
         self.data['timestamp'] = ts
@@ -112,13 +113,18 @@ class RocketData:
         ]
         return all_data
 
+
     def convert_to_csv_string(self):
         data_to_convert = self.all_rocketdata()
-        csv_string = str(data_to_convert[0])
-        for data in data_to_convert[1:]:
-            csv_string += "," + str(data)
+        csv_string = ""
+        for data in data_to_convert[0:]:
+            if data is None:
+                csv_string += ","
+            else:
+                csv_string += "," + str(data)
 
         return csv_string
+
 
     def send_to_airbrakes():
         # TODO: send values to airbrakes
@@ -133,12 +139,7 @@ class RocketData:
             'acceleration': float #which sensor are we getting this val from? (lsm/adx)
         }
 
+
     def send_to_blackbox():
         csv_data = convert_to_csv_string();
         # TODO: send csv_data to blackbox
-
-    def send_to_ground():
-        # TODO: get a string of critical data to send to groundstation
-        #       - what data are we actually sending to ground?
-        #       - how is it going to be formatted? (200c string but does it need to be
-        #         human readable?)
