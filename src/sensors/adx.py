@@ -15,12 +15,33 @@ __read_acceleration_unsafe(): Reads the sensor and returns None read was unsucce
 
 class Adx:
     __safe_value = SafeValue([-100,100],-9.8)
+    """
+    ...
 
+    Attributes
+    ----------
+
+    __adxl375 : object
+        Driver for adx sensor, holds methods
+        for each sensor value
+
+    acceleration : float
+        Temperature value from the bme280
+
+    Methods
+    -------
+
+    read_unsafe_x() : float or None
+        Tries to return a sensor value reading
+        if the value doesn't read returns None
+
+    """
     __adxl375 = None
 
-    __acceleration = None
+    acceleration = None
 
     def __init__(self):
+        i2c = board.I2C()
         self.__adxl375 = adafruit_adxl37x.ADXL375(i2c)
     
     def read_acceleration_safe(self):
@@ -35,10 +56,7 @@ class Adx:
 
     def __read_acceleration_unsafe(self):
         try:
-            self.__acceleration = self.__adxl375.acceleration
-            return self.__acceleration
+            self.acceleration = self.__adxl375.acceleration
+            return self.acceleration
         except:
             return None
-    
-
-
