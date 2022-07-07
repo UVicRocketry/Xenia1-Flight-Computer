@@ -11,29 +11,11 @@ import busio
 import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 
-
-"""
-This class implements a Kalman filter to determine how far the airbrakes
-flaps should be deployed, based on sensor data and previous flight data.
-
-
-Attributes
-----------
-
-
-
-Methods
--------
-
-
-
-
-"""
-class KalmanFilter:
-  def __init__(self, rd):
-    rocket_data = rd
-
-
+# 7 sleep, 12 enable, 24 step, 26 direction
+SLEEP_PIN = 7
+ENABLE_PIN = 12
+STEP_PIN = 24
+DIRECTION_PIN = 26
 
 """
 
@@ -108,9 +90,9 @@ class Airbrakes:
   __min_pot_val = None
 
   def __init__(self,
-              stepper_pin,
-              direction_pin, 
               direction: bool,
+              stepper_pin=STEP_PIN,
+              direction_pin=DIRECTION_PIN,
               ads_pot_pin=0,
               step_angle=1.8,
               microsteps=16,
