@@ -12,11 +12,11 @@ class SafeValue:
 
     def __init__(self, safe_range, backup_function):
         # The last read value
-        self.__last_value
+        self.__last_value = backup_function
         # The last non-nil value for calculations
-        self.__last_safe_value
+        self.__last_safe_value = backup_function
         # CPU timestamp to get delta t
-        self.__last_safe_time
+        self.__last_safe_time = time.time()
         #range of values that are acceptable
         self.__safe_range = safe_range
         # Proc to backup to

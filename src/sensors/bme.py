@@ -3,82 +3,85 @@ from adafruit_bme280 import basic as adafruit_bme280
 from safe_value import SafeValue
 
 """
-read_/../_safe(): reads new values from sensor and stores the data read in a SafeValue object. Returns the latest safe
-value or the backup function if the sensor has not read values for longer than the TIMEOUT Specification foun in safe_value.py.
-This function can be called to read new data from sensor and send data to calculations.
+    refresh(): reads new values from all sensors on chip and stores the data. If the data is not critical to calculations it is stored in
+    a variable. If it is critical it is stored in a SafeValue object. The variables are named after what is measured. for example,
+    __altitude stores the acceleration SafeValue object.
 
-get_/.../_unsafe(): returns the latest Sensor values even if they are of None type. Does NOT read new data from sensors.
-This function can be called to send data to black box/ground station
+    @property getters: Returns the latest value stored in the variable or the SafeValue Object. If the specific value is flight critical
+    (for example altitude) there is getters for acceleration which returns non-null values regardless of if sensor is functioning
+    and acceleration_unsafe which returns exactly what the sensor read.
 
-__read_/.../_unsafe(): Reads the sensor and returns None read was unsuccessful
+    __read_/.../_unsafe(): Reads the sensor and returns sensor value or None if read was unsuccessful
 """
+
+def __altitude_backup():
+    # TODO complete this function
+    pass
 
 class Bme: 
 
     __bme280 = None
 
     __temperature = None
-    __temperature_safe_value = SafeValue([-100,100], 15)
     __humidity = None
-    __humidity_safe_value = SafeValue([-100,100], 15)
     __pressure = None
-    __pressure_safe_value = SafeValue([-100,100], 15)
+    __altitude = SafeValue([0, 10000], __altitude_backup)
+
 
     def __init__(self):
         i2c = board.I2C()
         self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
         self.__bme280.sea_level_pressure = 1013.25
         # the datasheet lists this as a generic value, but we should get an accurate one before launch
-
         # TODO: initialize pins (from wiring diagram)
-    
-    def read_humidity_safe(self):
-        #read humidity and store in safe value
-        self.__humidity_safe_value.update(self.__read_humidity_unsafe)
-        #return last safe value from SafeValue Object
-        return self.__humidity_safe_value.get_last_safe_value()
 
-    def get_humidity_unsafe(self):
-        #returns last value from SafeValue object for Black Box data
-        return self.__humidity_safe_value.get_last_unsafe_value()
+    def refresh(self):
+        self.__humidity = self.__read_humidity_unsafe()
+        self.__pressure = self.__read_pressure_unsafe()
+        self.__temperature = self.__read_temperature_unsafe()
+        self.__altitude.update(self.__read_altitude_unsafe())
+
+    @property
+    def humidity(self):
+        return self.__humidity
 
     def __read_humidity_unsafe(self): 
         try: 
-            self.__humidity = self.__bme280.humidity
-            return self.__humidity
+            return self.__bme280.humidity
         except:
             return None
-    
-    def read_pressure_safe(self):
-        #read pressure and store in safe value
-        self.__pressure_safe_value.update(self.__read_pressure_unsafe)
-        #return last safe value from SafeValue Object
-        return self.__pressure_safe_value.get_last_safe_value()
 
-    def get_pressure_unsafe(self):
-        return self.__pressure_safe_value.get_last_unsafe_value()
-    
+    @property
+    def pressure(self):
+        return self.__pressure
+
     def __read_pressure_unsafe(self): 
         try: 
-            self.__pressure = self.__bme280.pressure
-            return self.__pressure
+            return self.__bme280.pressure
         except:
             return None
-
-    def read_temperature_safe(self):
-        #read temperature and store in safe value
-        self.__temperature_safe_value.update(self.__read_temperature_unsafe)
-        #return last safe value from SafeValue Object
-        return self.__temperature_safe_value.get_last_safe_value()
-
-    def get_temperature_unsafe(self):
-        #return unsafe value for black box
-        return self.__temperature_safe_value.get_last_unsafe_value()
+    
+    @property
+    def temperature(self):
+        return self.__temperature
 
     def __read_temperature_unsafe(self):
         #attempt to read sensor and return None if unsuccessful
         try: 
-            self.__temperature = self.__bme280.temperature
-            return self.__temperature
+            return self.__bme280.temperature
+        except:
+            return None
+
+    @property
+    def altitude(self):
+        return self.__altitude.get_last_safe_value()
+
+    @property
+    def altitude_unsafe(self):
+        return self.__altitude.get_last_unsafe_value()
+
+    def __read_altitude_unsafe(self):
+        try: 
+            return self.__bme280.altitude
         except:
             return None

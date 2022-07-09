@@ -2,16 +2,7 @@ import adafruit_lsm9ds1
 import board
 from safe_value import SafeValue
 
-"""
-read_/../_safe(): reads new values from sensor and stores the data read in a SafeValue object. Returns the latest safe
-value or the backup function if the sensor has not read values for longer than the TIMEOUT Specification foun in safe_value.py.
-This function can be called to read new data from sensor and send data to calculations.
 
-get_/.../_unsafe(): returns the latest Sensor values even if they are of None type. Does NOT read new data from sensors.
-This function can be called to send data to black box/ground station
-
-__read_/.../_unsafe(): Reads the sensor and returns None read was unsuccessful
-"""
 
 class Lsm:
     """
@@ -29,7 +20,7 @@ class Lsm:
     temperature : float
         Temperature reading from lsm
 
-    acceleration : tuple
+    acceleration : SafeValue (tuple)
         three axis (x, y, z) of acceleration
         reading from the lsm
 
@@ -44,81 +35,76 @@ class Lsm:
     Methods
     -------
 
-    read_unsafe_x() : float or None
-        Tries to return a sensor value reading
-        if the value doesn't read returns None
+    refresh(): reads new values from all sensors on chip and stores the data. If the data is not critical to calculations it is stored in
+    a variable. If it is critical it is stored in a SafeValue object. The variables are named after what is measured. for example,
+    __acceleration stores the acceleration SafeValue object.
+
+    @property getters: Returns the latest value stored in the variable or the SafeValue Object. If the specific value is flight critical
+    (for example acceleration) there is getters for acceleration which returns non-null values regardless of if sensor is functioning
+    and acceleration_unsafe which returns exactly what the sensor read.
+
+    __read_/.../_unsafe(): Reads the sensor and returns sensor value or None if read was unsuccessful
 
     """
     __lsm9ds1 = None
-
-    __gyroscope = None
-    __gyroscope_safe_value = SafeValue([-100,100], 15)
-    __magnetometer = None
-    __magnetometer_safe_value = SafeValue([-100,100], 15)
-    __acceleration = None
-    __acceleration_safe_value = SafeValue([-100,100], 15)
+    
     __temperature = None
-    __temperature_safe_value = SafeValue([-100,100], 15)
+    __acceleration = SafeValue([-100,100], 15)
+    __magnetometer = None
+    __gyroscope = None
 
     def __init__(self):
         i2c = board.I2C()
         self.__lsm9ds1 = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
         # TODO: initialize pins (from wiring diagram)
 
+    def refresh(self):
+        self.__temperature = self.__read_temperature_unsafe()
+        self.__acceleration.update(self.__read_acceleration_unsafe())
+        self.__magnetometer = self.__read_magnetometer_unsafe()
+        self.__gyroscope = self.__read_gyroscope_unsafe()
+
     @property
     def temperature(self):
-        """Safety first"""
-        self.__temperature_safe_value.update(self.__read_temperature_unsafe())
-        return self.__temperature_safe_value.get_last_safe_value()
-
-    def get_temperature_unsafe(self):
-        return self.__temperature_safe_value.get_last_unsafe_value()
+        return self.__temperature
 
     def __read_temperature_unsafe(self):
         try:
-            self.__temperature = self.__lsm9ds1.Temperature
-            return self.__temperature
+            return self.__lsm9ds1.Temperature
         except:
             return None
 
-    def read_acceleration_safe(self):
-        self.__acceleration_safe_value.update(self.__read_acceleration_unsafe())
-        return self.__acceleration_safe_value.get_last_safe_value()
+    @property
+    def acceleration(self):
+        return self.__acceleration.get_last_safe_value()
 
-    def get_acceleration_unsafe(self):
-        return self.__acceleration_safe_value.get_last_unsafe_value()
+    @property
+    def acceleration_unsafe(self):
+        return self.__acceleration.get_last_unsafe_value()
 
-    def read_unsafe_acceleration(self):
+    def read_acceleration_unsafe(self):
         try:
-            self.__acceleration = self.__lsm9ds1.Acceleration
-            return self.__acceleration
+            return self.__lsm9ds1.Acceleration
         except:
             return None
 
-    def read_magnetometer_safe(self):
-        self.__magnetometer_safe_value.update(self.__read_magnetometer_unsafe())
-        return self.__magnetometer_safe_value.get_last_safe_value()
+    @property
+    def magnetometer(self):
+        return self.__magnetometer
 
-    def get_magnetometer_unsafe(self):
-        return self.__magnetometer_safe_value.get_last_unsafe_value()
-
-    def read_unsafe_magnetometer(self):
+    def read_magnetometer_unsafe(self):
         try:
-            self.__magnetometer = self.__lsm9ds1.Magnetometer
-            return self.__magnetometer
+            return self.__lsm9ds1.Magnetometer
         except:
             return None
 
-    def read_gyroscope_safe(self):
-        self.__gyroscope_safe_value.update(self.__read_gyroscope_unsafe())
-        return self.__gyroscope_safe_value.get_last_safe_value()
+    @property
+    def gyroscope(self):
+        return self.__gyroscope
 
-    def get_gyroscope_unsafe(self):
-        return self.__gyroscope_safe_value.get_last_unsafe_value()
 
-    def read_unsafe_gyroscope(self):
+    def read_gyroscope_unsafe(self):
         try:
-            self.__gyroscope = self.__lsm9ds1.Gyroscope
-            return self.__gyroscope
+            return self.__lsm9ds1.Gyroscope
         except:
             return None
