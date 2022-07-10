@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "Rocketry_project")(type "KiCad")(uri "${KIPRJMOD}/Rocketry_project.kicad_sym")(options "")(descr ""))
+  (lib (name "ADA3708")(type "KiCad")(uri "C:/Users/maroo/Downloads/ADA3708/ADA3708.kicad_sym")(options "")(descr ""))
+)
