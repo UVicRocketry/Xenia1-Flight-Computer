@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # go.sh
 #
 # Created 2022-07-12
