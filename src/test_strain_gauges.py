@@ -62,15 +62,14 @@ def get_offsets():
 	return get_readings()
 	
 def clear_console():
-	print("\n"*100)
+	print("\n"*50)
 
 offsets = get_offsets()
 sensitivity = 100
 
+readings = get_readings()
+
 while True:
-	clear_console()
-	
-	readings = get_readings()
 
 	for i,reading in enumerate(readings):
 		print(get_bar(reading-offsets[i]), sensitivity)
@@ -78,11 +77,6 @@ while True:
 		# Seperate rings
 		if i%4 == 0:
 			print("\n")
-		
 
-		
-
-		
-
-
-
+	readings = get_readings()
+	clear_console()
