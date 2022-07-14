@@ -20,7 +20,9 @@ DIRECTION_PIN = 26
 """
 
 Airbrakes: This class provides a simple way to interface with the airbrakes
-hardware. It is used by the KalmanFilter class.
+hardware. On construction, the wake() function is called and to conserve power,
+it should be put to sleep(). To call any of the functions involving movement of
+the motor, Airbrakes should be (a)wake().
 
 
 Attributes
@@ -32,9 +34,10 @@ fully deployed. Set by calibrate().
 __min_pot_val [double]: Value of the potentiometer as read by the ADC when brakes are
 fully closed. Set by calibrate().
 
-pot_pin [int]: ADS1115 pin that is connected to potentiometer
-step_pin [int]: GPIO pin that controls stepping of A4988 stepper driver
-dir_pin [int]: GPIO pin that controls direction of A4988 stepper driver
+pot_pin   [int]: ADS1115 pin that is connected to potentiometer
+step_pin  [int]: GPIO pin that controls stepping of the driver 
+dir_pin   [int]: GPIO pin that controls direction of the driver
+sleep_pin [int]: GPIO pin that puts the driver to sleep (no holding torque)
 
 motor_direction [bool]: This value is XOR'd with the direction passed to
 __singleStep(). For the user, this means if the flaps are opening in the wrong
@@ -81,6 +84,23 @@ deployBrakes():
   error associated with this. Adjust this error by changing max_error in
   method body.
 
+sleep():
+  Powers off the stepper motor using the sleep pin of the driver. 
+  
+  Returns nothing.
+
+  Note: This means a loss of torque and thus should only be used while on the
+  launch pad to save power, and NEVER during flight. It should also be used
+  after the brakes have been retracted after apogee.
+
+wake():
+  Powers on the stepper motor using the sleep pin of the driver. 
+  
+  Returns nothing.
+
+  Note: This means the driver is awake and powering the motor. This will consume
+  a lot of power so it should only be used during flight. By default, the creating
+  and Airbrakes object will call this function.
 
 """
 class Airbrakes:
@@ -93,6 +113,7 @@ class Airbrakes:
               direction: bool,
               stepper_pin=STEP_PIN,
               direction_pin=DIRECTION_PIN,
+              sleep_pin=SLEEP_PIN,
               ads_pot_pin=0,
               step_angle=1.8,
               microsteps=16,
@@ -102,6 +123,7 @@ class Airbrakes:
     # GPIO pins
     self.step_pin = stepper_pin
     self.dir_pin  = direction_pin
+    self.sleep_pin= sleep_pin
 
     # Stepper motor specs
     self.stepper_motor = {
@@ -184,3 +206,15 @@ class Airbrakes:
 
     # Return the final potentiometer value and percentage open
     return (self.potentiometer.value, percent_deployed)
+
+  def sleep(self):
+
+    # The sleep pin is active low meaning pulling it low
+    # puts the driver to sleep.
+    GPIO.output(self.sleep, GPIO.LOW)
+  
+  def wake(self):
+
+    # The sleep pin is active low meaning pulling it high
+    # powers up the driver.
+    GPIO.output(self.sleep, GPIO.HIGH)
