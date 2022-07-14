@@ -108,13 +108,15 @@ class SendData:
         Returns:
             lapse_rate: float, lapse rate (... duh)
         """
+        temperature_kelvin = temperature + 273.15
+        
         numerator_numerator = H2O_VAPOUR_HEAT * moist
-        numerator_denominator = temperature * SPECIFIC_GAS_H2O * (pressure - moist)
+        numerator_denominator = temperature_kelvin * SPECIFIC_GAS_H2O * (pressure - moist)
 
         numerator = GRAVITY * (1 + (numerator_numerator/numerator_denominator))
 
         denominator_numerator = H2O_VAPOUR_HEAT**2 * SPECIFIC_GAS_DRY * moist
-        denominator_denominator = (SPECIFIC_GAS_H2O * temperature)**2 * (pressure - moist)
+        denominator_denominator = (SPECIFIC_GAS_H2O * temperature_kelvin)**2 * (pressure - moist)
 
         denominator = SPECIFIC_HEAT_DRY_AIR + (denominator_numerator/denominator_denominator)
         
@@ -160,6 +162,7 @@ class SendData:
         Returns:
             alt_temperature: float, altitude from temperature
         """
+        curr_temperature_kelvin = curr_temperature + 273.15
 
         alt_temperature = -1 * ((curr_temperature - init_temperature)/LAPSE_RATE)
 
