@@ -64,9 +64,9 @@ class FlightComputer:
         # Set the pins as outputs
         GPIO.setup(19, GPIO.OUT)
 
-    def config_sensors():
+    def config_sensors(self):
         """Test readings from sensors, returns true if all sensors read something"""
-        return True
+        return self.rocket_data.test_all_sensors()
 
     def __standby(self):
         while True:
