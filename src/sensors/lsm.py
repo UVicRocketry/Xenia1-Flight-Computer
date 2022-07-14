@@ -4,7 +4,7 @@ import board
 
 class Lsm:
     """
-    bme sensor object
+    lsm sensor object
 
     ...
 
@@ -12,11 +12,11 @@ class Lsm:
     ----------
 
     __lsm9ds1 : object
-        Driver for lsm sensor, holds methods to
+        Driver for the lsm sensor, holds methods to
         get each sensor value
 
     temperature : float
-        Temperature reading from lsm
+        Temperature reading from the lsm
 
     acceleration : (tuple)
         three axis (x, y, z) of acceleration
@@ -99,3 +99,21 @@ class Lsm:
             return self.__lsm9ds1.Gyroscope
         except:
             return None
+
+    def temperature_backup():
+        # TODO: complete this function
+        pass
+
+    def acceleration_backup():
+        # TODO: complete this function
+        pass
+
+    def magnetometer_backup():
+        # TODO: complete this function
+        pass
+
+    def gyroscope_backup():
+        # TODO: complete this function
+        pass
+
+    
