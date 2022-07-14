@@ -136,13 +136,14 @@ class Airbrakes:
    
     # Max steps to go from fully closed to fully open with 1.25 safety factor 
     # Division by 6 is because airbrakes only require 1/6 of a turn to open
-    self.__max_steps_to_open = (1.25
+    self.__max_steps_to_open = int(1.25
                                 * (self.stepper_motor["gear_ratio"]
                                    *(360/self.stepper_motor["step_angle"])
                                    * self.stepper_motor["microsteps"])
                                 /6)
 
-    GPIO.setmode(GPIO.BOARD)
+    # Set elsewhere in flight comp
+    #GPIO.setmode(GPIO.BOARD)
 
     # Set the pins as outputs
     GPIO.setup(self.step_pin, GPIO.OUT)
@@ -215,10 +216,10 @@ class Airbrakes:
 
     # The sleep pin is active low meaning pulling it low
     # puts the driver to sleep.
-    GPIO.output(self.sleep, GPIO.LOW)
+    GPIO.output(self.sleep_pin, GPIO.LOW)
   
   def wake(self):
 
     # The sleep pin is active low meaning pulling it high
     # powers up the driver.
-    GPIO.output(self.sleep, GPIO.HIGH)
+    GPIO.output(self.sleep_pin, GPIO.HIGH)
