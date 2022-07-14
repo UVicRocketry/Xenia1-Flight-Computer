@@ -86,7 +86,9 @@ class RocketData():
         self.initial_altitude = self._bme.altitude
         self.initial_temperature = self._bme.temperature or self._lsm.temperature
 
-
+    def test_all_sensors(self):
+        return _bme.pressure and _bme.humidity and _bme.altitude and _bme.temperature and _lsm.acceleration and _lsm.temperature and _lsm.gyroscope and _lsm.magnetometer and _adx.acceleration
+    
     def refresh(self):
         previous_altitude = self._bme.altitude
         #TODO: what if altitude is None?
