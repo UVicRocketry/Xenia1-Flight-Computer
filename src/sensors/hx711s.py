@@ -1,59 +1,67 @@
 from HX711Multi import HX711_Multi
+import time
 
 '''
 Constants
 '''
+CLK1 = 24
+CLK2 = 25
+CLK3 = 12
 
-# Taring settings
-NUMBER_OF_SAMPLES = 200
-MAX_AWAY_FROM_STD = 0.3
-
-# Init settings
-CLK_PIN = 27
 GAIN = 128
 DEBUGGER_MODE = False
 
-DATA_PIN_1 = 17
-DATA_PINS = [DATA_PIN_1]
+DATA_PINS = [
+    [ 22, 10, 9, 11 ],
+    [ 5, 6, 13, 19 ],
+    [ 26, 17, 27, 25 ]
+]
+
+class Hx711:
+    """
+    An Interface for HX711s
+
+    ...
+
+    Attributes
+    ----------
+    hx711s : list
 
 
-class Hx711: 
-    hx711s = None
-    debugger_mode = True
-    readings = []
-    configure = True
+    Methods
+    -------
+    get_offsets() : [float]
+
+    get_readings() : [float]
+
+    """
+
 
     def __init__(self):
-        
-        self.hx711s = HX711_Multi(DATA_PINS, CLK_PIN, GAIN, DEBUGGER_MODE)
-        while self.configure:
-            if self.hx711s.isReady():
-                self.__tare()
-                # TODO: Ask JJ how to get the offset reading and record the offset 
-            
-    
-    def __tare(self):
-        self.hx711s.tare(NUMBER_OF_SAMPLES, MAX_AWAY_FROM_STD)
+        self.__hx1 = HX711_Multi(DATA_PINS[0], CLK1)
+        self.__hx2 = HX711_Multi(DATA_PINS[1], CLK2)
+        self.__hx3 = HX711_Multi(DATA_PINS[2], CLK3)
+        self.hx711s = [self.__hx1, self.__hx2, self.__hx3]
 
-    @property
-    def hx711s(self):
-        return self.__read()
 
-    def __read(self):
-        try:
-            if self.hx711s.isReady():
-                self.readings = self.hx711s.readRaw()
-                return self.readings
-        except:
-            if self.debugger_mode:
-                print("HX711's not ready")
-            assert("HX711's not ready")
+    def get_offsets(self):
+        for i in range(10):
+            self.get_readings()
 
-    def print_visual(self):
-        '''
-        Note you can't break out of this function after starting to be used for testing only 
-        '''
-        if self.debugger_mode:
-            while True: 
-                self.__read()   
-                print(str(self.readings[0]) + '\n')                
+        return self.get_readings()
+
+
+    def get_readings(self):
+        readings = []
+
+        for hx in self.hx711s:
+
+            while not hx.isReady():
+                time.sleep(0.005)
+
+            values = hx.readRaw()
+
+            for value in values:
+                readings.append(value)
+
+        return readings

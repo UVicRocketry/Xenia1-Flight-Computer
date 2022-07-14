@@ -6,7 +6,7 @@ from .sensors.adx import Adx
 from .sensors.lsm import Lsm
 from .sensors.hx711s import Hx711
 
-#gravitational acceleration 
+#gravitational acceleration
 GRAVITY = 9.80665
 
 #gas constant
@@ -109,7 +109,7 @@ class RocketData():
                 current_altitude = self.altitude_temperature(self._lsm.temperature, self.initial_temperature)
         elif not self._bme.altitude and self._bme.pressure:
             current_altitude = self.altitude_barometric(self._bme.pressure, self.initial_pressure, self.initial_temperature)
-        self.send_to_airbrakes()
+
         self._velocity = self.get_velocity(
             current_altitude,
             previous_altitude,
@@ -170,8 +170,8 @@ class RocketData():
             return dh/dt
         else:
             return None
-    
-    
+
+
     def initialize_lapse_rate(moist, pressure, temperature):
         """
         Takes moistness, pressure, and temperature readings at launch site to find lapse rate. 
@@ -194,9 +194,9 @@ class RocketData():
         denominator_denominator = (SPECIFIC_GAS_H2O * temperature)**2 * (pressure - moist)
 
         denominator = SPECIFIC_HEAT_DRY_AIR + (denominator_numerator/denominator_denominator)
-        
+
         lapse_rate = (numerator/denominator)
-        
+
         return lapse_rate
 
 
