@@ -1,10 +1,12 @@
 import sys
+from rocketData import RocketData
 
 # TODO: Uncomment these once the modules don't have errors.
 from sensors.lsm import Lsm
 from sensors.bme import Bme
 from sensors.adx import Adx
 import numpy as np
+import time
 # from rocketData import RocketData
 
 LAUNCH_ACCELERATION_THRESHOLD = 10
@@ -102,7 +104,7 @@ def coast_flight():
     # TODO: Implement this state
     # TODO: This is where we will have to deal with threading for the airbrakes
     #       controls.
-    pass
+    
 
 
 def recovery():

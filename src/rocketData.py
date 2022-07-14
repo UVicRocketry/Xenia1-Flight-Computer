@@ -109,7 +109,7 @@ class RocketData():
                 current_altitude = self.altitude_temperature(self._lsm.temperature, self.initial_temperature)
         elif not self._bme.altitude and self._bme.pressure:
             current_altitude = self.altitude_barometric(self._bme.pressure, self.initial_pressure, self.initial_temperature)
-        self.send_to_airbrakes()
+
         self._velocity = self.get_velocity(
             current_altitude,
             previous_altitude,
@@ -152,7 +152,7 @@ class RocketData():
         return init_altitude, altitude, velocity, acceleration
 
 
-    def send_to_black_box(self, black_box, data):
+    def send_to_black_box(self, black_box):
         """
         black_box:
             the directory of blackbox on the pi should be something like '/media/pi/...'
@@ -160,7 +160,7 @@ class RocketData():
             current rocket data to send to black bos
         """
         writer = csv.writer(black_box)
-        writer.writerow(data)
+        writer.writerow(self.convert_to_csv_string())
 
 
     def get_velocity(self, current_alt, prev_alt, current_timestamp, prev_timestamp):
