@@ -1,6 +1,5 @@
 import adafruit_lsm9ds1
 import board
-from safe_value import SafeValue
 
 """
 read_/../_safe(): reads new values from sensor and stores the data read in a SafeValue object. Returns the latest safe
@@ -52,13 +51,9 @@ class Lsm:
     __lsm9ds1 = None
 
     __gyroscope = None
-    __gyroscope_safe_value = SafeValue([-100,100], 15)
     __magnetometer = None
-    __magnetometer_safe_value = SafeValue([-100,100], 15)
     __acceleration = None
-    __acceleration_safe_value = SafeValue([-100,100], 15)
     __temperature = None
-    __temperature_safe_value = SafeValue([-100,100], 15)
 
     def __init__(self):
         i2c = board.I2C()

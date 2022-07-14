@@ -1,6 +1,5 @@
 import board
 from adafruit_bme280 import basic as adafruit_bme280
-from safe_value import SafeValue
 
 """
 read_/../_safe(): reads new values from sensor and stores the data read in a SafeValue object. Returns the latest safe
@@ -18,11 +17,8 @@ class Bme:
     __bme280 = None
 
     __temperature = None
-    __temperature_safe_value = SafeValue([-100,100], 15)
     __humidity = None
-    __humidity_safe_value = SafeValue([-100,100], 15)
     __pressure = None
-    __pressure_safe_value = SafeValue([-100,100], 15)
 
     def __init__(self):
         i2c = board.I2C()
@@ -30,7 +26,6 @@ class Bme:
         self.__bme280.sea_level_pressure = 1013.25
         # the datasheet lists this as a generic value, but we should get an accurate one before launch
 
-        # TODO: initialize pins (from wiring diagram)
     
     def read_humidity_safe(self):
         #read humidity and store in safe value

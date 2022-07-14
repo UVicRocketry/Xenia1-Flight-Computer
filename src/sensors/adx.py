@@ -1,5 +1,4 @@
 import adafruit_adxl37x
-from safe_value import SafeValue
 
 """
 read_acceleration_safe(): reads new values from sensor and stores the data read in a SafeValue object. Returns the latest safe
@@ -14,7 +13,6 @@ __read_acceleration_unsafe(): Reads the sensor and returns None read was unsucce
 
 
 class Adx:
-    __safe_value = SafeValue([-100,100],-9.8)
     """
     ...
 
