@@ -1,5 +1,5 @@
 import time
-from urllib.request import DataHandler 
+import csv
 
 from .sensors.bme import Bme
 from .sensors.adx import Adx
@@ -78,23 +78,42 @@ class RocketData():
         self._strain_gauges = Hx711()
         self._velocity = 0
         self.timestamp = time.time()
+        
+        self.refresh()
+
+        self.initial_pressure = self._bme.pressure
+        self.initial_humidity = self._bme.humidity
+        self.initial_altitude = self._bme.altitude
+        self.initial_temperature = self._bme.temperature or self._lsm.temperature
 
 
     def refresh(self):
         previous_altitude = self._bme.altitude
+        #TODO: what if altitude is None?
         previous_timestamp = self.timestamp
 
         self._bme.refresh()
         self._lsm.refresh()
         self._adx.refresh()
         # TODO: Make HX711s refresh function
+
         self._strain_gauges.refresh()
         self.timestamp = time.time()
-        
+
+        current_altitude = self._bme.altitude
+
+        if not self._bme.altitude and self._bme.pressure:
+            if self._bme.temperature:
+                current_altitude = self.altitude_temperature(self._bme.temperature, self.initial_temperature)
+            elif self._lsm.temperature:
+                current_altitude = self.altitude_temperature(self._lsm.temperature, self.initial_temperature)
+        elif not self._bme.altitude and self._bme.pressure:
+            current_altitude = self.altitude_barometric(self._bme.pressure, self.initial_pressure, self.initial_temperature)
+        self.send_to_airbrakes()
         self._velocity = self.get_velocity(
-            self._bme.altitude, 
-            previous_altitude, 
-            self.timestamp, 
+            current_altitude,
+            previous_altitude,
+            self.timestamp,
             previous_timestamp
         )
 
@@ -128,31 +147,27 @@ class RocketData():
         return csv_string
 
 
-    def send_to_airbrakes():
-        # TODO: send values to airbrakes
-        #   - launch altitude (initial val)
-        #   - altitude (during flight)
-        #   - velocity (during flight)
-        #   - acceleration (during flight)
-
-        return {
-            'altitude': float, #needs to be calculated?
-            'velocity': float, #needs to be calculated?
-            'acceleration': float #which sensor are we getting this val from? (lsm/adx)
-        }
+    def airbrakes_data(altitude, velocity, acceleration, init_altitude):
+        init_altitude = init_altitude or None
+        return init_altitude, altitude, velocity, acceleration
 
 
-    def send_to_black_box(self):
-        csv_data = self.convert_to_csv_string();
-        # TODO: send csv_data to blackbox
-        pass
+    def send_to_black_box(self, black_box, data):
+        """
+        black_box:
+            the directory of blackbox on the pi should be something like '/media/pi/...'
+        data:
+            current rocket data to send to black bos
+        """
+        writer = csv.writer(black_box)
+        writer.writerow(data)
 
 
-    def get_velocity(current_alt, prev_alt, current_timestamp, prev_timestamp):
+    def get_velocity(self, current_alt, prev_alt, current_timestamp, prev_timestamp):
         if current_alt != type(None) and prev_alt != type(None):
             dh = current_alt - prev_alt
             dt = current_timestamp - prev_timestamp
-            return dh/dt  
+            return dh/dt
         else:
             return None
     
@@ -210,7 +225,7 @@ class RocketData():
         return alt_baro
 
 
-    def altitude_temperature_v2(curr_temperature, init_temperature): # or altTemp if needed
+    def altitude_temperature(curr_temperature, init_temperature): # or altTemp if needed
         """
         Takes current temperature measurement and initialized temperature measurement change to get altitude from temperature.
         This version essentially turns the flight path into two linear directions (possibly ignore this, docstrings to be changed)
