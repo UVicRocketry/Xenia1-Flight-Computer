@@ -147,11 +147,15 @@ class Airbrakes:
     # Set the pins as outputs
     GPIO.setup(self.step_pin, GPIO.OUT)
     GPIO.setup(self.dir_pin, GPIO.OUT)
+    GPIO.setup(self.sleep_pin, GPIO.OUT)
 
     # Initialize ADC (ADS1115) for reading the potentiometer 
     self.i2c = busio.I2C(board.SCL, board.SDA)
     self.ads = ADS.ADS1115(self.i2c)
     self.potentiometer = AnalogIn(self.ads, ads_pot_pin)
+
+    # Wake up the driver so that it can be calibrated by the user.
+    self.wake()
 
   def __singleStep(self, step_direction: bool):
 
