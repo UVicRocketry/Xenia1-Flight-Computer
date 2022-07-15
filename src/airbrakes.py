@@ -108,6 +108,7 @@ class Airbrakes:
   # Set when calibrate() is called
   __max_pot_val = None
   __min_pot_val = None
+  __total_steps = None
 
   def __init__(self,
               direction: bool,
@@ -179,25 +180,31 @@ class Airbrakes:
     self.__max_pot_val = self.potentiometer.value
 
     # Fully close brakes and record pot value
+    total_steps = 0
     for _ in range(self.__max_steps_to_open):
       self.__singleStep(False)
+      total_steps += 1
+    # Total steps is used later to estimate the number of steps required
+    self.__total_steps = total_steps
     self.__min_pot_val = self.potentiometer.value
 
   def deployBrakes(self, percent):
 
     # Convert percent to potentiometer value
     target_pot = self.__min_pot_val + (percent/100)*(self.__max_pot_val-self.__min_pot_val)
-    
     curr_error = target_pot-self.potentiometer.value
+    step_error = int((curr_error / pot_range) * self.__total_steps) 
 
     # TODO set this based on the resolution of ADC/pot, slop in gears, etc. (requires testing)
-    max_error  = 10 
+    max_error = 10 
 
     # Move stepper to target position within some error
     # Prevent infinite loop by never stepping more than the max to open
     steps = 0
     while abs(curr_error) > max_error and steps < self.__max_steps_to_open:
+      step_error = int((curr_error / pot_range) * self.__total_steps)
       
+      # TODO: !MC - Step until step error zero, then check
       if curr_error < 0:
         self.__singleStep(True)
       else:
