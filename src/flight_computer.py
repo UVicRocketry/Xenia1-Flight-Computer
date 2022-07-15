@@ -78,7 +78,15 @@ class FlightComputer:
         return np.sqrt(np.dot(v, v))
 
     def __powered_flight(self):
-        pass
+        time_at_start = time.time()
+        
+        while True:
+            rocket_data.refresh()
+            rocket_data.send_to_blackbox()
+            if time.time > (time_at_start + 5):
+                break
+            elif rocket_data.current_altitude < -9:
+                break
 
     def __coast_flight(self):
         pass
