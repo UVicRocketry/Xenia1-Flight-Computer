@@ -1,6 +1,5 @@
 import adafruit_lsm9ds1
 import board
-from safe_value import SafeValue
 
 """
 read_/../_safe(): reads new values from sensor and stores the data read in a SafeValue object. Returns the latest safe
@@ -15,7 +14,7 @@ __read_/.../_unsafe(): Reads the sensor and returns None read was unsuccessful
 
 class Lsm:
     """
-    bme sensor object
+    lsm sensor object
 
     ...
 
@@ -23,11 +22,11 @@ class Lsm:
     ----------
 
     __lsm9ds1 : object
-        Driver for lsm sensor, holds methods to
+        Driver for the lsm sensor, holds methods to
         get each sensor value
 
     temperature : float
-        Temperature reading from lsm
+        Temperature reading from the lsm
 
     acceleration : tuple
         three axis (x, y, z) of acceleration
@@ -52,13 +51,9 @@ class Lsm:
     __lsm9ds1 = None
 
     __gyroscope = None
-    __gyroscope_safe_value = SafeValue([-100,100], 15)
     __magnetometer = None
-    __magnetometer_safe_value = SafeValue([-100,100], 15)
     __acceleration = None
-    __acceleration_safe_value = SafeValue([-100,100], 15)
     __temperature = None
-    __temperature_safe_value = SafeValue([-100,100], 15)
 
     def __init__(self):
         i2c = board.I2C()
