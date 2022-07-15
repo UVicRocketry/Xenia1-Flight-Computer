@@ -6,33 +6,24 @@ from .sensors.adx import Adx
 from .sensors.lsm import Lsm
 from .sensors.hx711s import Hx711
 
-#gravitational acceleration 
 GRAVITY = 9.80665
 
-#gas constant
 GAS_CONSTANT = 8.3144598
 
-#earth atmospheric molar mass
 ATMOSPHERIC_MOLAR_MASS = 0.289644
 
-#vaporization heat of water
 H2O_VAPOUR_HEAT = 2501000
 
-#specific gas constant of dry air
 SPECIFIC_GAS_DRY = 287
 
-#specific gas constant of water vapour
 SPECIFIC_GAS_H2O = 461.5
 
-#specific heat of dry air
 SPECIFIC_HEAT_DRY_AIR = 1003.5
 
-#initialized altitude at launch pad
 INITIALIZED_ALTITUDE = 274.1
-# just an estimate, actual data will be collected on site
 
-#lapse rate of the air
 LAPSE_RATE = 0.0098
+
 
 class RocketData():
     """
@@ -42,15 +33,27 @@ class RocketData():
 
     Attributes
     ----------
-    data : object
-        holds all sensor data and a timestamp
+    lsm : Object
+        sensor object for lsm
+
+    bme : Object
+        sensor object for bme
+
+    adx : Object
+        sensor object for adx
+
+    strain_gauges : Object
+        sensor object for the 12 hx711s
+
+    velocity : float
+        calculated velocity
 
     Methods
     -------
-    all_rocket_data()
+    __all_rocket_data()
         Description: returns an array of all sensor data to be used in convert_to_csv_string
 
-    convert_to_csv_string()
+    __convert_to_csv_string()
         Description: converts all of the data into a csv string
 
     send_to_airbrake()
@@ -61,82 +64,94 @@ class RocketData():
     send_to_black_box()
         Description: converts data to a csv string to be sent to blackbox
 
-    send_to_ground()
-        Description: takes critical data (what exactly?) and converts it to a string to be sent to the groundstation
 
     """
-    _lsm = None
-    _bme = None
-    _adx = None
-    _strain_gauges = None
-    _velocity = 0
+    lsm = None
+    bme = None
+    adx = None
+    strain_gauges = None
+    velocity = 0
 
     def __init__(self):
-        self._bme = Bme()
-        self._lsm = Lsm()
-        self._adx = Adx()
-        self._strain_gauges = Hx711()
-        self._velocity = 0
+        self.bme = Bme()
+        self.lsm = Lsm()
+        self.adx = Adx()
+        self.strain_gauges = Hx711()
+        self.velocity = 0
+        self.current_altitude = 0
         self.timestamp = time.time()
-        
+
         self.refresh()
 
-        self.initial_pressure = self._bme.pressure
-        self.initial_humidity = self._bme.humidity
-        self.initial_altitude = self._bme.altitude
-        self.initial_temperature = self._bme.temperature or self._lsm.temperature
+        self.initial_pressure = self.bme.pressure
+        self.initial_humidity = self.bme.humidity
+        self.initial_altitude = self.bme.altitude
+        self.initial_temperature = self.bme.temperature or self.lsm.temperature
+
+
+    def test_all_sensor_readings(self):
+        return {
+            self.bme.pressure and
+            self.bme.humidity and
+            self.bme.altitude and
+            self.bme.temperature and
+            self.lsm.acceleration and
+            self.lsm.temperature and
+            self.lsm.gyroscope and
+            self.lsm.magnetometer and
+            self.adx.acceleration
+        }
 
 
     def refresh(self):
-        previous_altitude = self._bme.altitude
-        #TODO: what if altitude is None?
+        previous_altitude = self.current_altitude
         previous_timestamp = self.timestamp
 
-        self._bme.refresh()
-        self._lsm.refresh()
-        self._adx.refresh()
-        # TODO: Make HX711s refresh function
-
-        self._strain_gauges.refresh()
+        self.bme.refresh()
+        self.lsm.refresh()
+        self.adx.refresh()
+        self.strain_gauges.refresh()
         self.timestamp = time.time()
 
-        current_altitude = self._bme.altitude
+        self.__set_altitude()
 
-        if not self._bme.altitude and self._bme.pressure:
-            if self._bme.temperature:
-                current_altitude = self.altitude_temperature(self._bme.temperature, self.initial_temperature)
-            elif self._lsm.temperature:
-                current_altitude = self.altitude_temperature(self._lsm.temperature, self.initial_temperature)
-        elif not self._bme.altitude and self._bme.pressure:
-            current_altitude = self.altitude_barometric(self._bme.pressure, self.initial_pressure, self.initial_temperature)
-
-        self._velocity = self.get_velocity(
-            current_altitude,
+        self.velocity = self.get_velocity(
+            self.current_altitude,
             previous_altitude,
             self.timestamp,
             previous_timestamp
         )
 
 
-    def all_rocket_data(self):
+    def __set_altitude(self):
+        if not self.bme.altitude and self.bme.pressure:
+            if self.bme.temperature:
+                self.current_altitude = self.altitude_temperature(self.bme.temperature, self.initial_temperature)
+            elif self.lsm.temperature:
+                self.current_altitude = self.altitude_temperature(self.lsm.temperature, self.initial_temperature)
+        elif not self.bme.altitude and self.bme.pressure:
+            self.current_altitude = self.altitude_barometric(self.bme.pressure, self.initial_pressure, self.initial_temperature)
+
+
+    def __all_rocket_data(self):
         all_data = [
-            self._bme.temperature,
-            self._bme.pressure,
-            self._bme.humidity,
-            self._bme.altitude,
-            self._lsm.temperature,
-            self._lsm.acceleration,
-            self._lsm.gyroscope,
-            self._lsm.magnetometer,
-            self._adx.acceleration,
-            *self._strain_gauges,
+            self.bme.temperature,
+            self.bme.pressure,
+            self.bme.humidity,
+            self.bme.altitude,
+            self.lsm.temperature,
+            self.lsm.acceleration,
+            self.lsm.gyroscope,
+            self.lsm.magnetometer,
+            self.adx.acceleration,
+            *self.strain_gauges,
             self.timestamp,
         ]
         return all_data
 
 
     def convert_to_csv_string(self):
-        data_to_convert = self.all_rocket_data()
+        data_to_convert = self.__all_rocket_data()
         csv_string = ""
         for data in data_to_convert[0:]:
             if data is None:
@@ -154,10 +169,12 @@ class RocketData():
 
     def send_to_black_box(self, black_box):
         """
-        black_box:
-            the directory of blackbox on the pi should be something like '/media/pi/...'
-        data:
-            current rocket data to send to black bos
+        Writes rocket data to a file on the black box
+        Parameters:
+            black_box: string, the directory of blackbox on the pi should be something like '/media/pi/...'
+
+        Returns: None
+
         """
         writer = csv.writer(black_box)
         writer.writerow(self.convert_to_csv_string())
@@ -170,11 +187,11 @@ class RocketData():
             return dh/dt
         else:
             return None
-    
-    
+
+
     def initialize_lapse_rate(moist, pressure, temperature):
         """
-        Takes moistness, pressure, and temperature readings at launch site to find lapse rate. 
+        Takes moistness, pressure, and temperature readings at launch site to find lapse rate.
         This should not be run after the initialization phase
 
         Parameters:
@@ -194,13 +211,13 @@ class RocketData():
         denominator_denominator = (SPECIFIC_GAS_H2O * temperature)**2 * (pressure - moist)
 
         denominator = SPECIFIC_HEAT_DRY_AIR + (denominator_numerator/denominator_denominator)
-        
+
         lapse_rate = (numerator/denominator)
-        
+
         return lapse_rate
 
 
-    def altitude_barometric(pressure, init_pressure, init_temperature): # or altBaro, if needed
+    def altitude_barometric(pressure, init_pressure, init_temperature):
         """
         Takes pressure reading, initial pressure reading, and initial temperature reading to get altitude
 
