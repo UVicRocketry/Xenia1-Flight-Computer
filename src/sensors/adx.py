@@ -1,5 +1,5 @@
-import adafruit_adxl37x
 
+import adafruit_adxl34x
 
 class Adx:
     """
@@ -32,7 +32,7 @@ class Adx:
 
     def __init__(self):
         i2c = board.I2C()
-        self.__adxl375 = adafruit_adxl37x.ADXL375(i2c)
+        self.__adxl375 = adafruit_adxl34x.ADXL345(i2c)
     
     def refresh(self):
         #gets new data from sensors and uses update() function in safe_value class to place data in last_value and last_safe_value

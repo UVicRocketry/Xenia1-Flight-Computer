@@ -1,16 +1,47 @@
 import board
 from adafruit_bme280 import basic as adafruit_bme280
 
-"""
-    refresh(): reads new values from all sensors on chip and stores the data.
+SEA_LEVEL_PRESSURE = 1013.25
+# update sea level before final launch
 
-    @property getters: Returns the latest value stored in the variable.
+class Bme:
+     """
+    bme sensor object
 
-    __read_/.../: Reads the sensor and returns sensor value or None if read was unsuccessful
-"""
+    ...
 
+    Attributes
+    ----------
 
-class Bme: 
+    __bme280 : object
+        Bme driver for the bme sensor, holds methods to
+        get each sensor value
+
+    __temperature : float
+        Temperature reading from the bme
+
+    __humidity : (tuple)
+        Moistness of from the reading bme
+
+    __pressure : tuple
+        pressure reading form the bme
+
+    __altitude : tuple
+        altitude reading from the bme
+
+    Methods
+    -------
+
+    refresh():
+        reads new values from all sensors on chip and stores the data.
+
+    @property getters:
+        Returns the latest value stored in the variable.
+
+    __read_/.../():
+        Reads the sensor and returns sensor value or None if read was unsuccessful
+
+    """
 
     __bme280 = None
 
@@ -23,9 +54,7 @@ class Bme:
     def __init__(self):
         i2c = board.I2C()
         self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
-        self.__bme280.sea_level_pressure = 1013.25
-        # the datasheet lists this as a generic value, but we should get an accurate one before launch
-        # TODO: initialize pins (from wiring diagram)
+        self.__bme280.sea_level_pressure = SEA_LEVEL_PRESSURE
 
     def refresh(self):
         self.__humidity = self.__read_humidity()
@@ -38,7 +67,7 @@ class Bme:
         return self.__humidity
 
     def __read_humidity(self): 
-        try: 
+        try:
             return self.__bme280.humidity
         except:
             return None
@@ -57,10 +86,25 @@ class Bme:
     def temperature(self):
         return self.__temperature
 
+
+    @property
+    def temperature(self):
+        return self.__temperature
+
     def __read_temperature(self):
         #attempt to read sensor and return None if unsuccessful
-        try: 
+        try:
             return self.__bme280.temperature
+        except:
+            return None
+
+    @property
+    def altitude(self):
+        return self.__altitude()
+
+    def __read_altitude(self):
+        try:
+            return self.__bme280.altitude
         except:
             return None
 
