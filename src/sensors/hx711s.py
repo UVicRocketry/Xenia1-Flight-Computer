@@ -51,7 +51,7 @@ class Hx711:
         return self.get_readings()
 
 
-    def get_readings(self):
+    def __get_readings(self):
         readings = []
 
         for hx in self.hx711s:
@@ -65,3 +65,7 @@ class Hx711:
                 readings.append(value)
 
         return readings
+
+
+    def refresh(self):
+        self.__get_readings()
