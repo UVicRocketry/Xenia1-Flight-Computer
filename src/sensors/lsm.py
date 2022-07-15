@@ -4,7 +4,7 @@ import board
 
 class Lsm:
     """
-    bme sensor object
+    lsm sensor object
 
     ...
 
@@ -12,36 +12,37 @@ class Lsm:
     ----------
 
     __lsm9ds1 : object
-        Driver for lsm sensor, holds methods to
+        Driver for the lsm sensor, holds methods to
         get each sensor value
 
-    temperature : float
-        Temperature reading from lsm
+    __temperature : float
+        Temperature reading from the lsm
 
-    acceleration : (tuple)
+    __acceleration : (tuple)
         three axis (x, y, z) of acceleration
         reading from the lsm
 
-    gyroscope : tuple
+    __gyroscope : tuple
         three axis (x, y, z) of gyroscope
         reading from the lsm
 
-    magnetometer : tuple
+    __magnetometer : tuple
         three axis (x, y, z) of magnetometer
         reading from the lsm
 
     Methods
     -------
 
-    refresh(): reads new values from all sensors on chip and stores the data. 
+    refresh(): reads new values from all sensors on chip and stores the data.
 
     @property getters: Returns the latest value stored in the variable.
 
     __read_/.../: Reads the sensor and returns sensor value or None if read was unsuccessful
 
     """
+
     __lsm9ds1 = None
-    
+
     __temperature = None
     __acceleration = None
     __magnetometer = None
@@ -50,7 +51,6 @@ class Lsm:
     def __init__(self):
         i2c = board.I2C()
         self.__lsm9ds1 = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
-        # TODO: initialize pins (from wiring diagram)
 
     def refresh(self):
         self.__temperature = self.__read_temperature()
