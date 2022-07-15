@@ -117,21 +117,3 @@ class Lsm:
             return self.__gyroscope
         except:
             return None
-
-    def temperature_backup():
-        # TODO: complete this function
-        pass
-
-    def acceleration_backup():
-        # TODO: complete this function
-        pass
-
-    def magnetometer_backup():
-        # TODO: complete this function
-        pass
-
-    def gyroscope_backup():
-        # TODO: complete this function
-        pass
-
-    
