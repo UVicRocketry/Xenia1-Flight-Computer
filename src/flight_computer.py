@@ -89,8 +89,16 @@ class FlightComputer:
                 break
 
     def __coast_flight(self):
-        pass
-
+        time_at_start = time.time()
+        
+        while True:
+            rocket_data.refresh()
+            rocket_data.send_to_blackbox()
+            if time.time > (time_at_start + 480):
+                break
+            elif rocket_data.velocity < 0:
+                break
+        
     def __recovery_flight(self);
         pass
 
