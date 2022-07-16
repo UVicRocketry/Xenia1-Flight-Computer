@@ -1,6 +1,5 @@
 import board
-import math
-import csv
+
 import time
 from airbrakes import Airbrakes
 from adafruit_bme280 import basic as adafruit_bme280
@@ -32,7 +31,8 @@ class FlightComputer:
         self.init_stepper()
     
         self.config_buzzer()
-        if self.config_sensors():
+        if self.rocket_data.test_all_sensors():
+            # all sensors read correctly
             self.beep()
         else:
             # didnt read all sensors not ready to go
@@ -64,9 +64,12 @@ class FlightComputer:
         # Set the pins as outputs
         GPIO.setup(19, GPIO.OUT)
 
-    def config_sensors(self):
-        """Test readings from sensors, returns true if all sensors read something"""
-        return self.rocket_data.test_all_sensors()
+    def beep():
+        """This method should buzz the buzzer to let the operator know that setup
+        is complete."""
+        GPIO.output(19, GPIO.HIGH)
+        print("beep")
+
 
     def __standby(self):
         while True:
@@ -81,31 +84,35 @@ class FlightComputer:
         time_at_start = time.time()
         
         while True:
-            rocket_data.refresh()
-            rocket_data.send_to_blackbox()
-            if time.time > (time_at_start + 5):
+            self.rocket_data.refresh()
+            self.rocket_data.send_to_blackbox()
+            # TODO: send data to airbrakes
+            if time.time() > (time_at_start + 5):
                 break
-            elif rocket_data.current_altitude < -9:
+            elif self.rocket_data.current_altitude < -9:
                 break
 
     def __coast_flight(self):
         time_at_start = time.time()
         
         while True:
-            rocket_data.refresh()
-            rocket_data.send_to_blackbox()
+            self.rocket_data.refresh()
+            self.rocket_data.send_to_blackbox()
+            # TODO: send data to airbrakes
             if time.time > (time_at_start + 480):
                 break
-            elif rocket_data.velocity < 0:
+            elif self.rocket_data.velocity < 0:
                 break
         
-    def __recovery_flight(self);
+    def __recovery_flight(self):
         time_at_start = time.time()
         
         while True:
-            rocket_data.refresh()
-            rocket_data.send_to_blackbox()
+            self.rocket_data.refresh()
+            self.rocket_data.send_to_blackbox()
             if time.time > (time_at_start + 300):
+                break
+            elif self.rocketdata.velocity == 0:
                 break
 
     def fly(self):
