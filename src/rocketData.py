@@ -124,7 +124,7 @@ class RocketData():
 
 
     def __set_altitude(self):
-        if not self.bme.altitude and self.bme.pressure:
+        if not self.bme.altitude and (self.bme.temperature or self.lsm.temperature):
             if self.bme.temperature:
                 self.current_altitude = self.altitude_temperature(self.bme.temperature, self.initial_temperature)
             elif self.lsm.temperature:
@@ -185,6 +185,7 @@ class RocketData():
             dh = current_alt - prev_alt
             dt = current_timestamp - prev_timestamp
             return dh/dt
+            # TODO Ensure that dt is never 0
         else:
             return None
 
