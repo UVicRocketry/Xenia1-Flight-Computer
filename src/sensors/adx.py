@@ -29,8 +29,7 @@ class Adx:
 
     __acceleration = None
 
-    def __init__(self):
-        i2c = board.I2C()
+    def __init__(self, i2c):
         self.__adxl375 = adafruit_adxl34x.ADXL345(i2c)
     
     def refresh(self):
@@ -40,7 +39,7 @@ class Adx:
     @property
     def acceleration(self):
         #returns last safe value or result of alternative function if the sensor has returned None for longer than the TIMEOUT setting.
-        return self.__acceleration.get_last_safe_value()
+        return self.__acceleration
 
     def __read_acceleration(self):
         try:

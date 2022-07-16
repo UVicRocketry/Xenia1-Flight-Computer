@@ -5,7 +5,7 @@ SEA_LEVEL_PRESSURE = 1013.25
 # update sea level before final launch
 
 class Bme:
-     """
+    """
     bme sensor object
 
     ...
@@ -51,8 +51,7 @@ class Bme:
     __altitude = None
 
 
-    def __init__(self):
-        i2c = board.I2C()
+    def __init__(self, i2c):
         self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
         self.__bme280.sea_level_pressure = SEA_LEVEL_PRESSURE
 
