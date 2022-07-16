@@ -31,7 +31,7 @@ class FlightComputer:
         self.init_stepper()
     
         self.config_buzzer()
-        if self.rocket_data.test_all_sensors():
+        if self.rocket_data.test_all_sensor_readings():
             # all sensors read correctly
             self.beep()
         else:
