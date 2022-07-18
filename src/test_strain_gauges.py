@@ -2,19 +2,22 @@ from HX711Multi import HX711_Multi
 from time import sleep
 
 # Pins
-clk1 = 1
-clk2 = 2
-clk3 = 3
+clk1 = 26
+clk2 = 5
+clk3 = 16
+clk4 = 21
 
-ring1 = [4,5,6,7]
-ring2 = [8,9,10,11]
-ring3 = [12,13,14,15]
+ring1 = [27,9]
+ring2 = [11,20,17]
+ring3 = [0,19,6]
+ring4 = [4,22]
 
 hx1 = HX711_Multi(ring1, clk1)
-hx2 = HX711_Multi(ring2, clk1)
-hx3 = HX711_Multi(ring3, clk1)
+hx2 = HX711_Multi(ring2, clk2)
+hx3 = HX711_Multi(ring3, clk3)
+hx4 = HX711_Multi(ring4, clk4)
 
-HX711s = [hx1, hx2, hx3]
+HX711s = [hx1, hx2, hx3, hx4]
 
 def get_readings():
 
