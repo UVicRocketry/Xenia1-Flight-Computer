@@ -24,6 +24,8 @@ INITIALIZED_ALTITUDE = 274.1
 
 LAPSE_RATE = 0.0098
 
+ACCELERATION_DIRECTION_INDEX = 1
+
 
 class RocketData():
     """
@@ -127,9 +129,9 @@ class RocketData():
 
     def __set_acceleration(self):
         if self.adx.acceleration:
-            self.current_acceleration = self.adx.acceleration
-        elif (not self.adx.acceleration) and self.lsm.acceleration:
-            self.current_acceleration = self.lsm.acceleration
+            self.current_acceleration = self.adx.acceleration[ACCELERATION_DIRECTION_INDEX]
+        elif self.lsm.acceleration:
+            self.current_acceleration = -1 * self.lsm.acceleration[ACCELERATION_DIRECTION_INDEX]
         else:
             self.current_acceleration = -9.8
 
