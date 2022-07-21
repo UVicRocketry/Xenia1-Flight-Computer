@@ -34,11 +34,22 @@ class FlightComputer:
         self.__init_stepper()
     
         self.__config_buzzer()
-        if self.rocket_data.test_all_sensor_readings():
-            # all sensors read correctly
+        if self.rocket_data.test_lsm_sensor_readings():
+            # lsm sensors read correctly
             self.__beep()
-        else:
+        if self.rocket_data.test_bme_sensor_readings():
+            # bme sensors read correctly
+            self.__beep()
+        if self.rocket_data.test_adx_sensor_readings():
+            # adx sensors read correctly
+            self.__beep()
+        
+        if not (self.rocket_data.test_lsm_sensor_readings() or self.rocket_data.test_bme_sensor_readings() or self.rocket_data.test_adx_sensor_readings()):
             # didnt read all sensors not ready to go
+            self.__beep()
+            time.sleep(0.2)
+            self.__beep()
+            time.sleep(0.2)
             self.__beep()
             time.sleep(0.2)
             self.__beep()
@@ -71,7 +82,8 @@ class FlightComputer:
         """This method should buzz the buzzer to let the operator know that setup
         is complete."""
         GPIO.output(19, GPIO.HIGH)
-        print("beep")
+        time.sleep(0.2)
+        GPIO.output(19, GPIO.LOW)
 
 
     def __standby(self):

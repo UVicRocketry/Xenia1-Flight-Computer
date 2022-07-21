@@ -92,18 +92,24 @@ class RocketData():
         self.initial_temperature = self.bme.temperature or self.lsm.temperature
 
 
-    def test_all_sensor_readings(self):
+    def test_bme_sensor_readings(self):
         return {
             self.bme.pressure and
             self.bme.humidity and
             self.bme.altitude and
-            self.bme.temperature and
+            self.bme.temperature
+        }
+
+    def test_lsm_sensor_readings(self):
+        return {
             self.lsm.acceleration and
             self.lsm.temperature and
             self.lsm.gyroscope and
-            self.lsm.magnetometer and
-            self.adx.acceleration
+            self.lsm.magnetometer
         }
+
+    def test_adx_sensor_readings(self):
+        return self.adx.acceleration
 
 
     def refresh(self):
