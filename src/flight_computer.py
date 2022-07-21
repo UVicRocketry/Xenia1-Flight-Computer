@@ -28,19 +28,19 @@ class FlightComputer:
 
     def startup(self):
         """Initialize all the things"""
-        self.init_stepper()
+        self.__init_stepper()
     
-        self.config_buzzer()
+        self.__config_buzzer()
         if self.rocket_data.test_all_sensor_readings():
             # all sensors read correctly
-            self.beep()
+            self.__beep()
         else:
             # didnt read all sensors not ready to go
-            self.beep()
+            self.__beep()
             time.sleep(0.2)
-            self.beep()
+            self.__beep()
 
-    def init_stepper():
+    def __init_stepper():
         """This should initialize the airbrakes stepper motor and open and close airbrakes
     The main driver for the airbrakes should automatically do this upon
     initialization.
@@ -59,12 +59,12 @@ class FlightComputer:
         airbrakes.calibrate()
         print("calibrate")
 
-    def config_buzzer():
+    def __config_buzzer():
         # GPIO.setmode(GPIO.BOARD)
         # Set the pins as outputs
         GPIO.setup(19, GPIO.OUT)
 
-    def beep():
+    def __beep():
         """This method should buzz the buzzer to let the operator know that setup
         is complete."""
         GPIO.output(19, GPIO.HIGH)
