@@ -79,6 +79,7 @@ class RocketData():
         self.strain_gauges = Hx711()
         self.velocity = 0
         self.current_altitude = 0
+        self.current_acceleration = 0
         self.timestamp = time.time()
 
         self.refresh()
@@ -115,6 +116,8 @@ class RocketData():
 
         self.__set_altitude()
 
+        self.__set_acceleration()
+
         self.velocity = self.get_velocity(
             self.current_altitude,
             previous_altitude,
@@ -122,6 +125,13 @@ class RocketData():
             previous_timestamp
         )
 
+    def __set_acceleration(self):
+        if self.adx.acceleration:
+            self.current_acceleration = self.adx.acceleration
+        elif (not self.adx.acceleration) and self.lsm.acceleration:
+            self.current_acceleration = self.lsm.acceleration
+        else:
+            self.current_acceleration = -9.8
 
     def __set_altitude(self):
         if not self.bme.altitude and self.bme.pressure:

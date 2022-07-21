@@ -16,6 +16,9 @@ i2c = board.I2C()
 # i2c = busio.I2C(board.SCL, board.SDA)
 
 LAUNCH_ACCELERATION_THRESHOLD = 10
+POWERED_TIMEOUT = 5
+COAST_TIMEOUT = 300
+RECOVERY_TIMEOUT = 480
 # TODO: complete filepath
 BLACKBOX_FILEPATH = "/media/pi/.."
 
@@ -87,9 +90,9 @@ class FlightComputer:
             self.rocket_data.refresh()
             self.rocket_data.send_to_blackbox()
             # TODO: send data to airbrakes
-            if time.time() > (time_at_start + 5):
+            if time.time() > (time_at_start + POWERED_TIMEOUT):
                 break
-            elif self.rocket_data.current_altitude < -9:
+            elif self.rocket_data.current_acceleration < -9:
                 break
 
     def __coast_flight(self):
@@ -99,7 +102,7 @@ class FlightComputer:
             self.rocket_data.refresh()
             self.rocket_data.send_to_blackbox()
             # TODO: send data to airbrakes
-            if time.time > (time_at_start + 480):
+            if time.time > (time_at_start + COAST_TIMEOUT):
                 break
             elif self.rocket_data.velocity < 0:
                 break
@@ -110,7 +113,7 @@ class FlightComputer:
         while True:
             self.rocket_data.refresh()
             self.rocket_data.send_to_blackbox()
-            if time.time > (time_at_start + 300):
+            if time.time > (time_at_start + RECOVERY_TIMEOUT):
                 break
             elif self.rocketdata.velocity == 0:
                 break
