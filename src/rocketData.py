@@ -129,10 +129,13 @@ class RocketData():
 
     def __set_acceleration(self):
         if self.adx.acceleration:
-            self.current_acceleration = self.adx.acceleration[ACCELERATION_DIRECTION_INDEX]
+            #Access y direction of ADX sensor. Multiply by -1 as y is pointing down on board
+            self.current_acceleration = -1* self.adx.acceleration[ACCELERATION_DIRECTION_INDEX]
         elif self.lsm.acceleration:
-            self.current_acceleration = -1 * self.lsm.acceleration[ACCELERATION_DIRECTION_INDEX]
+            #Access y direction of LSM sensor. No operations needed as y is pointing up on board
+            self.current_acceleration = self.lsm.acceleration[ACCELERATION_DIRECTION_INDEX]
         else:
+            #Default Acceleration in case both ADX and LSM fail
             self.current_acceleration = -9.8
 
     def __set_altitude(self):
