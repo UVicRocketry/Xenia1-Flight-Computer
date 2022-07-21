@@ -59,11 +59,6 @@ class Lsm:
         self.__magnetometer = self.__read_magnetometer()
         self.__gyroscope = self.__read_gyroscope()
 
-    def refresh(self):
-        self.__temperature = self.__read_temperature()
-        self.__acceleration = self.__read_acceleration()
-        self.__magnetometer = self.__read_magnetometer()
-        self.__gyroscope = self.__read_gyroscope()
 
     @property
     def temperature(self):
@@ -77,7 +72,7 @@ class Lsm:
 
     @property
     def acceleration(self):
-        return self.__acceleration()
+        return self.__acceleration
 
 
     def read_acceleration(self):
