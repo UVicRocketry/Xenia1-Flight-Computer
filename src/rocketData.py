@@ -24,6 +24,8 @@ INITIALIZED_ALTITUDE = 274.1
 
 LAPSE_RATE = 0.0098
 
+ACCELERATION_DIRECTION_INDEX = 1
+
 
 class RocketData():
     """
@@ -79,6 +81,7 @@ class RocketData():
         self.strain_gauges = Hx711()
         self.velocity = 0
         self.current_altitude = 0
+        self.current_acceleration = 0
         self.timestamp = time.time()
 
         self.refresh()
@@ -89,18 +92,24 @@ class RocketData():
         self.initial_temperature = self.bme.temperature or self.lsm.temperature
 
 
-    def test_all_sensor_readings(self):
+    def test_bme_sensor_readings(self):
         return {
             self.bme.pressure and
             self.bme.humidity and
             self.bme.altitude and
-            self.bme.temperature and
+            self.bme.temperature
+        }
+
+    def test_lsm_sensor_readings(self):
+        return {
             self.lsm.acceleration and
             self.lsm.temperature and
             self.lsm.gyroscope and
-            self.lsm.magnetometer and
-            self.adx.acceleration
+            self.lsm.magnetometer
         }
+
+    def test_adx_sensor_readings(self):
+        return self.adx.acceleration
 
 
     def refresh(self):
@@ -115,6 +124,8 @@ class RocketData():
 
         self.__set_altitude()
 
+        self.__set_acceleration()
+
         self.velocity = self.get_velocity(
             self.current_altitude,
             previous_altitude,
@@ -122,6 +133,16 @@ class RocketData():
             previous_timestamp
         )
 
+    def __set_acceleration(self):
+        if self.adx.acceleration:
+            #Access y direction of ADX sensor. Multiply by -1 as y is pointing down on board
+            self.current_acceleration = -1* self.adx.acceleration[ACCELERATION_DIRECTION_INDEX]
+        elif self.lsm.acceleration:
+            #Access y direction of LSM sensor. No operations needed as y is pointing up on board
+            self.current_acceleration = self.lsm.acceleration[ACCELERATION_DIRECTION_INDEX]
+        else:
+            #Default Acceleration in case both ADX and LSM fail
+            self.current_acceleration = -9.8
 
     def __set_altitude(self):
         if not self.bme.altitude and self.bme.pressure:

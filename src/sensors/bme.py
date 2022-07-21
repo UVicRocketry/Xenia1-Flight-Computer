@@ -65,7 +65,7 @@ class Bme:
     def humidity(self):
         return self.__humidity
 
-    def __read_humidity(self):
+    def __read_humidity(self): 
         try:
             return self.__bme280.humidity
         except:
@@ -75,11 +75,16 @@ class Bme:
     def pressure(self):
         return self.__pressure
 
-    def __read_pressure(self):
-        try:
+    def __read_pressure(self): 
+        try: 
             return self.__bme280.pressure
         except:
             return None
+    
+    @property
+    def temperature(self):
+        return self.__temperature
+
 
     @property
     def temperature(self):
@@ -98,6 +103,16 @@ class Bme:
 
     def __read_altitude(self):
         try:
+            return self.__bme280.altitude
+        except:
+            return None
+
+    @property
+    def altitude(self):
+        return self.__altitude()
+
+    def __read_altitude(self):
+        try: 
             return self.__bme280.altitude
         except:
             return None

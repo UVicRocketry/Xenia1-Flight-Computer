@@ -18,6 +18,7 @@ class Lsm:
     __temperature : float
         Temperature reading from the lsm
 
+
     __acceleration : (tuple)
         three axis (x, y, z) of acceleration
         reading from the lsm
@@ -56,6 +57,7 @@ class Lsm:
         self.__acceleration = self.__read_acceleration()
         self.__magnetometer = self.__read_magnetometer()
         self.__gyroscope = self.__read_gyroscope()
+
 
     @property
     def temperature(self):

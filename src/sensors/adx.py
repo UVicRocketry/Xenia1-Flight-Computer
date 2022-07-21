@@ -1,3 +1,4 @@
+
 import adafruit_adxl34x
 
 class Adx:
