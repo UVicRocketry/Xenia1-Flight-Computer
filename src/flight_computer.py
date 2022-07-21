@@ -45,23 +45,18 @@ class FlightComputer:
             self.__beep()
         
         if not (self.rocket_data.test_lsm_sensor_readings() or self.rocket_data.test_bme_sensor_readings() or self.rocket_data.test_adx_sensor_readings()):
-            # didnt read all sensors not ready to go
-            self.__beep()
-            time.sleep(0.2)
-            self.__beep()
-            time.sleep(0.2)
-            self.__beep()
-            time.sleep(0.2)
-            self.__beep()
+            # didnt read all sensors, not ready to go
+            self.__beep(1.2)
+            
 
     def __init_stepper():
-        """This should initialize the airbrakes stepper motor and open and close airbrakes
-    The main driver for the airbrakes should automatically do this upon
-    initialization.
-    Don't stand next to the airbrakes at this point."""
+        """
+        This should initialize the airbrakes stepper motor and open and close airbrakes
+        The main driver for the airbrakes should automatically do this upon
+        initialization.
+        Don't stand next to the airbrakes at this point.
+        """
 
-        # TODO: I have ZERO idea what this direction should be. There is a 50%
-        #       chance that this is correct.
         GPIO.setup(18, GPIO.OUT)
         GPIO.setup(4, GPIO.OUT)
         airbrakes = Airbrakes(direction = True)
@@ -78,11 +73,11 @@ class FlightComputer:
         # Set the pins as outputs
         GPIO.setup(19, GPIO.OUT)
 
-    def __beep():
+    def __beep(duration = 0.2):
         """This method should buzz the buzzer to let the operator know that setup
         is complete."""
         GPIO.output(19, GPIO.HIGH)
-        time.sleep(0.2)
+        time.sleep(duration)
         GPIO.output(19, GPIO.LOW)
 
 
