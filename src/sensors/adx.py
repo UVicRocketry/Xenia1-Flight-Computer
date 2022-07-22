@@ -38,7 +38,7 @@ class Adx:
                 'acceleration': 0
             }
 
-    
+
     def refresh(self):
         #gets new data from sensors and uses update() function in safe_value class to place data in last_value and last_safe_value
         self.__acceleration = self.__read_acceleration()
