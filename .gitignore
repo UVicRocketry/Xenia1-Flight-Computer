@@ -1,4 +1,9 @@
 **/__pycache__
+
+# This is the video exported from the script in script/gource_animation.sh
+git_history.mp4
+
+# Mac file
 .DS_Store
 
 #
