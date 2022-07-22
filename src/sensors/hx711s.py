@@ -1,3 +1,4 @@
+from operator import truediv
 from HX711Multi import HX711_Multi
 import time
 
@@ -16,6 +17,13 @@ DATA_PINS = [
     [ 5, 6, 13, 19 ],
     [ 26, 17, 27, 25 ]
 ]
+
+class FakeHx711:
+    def __init__(self) -> None:
+        pass
+
+    def __get_readings():
+        return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 class Hx711:
     """
@@ -38,10 +46,14 @@ class Hx711:
 
 
     def __init__(self):
-        self.__hx1 = HX711_Multi(DATA_PINS[0], CLK1)
-        self.__hx2 = HX711_Multi(DATA_PINS[1], CLK2)
-        self.__hx3 = HX711_Multi(DATA_PINS[2], CLK3)
-        self.hx711s = [self.__hx1, self.__hx2, self.__hx3]
+        self.backup_hx711 = FakeHx711()
+        try:
+            self.__hx1 = HX711_Multi(DATA_PINS[0], CLK1)
+            self.__hx2 = HX711_Multi(DATA_PINS[1], CLK2)
+            self.__hx3 = HX711_Multi(DATA_PINS[2], CLK3)
+            self.hx711s = [self.__hx1, self.__hx2, self.__hx3]
+        except ValueError:
+            self.hx711s = self.backup_hx711
 
 
     def get_offsets(self):
