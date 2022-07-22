@@ -30,8 +30,7 @@ class Adx:
 
     __acceleration = None
 
-    def __init__(self):
-        i2c = board.I2C()
+    def __init__(self, i2c):
         try:
             self.__adxl375 = adafruit_adxl34x.ADXL345(i2c)
         except ValueError:

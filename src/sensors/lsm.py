@@ -49,8 +49,7 @@ class Lsm:
     __magnetometer = None
     __gyroscope = None
 
-    def __init__(self):
-        i2c = board.I2C()
+    def __init__(self, i2c):
         try:
             self.__lsm9ds1 = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
         except ValueError:

@@ -51,8 +51,7 @@ class Bme:
     __altitude = None
 
 
-    def __init__(self):
-        i2c = board.I2C()
+    def __init__(self, i2c):
         try:
             self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
         except ValueError:
