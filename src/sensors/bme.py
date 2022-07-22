@@ -52,7 +52,13 @@ class Bme:
 
 
     def __init__(self, i2c):
-        self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+        try:
+            self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+        except ValueError:
+            self.__bme280 = {
+                'pressure': 0,
+                'temperature': 0
+            }
         self.__bme280.sea_level_pressure = SEA_LEVEL_PRESSURE
 
     def refresh(self):
@@ -86,10 +92,6 @@ class Bme:
         return self.__temperature
 
 
-    @property
-    def temperature(self):
-        return self.__temperature
-
     def __read_temperature(self):
         #attempt to read sensor and return None if unsuccessful
         try:
@@ -107,12 +109,4 @@ class Bme:
         except:
             return None
 
-    @property
-    def altitude(self):
-        return self.__altitude()
-
-    def __read_altitude(self):
-        try: 
-            return self.__bme280.altitude
-        except:
-            return None
+    
