@@ -2,9 +2,6 @@ import board
 
 import time
 from airbrakes import Airbrakes
-from adafruit_bme280 import basic as adafruit_bme280
-import adafruit_lsm9ds1
-import adafruit_adxl34x
 import RPi.GPIO as GPIO
 import busio
 from rocketData import RocketData
@@ -12,15 +9,15 @@ import numpy as np
 
 from HX711Multi import HX711_Multi
 
-i2c = board.I2C()
-# i2c = busio.I2C(board.SCL, board.SDA)
 
-LAUNCH_ACCELERATION_THRESHOLD = 10
+STANDBY_EXIT_THRESHOLD = 10
+POWERED_FLIGHT_EXIT_THRESHOLD = -9
 POWERED_TIMEOUT = 5
 COAST_TIMEOUT = 300
 RECOVERY_TIMEOUT = 480
+
 # TODO: complete filepath
-BLACKBOX_FILEPATH = "/media/pi/.."
+BLACKBOX_FILEPATH = "/media/pi/XENIA_BB"
 
 class FlightComputer:
 
@@ -60,8 +57,8 @@ class FlightComputer:
         GPIO.setup(18, GPIO.OUT)
         GPIO.setup(4, GPIO.OUT)
         airbrakes = Airbrakes(direction = True)
-        print("hello")
-
+        # GPIO.setmode(GPIO.BOARD)
+        # Set the pins as outputs
         GPIO.output(18, GPIO.LOW)
         GPIO.output(4, GPIO.HIGH)
         # This will wave at the fans (move the brakes in and out)
@@ -69,8 +66,6 @@ class FlightComputer:
         print("calibrate")
 
     def __config_buzzer():
-        # GPIO.setmode(GPIO.BOARD)
-        # Set the pins as outputs
         GPIO.setup(19, GPIO.OUT)
 
     def __beep(duration = 0.2):
@@ -84,7 +79,7 @@ class FlightComputer:
     def __standby(self):
         while True:
             self.rocket_data.refresh()
-            if self.vec_len(self.rocket_data.acceleration) < LAUNCH_ACCELERATION_THRESHOLD:
+            if self.vec_len(self.rocket_data.acceleration) < STANDBY_EXIT_THRESHOLD:
                 break
     
     def vec_len(v):
@@ -99,7 +94,7 @@ class FlightComputer:
             # TODO: send data to airbrakes
             if time.time() > (time_at_start + POWERED_TIMEOUT):
                 break
-            elif self.rocket_data.current_acceleration < -9:
+            elif self.rocket_data.current_acceleration < POWERED_FLIGHT_EXIT_THRESHOLD:
                 break
 
     def __coast_flight(self):

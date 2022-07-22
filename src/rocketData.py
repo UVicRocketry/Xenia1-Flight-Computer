@@ -1,5 +1,6 @@
 import time
 import csv
+import board
 
 from .sensors.bme import Bme
 from .sensors.adx import Adx
@@ -75,9 +76,10 @@ class RocketData():
     velocity = 0
 
     def __init__(self):
-        self.bme = Bme()
-        self.lsm = Lsm()
-        self.adx = Adx()
+        i2c = board.I2C()
+        self.bme = Bme(i2c)
+        self.lsm = Lsm(i2c)
+        self.adx = Adx(i2c)
         self.strain_gauges = Hx711()
         self.velocity = 0
         self.current_altitude = 0
@@ -279,4 +281,3 @@ class RocketData():
         alt_temperature = -1 * ((curr_temperature - init_temperature)/LAPSE_RATE)
 
         return alt_temperature
-

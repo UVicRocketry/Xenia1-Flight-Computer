@@ -49,8 +49,7 @@ class Lsm:
     __magnetometer = None
     __gyroscope = None
 
-    def __init__(self):
-        i2c = board.I2C()
+    def __init__(self, i2c):
         self.__lsm9ds1 = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
 
     def refresh(self):
@@ -66,7 +65,7 @@ class Lsm:
 
     def __read_temperature(self):
         try:
-            return self.__lsm9ds1.Temperature
+            return self.__lsm9ds1.temperature
         except:
             return None
 
@@ -75,9 +74,9 @@ class Lsm:
         return self.__acceleration
 
 
-    def read_acceleration(self):
+    def __read_acceleration(self):
         try:
-            return self.__lsm9ds1.Acceleration
+            return self.__lsm9ds1.acceleration
         except:
             return None
 
@@ -85,9 +84,9 @@ class Lsm:
     def magnetometer(self):
         return self.__magnetometer
 
-    def read_magnetometer(self):
+    def __read_magnetometer(self):
         try:
-            return self.__lsm9ds1.Magnetometer
+            return self.__lsm9ds1.magnetometer
         except:
             return None
 
@@ -96,8 +95,8 @@ class Lsm:
         return self.__gyroscope
 
 
-    def read_gyroscope(self):
+    def __read_gyroscope(self):
         try:
-            return self.__lsm9ds1.Gyroscope
+            return self.__lsm9ds1.gyroscope
         except:
             return None
