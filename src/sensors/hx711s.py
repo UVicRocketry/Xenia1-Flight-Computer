@@ -2,6 +2,7 @@ from operator import truediv
 from HX711Multi import HX711_Multi
 import time
 
+
 '''
 Constants
 '''
@@ -19,8 +20,13 @@ DATA_PINS = [
 ]
 
 class FakeHx711:
+    """
+    this class is only used in the case that an error is thrown. To make sure the error wont
+    end execution of the program the class fakes the HX711 driver.
+    """
     def __init__(self) -> None:
         pass
+
 
     def __get_readings():
         return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -34,6 +40,7 @@ class Hx711:
     Attributes
     ----------
     hx711s : list
+        list of all hx
 
 
     Methods
@@ -43,8 +50,6 @@ class Hx711:
     get_readings() : [float]
 
     """
-
-
     def __init__(self):
         self.backup_hx711 = FakeHx711()
         try:
@@ -52,15 +57,15 @@ class Hx711:
             self.__hx2 = HX711_Multi(DATA_PINS[1], CLK2)
             self.__hx3 = HX711_Multi(DATA_PINS[2], CLK3)
             self.hx711s = [self.__hx1, self.__hx2, self.__hx3]
-        except ValueError:
+        except:
             self.hx711s = self.backup_hx711
 
 
     def get_offsets(self):
         for i in range(10):
-            self.get_readings()
+            self.__get_readings()
 
-        return self.get_readings()
+        return self.__get_readings()
 
 
     def __get_readings(self):

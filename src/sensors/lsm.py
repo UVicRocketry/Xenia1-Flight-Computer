@@ -1,5 +1,4 @@
 import adafruit_lsm9ds1
-import board
 
 
 class Lsm:

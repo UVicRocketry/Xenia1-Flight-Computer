@@ -1,8 +1,9 @@
-
 import adafruit_adxl34x
+
 
 class Adx:
     """
+    Adx sensor object
     ...
 
     Attributes
@@ -22,7 +23,7 @@ class Adx:
 
     @property getters: Returns the latest value stored in the variable.
 
-    __read_/.../(): Reads the sensor and returns sensor value or None if read was unsuccessful  
+    __read_/.../(): Reads the sensor and returns sensor value or None if read was unsuccessful
 
     """
 
