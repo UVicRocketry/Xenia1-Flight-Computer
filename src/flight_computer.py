@@ -6,6 +6,8 @@ import RPi.GPIO as GPIO
 import busio
 from rocketData import RocketData
 import numpy as np
+from camera import Camera
+import subprocess
 
 from HX711Multi import HX711_Multi
 
@@ -87,6 +89,7 @@ class FlightComputer:
 
     def __powered_flight(self):
         time_at_start = time.time()
+        subprocess.Popen(["python","./camera.py"], stdin=subprocess.PIPE)
 
         while True:
             self.rocket_data.refresh()
