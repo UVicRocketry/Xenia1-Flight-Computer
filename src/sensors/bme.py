@@ -5,7 +5,7 @@ SEA_LEVEL_PRESSURE = 1013.25
 # update sea level before final launch
 
 class Bme:
-     """
+    """
     bme sensor object
 
     ...
@@ -51,9 +51,14 @@ class Bme:
     __altitude = None
 
 
-    def __init__(self):
-        i2c = board.I2C()
-        self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+    def __init__(self, i2c):
+        try:
+            self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+        except ValueError:
+            self.__bme280 = {
+                'pressure': 0,
+                'temperature': 0
+            }
         self.__bme280.sea_level_pressure = SEA_LEVEL_PRESSURE
 
     def refresh(self):
@@ -66,7 +71,7 @@ class Bme:
     def humidity(self):
         return self.__humidity
 
-    def __read_humidity(self):
+    def __read_humidity(self): 
         try:
             return self.__bme280.humidity
         except:
@@ -76,15 +81,16 @@ class Bme:
     def pressure(self):
         return self.__pressure
 
-    def __read_pressure(self):
-        try:
+    def __read_pressure(self): 
+        try: 
             return self.__bme280.pressure
         except:
             return None
-
+    
     @property
     def temperature(self):
         return self.__temperature
+
 
     def __read_temperature(self):
         #attempt to read sensor and return None if unsuccessful
@@ -102,3 +108,5 @@ class Bme:
             return self.__bme280.altitude
         except:
             return None
+
+    

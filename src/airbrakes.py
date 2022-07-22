@@ -20,7 +20,9 @@ DIRECTION_PIN = 26
 """
 
 Airbrakes: This class provides a simple way to interface with the airbrakes
-hardware. It is used by the KalmanFilter class.
+hardware. On construction, the wake() function is called and to conserve power,
+it should be put to sleep(). To call any of the functions involving movement of
+the motor, Airbrakes should be (a)wake().
 
 
 Attributes
@@ -32,9 +34,10 @@ fully deployed. Set by calibrate().
 __min_pot_val [double]: Value of the potentiometer as read by the ADC when brakes are
 fully closed. Set by calibrate().
 
-pot_pin [int]: ADS1115 pin that is connected to potentiometer
-step_pin [int]: GPIO pin that controls stepping of A4988 stepper driver
-dir_pin [int]: GPIO pin that controls direction of A4988 stepper driver
+pot_pin   [int]: ADS1115 pin that is connected to potentiometer
+step_pin  [int]: GPIO pin that controls stepping of the driver 
+dir_pin   [int]: GPIO pin that controls direction of the driver
+sleep_pin [int]: GPIO pin that puts the driver to sleep (no holding torque)
 
 motor_direction [bool]: This value is XOR'd with the direction passed to
 __singleStep(). For the user, this means if the flaps are opening in the wrong
@@ -81,6 +84,23 @@ deployBrakes():
   error associated with this. Adjust this error by changing max_error in
   method body.
 
+sleep():
+  Powers off the stepper motor using the sleep pin of the driver. 
+  
+  Returns nothing.
+
+  Note: This means a loss of torque and thus should only be used while on the
+  launch pad to save power, and NEVER during flight. It should also be used
+  after the brakes have been retracted after apogee.
+
+wake():
+  Powers on the stepper motor using the sleep pin of the driver. 
+  
+  Returns nothing.
+
+  Note: This means the driver is awake and powering the motor. This will consume
+  a lot of power so it should only be used during flight. By default, the creating
+  and Airbrakes object will call this function.
 
 """
 class Airbrakes:
@@ -88,11 +108,13 @@ class Airbrakes:
   # Set when calibrate() is called
   __max_pot_val = None
   __min_pot_val = None
+  __total_steps = None
 
   def __init__(self,
               direction: bool,
               stepper_pin=STEP_PIN,
               direction_pin=DIRECTION_PIN,
+              sleep_pin=SLEEP_PIN,
               ads_pot_pin=0,
               step_angle=1.8,
               microsteps=16,
@@ -102,6 +124,7 @@ class Airbrakes:
     # GPIO pins
     self.step_pin = stepper_pin
     self.dir_pin  = direction_pin
+    self.sleep_pin= sleep_pin
 
     # Stepper motor specs
     self.stepper_motor = {
@@ -114,22 +137,27 @@ class Airbrakes:
    
     # Max steps to go from fully closed to fully open with 1.25 safety factor 
     # Division by 6 is because airbrakes only require 1/6 of a turn to open
-    self.__max_steps_to_open = (1.25
+    self.__max_steps_to_open = int(1.25
                                 * (self.stepper_motor["gear_ratio"]
                                    *(360/self.stepper_motor["step_angle"])
                                    * self.stepper_motor["microsteps"])
                                 /6)
 
-    GPIO.setmode(GPIO.BOARD)
+    # Set elsewhere in flight comp
+    #GPIO.setmode(GPIO.BOARD)
 
     # Set the pins as outputs
     GPIO.setup(self.step_pin, GPIO.OUT)
     GPIO.setup(self.dir_pin, GPIO.OUT)
+    GPIO.setup(self.sleep_pin, GPIO.OUT)
 
     # Initialize ADC (ADS1115) for reading the potentiometer 
     self.i2c = busio.I2C(board.SCL, board.SDA)
     self.ads = ADS.ADS1115(self.i2c)
     self.potentiometer = AnalogIn(self.ads, ads_pot_pin)
+
+    # Wake up the driver so that it can be calibrated by the user.
+    self.wake()
 
   def __singleStep(self, step_direction: bool):
 
@@ -156,27 +184,53 @@ class Airbrakes:
       self.__singleStep(False)
     self.__min_pot_val = self.potentiometer.value
 
+    # Now this part will slowly open the airbrakes to get the exact number of steps from closed to open.
+    total_steps = 0
+    step_range = 0
+
+    err = self.__max_pot_val - self.potentiometer.value
+    while abs(err) > 20 and total_steps < 10000:
+      if err < 0:
+        self.__singleStep(False)
+        step_range -= 1
+      else:
+        self.__singleStep(True)
+        step_range += 1
+      total_steps += 1
+      err = self.__max_pot_val - self.potentiometer.value
+
+    # Store the number of steps between open and close.
+    self.__total_steps = step_range
+
+    print("total_steps =", self.__total_steps, ", max: ", self.__max_pot_val, ", min: ", self.__min_pot_val)
+
   def deployBrakes(self, percent):
 
     # Convert percent to potentiometer value
     target_pot = self.__min_pot_val + (percent/100)*(self.__max_pot_val-self.__min_pot_val)
-    
     curr_error = target_pot-self.potentiometer.value
+    pot_range = abs(self.__max_pot_val - self.__min_pot_val)
+    step_error = int((curr_error / pot_range) * self.__total_steps)
+    print("step_error =", step_error)
 
     # TODO set this based on the resolution of ADC/pot, slop in gears, etc. (requires testing)
-    max_error  = 10 
+    max_error = 50 
 
     # Move stepper to target position within some error
     # Prevent infinite loop by never stepping more than the max to open
     steps = 0
     while abs(curr_error) > max_error and steps < self.__max_steps_to_open:
+      step_error = int((curr_error / pot_range) * self.__total_steps)
       
-      if curr_error < 0:
-        self.__singleStep(True)
-      else:
+      while step_error < 0:
         self.__singleStep(False)
+        step_error += 1
+      while step_error > 0:
+        self.__singleStep(True)
+        step_error -= 1
 
       curr_error = target_pot - self.potentiometer.value
+      print("curr_error = ", curr_error)
       steps += 1
     
     percent_deployed = ((self.potentiometer.value-self.__min_pot_val)/
@@ -184,3 +238,15 @@ class Airbrakes:
 
     # Return the final potentiometer value and percentage open
     return (self.potentiometer.value, percent_deployed)
+
+  def sleep(self):
+
+    # The sleep pin is active low meaning pulling it low
+    # puts the driver to sleep.
+    GPIO.output(self.sleep_pin, GPIO.LOW)
+  
+  def wake(self):
+
+    # The sleep pin is active low meaning pulling it high
+    # powers up the driver.
+    GPIO.output(self.sleep_pin, GPIO.HIGH)
