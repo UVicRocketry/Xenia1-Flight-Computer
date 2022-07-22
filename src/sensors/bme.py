@@ -53,7 +53,13 @@ class Bme:
 
     def __init__(self):
         i2c = board.I2C()
-        self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+        try:
+            self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+        except ValueError:
+            self.__bme280 = {
+                'pressure': 0,
+                'temperature': 0
+            }
         self.__bme280.sea_level_pressure = SEA_LEVEL_PRESSURE
 
     def refresh(self):
