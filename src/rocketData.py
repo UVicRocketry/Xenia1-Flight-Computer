@@ -164,6 +164,14 @@ class RocketData():
 
 
     def __all_rocket_data(self):
+        if not self.adx.acceleration:
+            self.adx.acceleration = (None, None, None)
+        if not self.lsm.acceleration:
+            self.lsm.acceleration = (None, None, None)
+        if not self.lsm.gyroscope:
+            self.lsm.gyroscope = (None, None, None)
+        if not self.lsm.magnetometer:
+            self.lsm.magnetometer = (None, None, None)
         all_data = [
             self.bme.temperature,
             self.bme.pressure,

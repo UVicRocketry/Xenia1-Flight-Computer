@@ -18,7 +18,7 @@ POWERED_TIMEOUT = 5
 COAST_TIMEOUT = 300
 RECOVERY_TIMEOUT = 480
 
-BLACKBOX_FILEPATH = "/media/pi/black_box"
+BLACKBOX_FILEPATH = "/media/pi/black_box/requirements.txt"
 
 class FlightComputer:
 
@@ -47,7 +47,7 @@ class FlightComputer:
             self.beep(1.2)
 
 
-    def __init_stepper():
+    def __init_stepper(self):
         """
         This should initialize the airbrakes stepper motor and open and close airbrakes
         The main driver for the airbrakes should automatically do this upon
@@ -62,11 +62,11 @@ class FlightComputer:
         airbrakes.calibrate()
 
 
-    def __config_buzzer():
+    def __config_buzzer(self):
         GPIO.setup(19, GPIO.OUT)
 
 
-    def beep(duration = 0.2):
+    def beep(self, duration = 0.2):
         """
         This method should buzz the buzzer. Different durations mean different
         things, default of 0.2 indicate success
@@ -76,7 +76,7 @@ class FlightComputer:
         GPIO.output(19, GPIO.LOW)
 
 
-    def vec_len(v):
+    def vec_len(self, v):
         return np.sqrt(np.dot(v, v))
 
 
@@ -89,8 +89,10 @@ class FlightComputer:
 
     def __powered_flight(self):
         time_at_start = time.time()
-        subprocess.Popen(["python","./camera.py"], stdin=subprocess.PIPE)
-
+        try:
+            subprocess.Popen(["python","./camera.py"], stdin=subprocess.PIPE)
+        except:
+            pass
         while True:
             self.rocket_data.refresh()
             self.rocket_data.send_to_black_box(self.black_box)

@@ -108,7 +108,7 @@ class Bme:
 
     @property
     def altitude(self):
-        return self.__altitude()
+        return self.__altitude
 
 
     def __read_altitude(self):
