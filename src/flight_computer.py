@@ -18,6 +18,7 @@ POWERED_TIMEOUT = 5 # Claire says 3 seconds expected
 COAST_TIMEOUT = 40 # Claire says 29 seconds expected
 RECOVERY_TIMEOUT = 480
 
+TIME_OF_SUSTAINED_ACCELERATION = 1.2
 BLACKBOX_FILEPATH = "/media/pi/black_box/requirements.txt"
 
 class FlightComputer:
@@ -85,8 +86,10 @@ class FlightComputer:
         while True:
             self.rocket_data.refresh()
             if (self.vec_len(self.rocket_data.current_acceleration) < STANDBY_EXIT_THRESHOLD):
+                #if acceleration threshold is not met, reset time threshold
                 start_of_acceleration_time = time.time()
-            elif (self.vec_len(self.rocket_data.current_acceleration) > STANDBY_EXIT_THRESHOLD) and ((time.time() + 2) < start_of_acceleration_time):
+            elif (self.vec_len(self.rocket_data.current_acceleration) > STANDBY_EXIT_THRESHOLD) and ((start_of_acceleration_time + TIME_OF_SUSTAINED_ACCELERATION) < time.time()):
+                #if acceleration is met and the time threshold is met, break into powered_flight
                 break
 
 
