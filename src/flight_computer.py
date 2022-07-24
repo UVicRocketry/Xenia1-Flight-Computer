@@ -77,23 +77,24 @@ class FlightComputer:
         GPIO.output(19, GPIO.LOW)
 
 
-    def vec_len(self, v):
-        return np.sqrt(np.dot(v, v))
+    # def vec_len(self, v):
+    #     return np.sqrt(np.dot(v, v))
 
 
     def __standby(self):
         start_of_acceleration_time = time.time()
         while True:
             self.rocket_data.refresh()
-            if (self.vec_len(self.rocket_data.current_acceleration) < STANDBY_EXIT_THRESHOLD):
+            if (abs(self.rocket_data.current_acceleration) < STANDBY_EXIT_THRESHOLD):
                 #if acceleration threshold is not met, reset time threshold
                 start_of_acceleration_time = time.time()
-            elif (self.vec_len(self.rocket_data.current_acceleration) > STANDBY_EXIT_THRESHOLD) and ((start_of_acceleration_time + TIME_OF_SUSTAINED_ACCELERATION) < time.time()):
+            elif (abs(self.rocket_data.current_acceleration) > STANDBY_EXIT_THRESHOLD) and (time.time() > (start_of_acceleration_time + TIME_OF_SUSTAINED_ACCELERATION)):
                 #if acceleration is met and the time threshold is met, break into powered_flight
                 break
 
 
     def __powered_flight(self):
+        self.beep()
         time_at_start = time.time()
         while True:
             self.rocket_data.refresh()
@@ -105,6 +106,7 @@ class FlightComputer:
 
 
     def __coast_flight(self):
+        self.beep()
         time_at_start = time.time()
 
         while True:
