@@ -18,7 +18,7 @@ POWERED_TIMEOUT = 5 # Claire says 3 seconds expected
 COAST_TIMEOUT = 40 # Claire says 29 seconds expected
 RECOVERY_TIMEOUT = 480
 
-TIME_OF_SUSTAINED_ACCELERATION = 1.2
+TIME_OF_SUSTAINED_ACCELERATION = 0.7
 BLACKBOX_FILEPATH = "/media/pi/black_box/requirements.txt"
 
 class FlightComputer:
