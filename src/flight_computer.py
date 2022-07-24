@@ -14,8 +14,8 @@ from HX711Multi import HX711_Multi
 #TODO: double check all these thresholds with @jj and @morgan
 STANDBY_EXIT_THRESHOLD = 10
 POWERED_FLIGHT_EXIT_THRESHOLD = -9
-POWERED_TIMEOUT = 5
-COAST_TIMEOUT = 300
+POWERED_TIMEOUT = 5 # Claire says 3 seconds expected
+COAST_TIMEOUT = 40 # Claire says 29 seconds expected
 RECOVERY_TIMEOUT = 480
 
 BLACKBOX_FILEPATH = "/media/pi/black_box/requirements.txt"
@@ -81,18 +81,17 @@ class FlightComputer:
 
 
     def __standby(self):
+        start_of_acceleration_time = time.time()
         while True:
             self.rocket_data.refresh()
-            if self.vec_len(self.rocket_data.current_acceleration) < STANDBY_EXIT_THRESHOLD:
+            if (self.vec_len(self.rocket_data.current_acceleration) < STANDBY_EXIT_THRESHOLD):
+                start_of_acceleration_time = time.time()
+            elif (self.vec_len(self.rocket_data.current_acceleration) > STANDBY_EXIT_THRESHOLD) and ((time.time() + 2) < start_of_acceleration_time):
                 break
 
 
     def __powered_flight(self):
         time_at_start = time.time()
-        try:
-            subprocess.Popen(["python","./camera.py"], stdin=subprocess.PIPE)
-        except:
-            pass
         while True:
             self.rocket_data.refresh()
             self.rocket_data.send_to_black_box(self.black_box)
