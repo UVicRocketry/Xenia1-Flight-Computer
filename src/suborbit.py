@@ -8,6 +8,9 @@ ROCKET_WET_MASS = 20.3
 FUEL_GRAIN_MASS = 3.423
 ROCKET_DRY_MASS = ROCKET_WET_MASS - FUEL_GRAIN_MASS
 
+# TODO: Is this needed anywhere
+ROCKET_AREA = 0.011050733
+
 # Data type for storing elements of rocket position
 #
 # Seems roughly equivalent a struct in other compiled languages (i.e. C, Rust)
@@ -284,11 +287,11 @@ class Suborbit:
             #       mixing between the airbrakes and no_airbrakes data based on the
             #       current_airbrakes position.
 
-            # Index of two is the power off CdA
+            # Index of one is the power off CdA
             cda_no_airbrake = find_drag_coefficient(
                 data.cd_no_airbrakes_data,
                 m_temp
-            )[2]
+            )[1]
 
             # TODO: 1.1 is constant for flap Cd, 80.0 should be the max angle of airbrakes.
             #       These should be global constants, and the max angle should be adjusted.
@@ -329,7 +332,7 @@ def test_data_loading():
 def test_running():
     so = Suborbit()
 
-    (alt, time) = so.run(552.7, 352.45, -9.8, 1.0)
+    (alt, time) = so.run(552.7, 352.45, -9.8, 0.0)
     print("alt =", alt, "time =", time)
 
 def run_tests():
