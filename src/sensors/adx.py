@@ -1,3 +1,4 @@
+from sys import settrace
 import adafruit_adxl34x
 
 
@@ -36,7 +37,7 @@ class Adx:
             self.__adxl375 = adafruit_adxl34x.ADXL345(i2c)
         except ValueError:
             self.__adxl375 = {
-                'acceleration': 0
+                'acceleration': (0,0,0)
             }
 
 
@@ -48,6 +49,10 @@ class Adx:
     def acceleration(self):
         #returns last safe value or result of alternative function if the sensor has returned None for longer than the TIMEOUT setting.
         return self.__acceleration
+
+    @acceleration.setter
+    def acceleration(self, v):
+        self.__acceleration = v
 
     def __read_acceleration(self):
         try:

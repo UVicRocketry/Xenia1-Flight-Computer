@@ -55,9 +55,9 @@ class Lsm:
         except ValueError:
             self.__lsm9ds1 = {
                 'temperature': 0,
-                'acceleration': 0,
-                'magnetometer': 0,
-                'gyroscope': 0
+                'acceleration': (0,0,0),
+                'magnetometer': (0,0,0),
+                'gyroscope': (0,0,0)
             }
 
     def refresh(self):
@@ -81,6 +81,9 @@ class Lsm:
     def acceleration(self):
         return self.__acceleration
 
+    @acceleration.setter
+    def acceleration(self, v):
+        self.__acceleration = v
 
     def __read_acceleration(self):
         try:
@@ -92,6 +95,10 @@ class Lsm:
     def magnetometer(self):
         return self.__magnetometer
 
+    @magnetometer.setter
+    def magnetometer(self, v):
+        self.__magnetometer = v
+
     def __read_magnetometer(self):
         try:
             return self.__lsm9ds1.magnetometer
@@ -102,6 +109,9 @@ class Lsm:
     def gyroscope(self):
         return self.__gyroscope
 
+    @gyroscope.setter
+    def gyroscope(self, v):
+        self.__gyroscope = v
 
     def __read_gyroscope(self):
         try:

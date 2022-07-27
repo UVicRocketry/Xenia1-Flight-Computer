@@ -147,7 +147,7 @@ class RocketData():
             self.current_acceleration = self.lsm.acceleration[ACCELERATION_DIRECTION_INDEX]
         else:
             #Default Acceleration in case both ADX and LSM fail
-            self.current_acceleration = -9.8
+            self.current_acceleration = -1 * GRAVITY
 
 
     def __set_altitude(self):
@@ -164,6 +164,14 @@ class RocketData():
 
 
     def __all_rocket_data(self):
+        if not self.adx.acceleration:
+            self.adx.acceleration = (None, None, None)
+        if not self.lsm.acceleration:
+            self.lsm.acceleration = (None, None, None)
+        if not self.lsm.gyroscope:
+            self.lsm.gyroscope = (None, None, None)
+        if not self.lsm.magnetometer:
+            self.lsm.magnetometer = (None, None, None)
         all_data = [
             self.bme.temperature,
             self.bme.pressure,
