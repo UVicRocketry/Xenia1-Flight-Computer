@@ -4,7 +4,7 @@ import functools
 from collections import namedtuple
 
 # Rocket mass in kg, including the fuel grain
-ROCKET_WET_MASS = 20.3
+ROCKET_WET_MASS = 20.493
 FUEL_GRAIN_MASS = 3.423
 ROCKET_DRY_MASS = ROCKET_WET_MASS - FUEL_GRAIN_MASS
 
@@ -332,8 +332,10 @@ def test_data_loading():
 def test_running():
     so = Suborbit()
 
-    (alt, time) = so.run(552.7, 352.45, -9.8, 0.0)
-    print("alt =", alt, "time =", time)
+    (max_alt, max_time) = so.run(552.7, 352.45, -9.8, 0.0)
+    (min_alt, min_time) = so.run(552.7, 352.45, -9.8, 1.0)
+    print("max: alt =", max_alt, "time =", max_time)
+    print("min: alt =", min_alt, "time =", min_time)
 
 def run_tests():
     test_data_loading()
