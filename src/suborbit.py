@@ -209,6 +209,11 @@ class Suborbit:
     def __init__(self):
         self.data = DragData("drag_data/cda_no_airbrakes.csv")
 
+
+    def calc_airbrakes_position(self, estimated_alt, current_brakes):
+        # TODO: Actually do the calculations
+        return current_brakes
+
     def run(self, alt, vel, accel, airbrakes, dry_mass = ROCKET_DRY_MASS):
         """
         Calculate the height of apogee and how long until apogee.
