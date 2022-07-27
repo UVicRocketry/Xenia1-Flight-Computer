@@ -1,5 +1,6 @@
 import time
 import csv
+import board
 
 from .sensors.bme import Bme
 from .sensors.adx import Adx
@@ -23,6 +24,8 @@ SPECIFIC_HEAT_DRY_AIR = 1003.5
 INITIALIZED_ALTITUDE = 274.1
 
 LAPSE_RATE = 0.0098
+
+ACCELERATION_DIRECTION_INDEX = 1
 
 
 class RocketData():
@@ -73,12 +76,14 @@ class RocketData():
     velocity = 0
 
     def __init__(self):
-        self.bme = Bme()
-        self.lsm = Lsm()
-        self.adx = Adx()
+        i2c = board.I2C()
+        self.bme = Bme(i2c)
+        self.lsm = Lsm(i2c)
+        self.adx = Adx(i2c)
         self.strain_gauges = Hx711()
         self.velocity = 0
         self.current_altitude = 0
+        self.current_acceleration = 0
         self.timestamp = time.time()
 
         self.refresh()
@@ -89,18 +94,26 @@ class RocketData():
         self.initial_temperature = self.bme.temperature or self.lsm.temperature
 
 
-    def test_all_sensor_readings(self):
+    def bme_sensor_ready(self):
         return {
             self.bme.pressure and
             self.bme.humidity and
             self.bme.altitude and
-            self.bme.temperature and
+            self.bme.temperature
+        }
+
+
+    def lsm_sensor_ready(self):
+        return {
             self.lsm.acceleration and
             self.lsm.temperature and
             self.lsm.gyroscope and
-            self.lsm.magnetometer and
-            self.adx.acceleration
+            self.lsm.magnetometer
         }
+
+
+    def adx_sensor_ready(self):
+        return self.adx.acceleration
 
 
     def refresh(self):
@@ -115,6 +128,8 @@ class RocketData():
 
         self.__set_altitude()
 
+        self.__set_acceleration()
+
         self.velocity = self.get_velocity(
             self.current_altitude,
             previous_altitude,
@@ -123,14 +138,29 @@ class RocketData():
         )
 
 
+    def __set_acceleration(self):
+        if self.adx.acceleration:
+            #Access y direction of ADX sensor. Multiply by -1 as y is pointing down on board
+            self.current_acceleration = -1* self.adx.acceleration[ACCELERATION_DIRECTION_INDEX]
+        elif self.lsm.acceleration:
+            #Access y direction of LSM sensor. No operations needed as y is pointing up on board
+            self.current_acceleration = self.lsm.acceleration[ACCELERATION_DIRECTION_INDEX]
+        else:
+            #Default Acceleration in case both ADX and LSM fail
+            self.current_acceleration = -9.8
+
+
     def __set_altitude(self):
-        if not self.bme.altitude and (self.bme.temperature or self.lsm.temperature):
+        """
+        This function updates altitude with backup values if bme stops reading altitude
+        """
+        if not self.bme.altitude and self.bme.pressure:
+            self.current_altitude = self.altitude_barometric(self.bme.pressure, self.initial_pressure, self.initial_temperature)
+        elif not self.bme.altitude and (self.bme.temperature or self.lsm.temperature):
             if self.bme.temperature:
                 self.current_altitude = self.altitude_temperature(self.bme.temperature, self.initial_temperature)
             elif self.lsm.temperature:
                 self.current_altitude = self.altitude_temperature(self.lsm.temperature, self.initial_temperature)
-        elif not self.bme.altitude and self.bme.pressure:
-            self.current_altitude = self.altitude_barometric(self.bme.pressure, self.initial_pressure, self.initial_temperature)
 
 
     def __all_rocket_data(self):
@@ -259,4 +289,3 @@ class RocketData():
         alt_temperature = -1 * ((curr_temperature - init_temperature)/LAPSE_RATE)
 
         return alt_temperature
-
