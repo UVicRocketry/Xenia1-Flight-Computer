@@ -1,4 +1,5 @@
 from adafruit_bme280 import basic as adafruit_bme280
+import numpy as np
 
 
 # TODO: update sea level before final launch
@@ -42,6 +43,8 @@ class Bme:
         Reads the sensor and returns sensor value or None if read was unsuccessful
 
     """
+    
+    INPUT_FILEPATH = './test.csv'
 
     __bme280 = None
 
@@ -49,12 +52,17 @@ class Bme:
     __humidity = None
     __pressure = None
     __altitude = None
+    __input_file = None
+    __input_array = None
+    __y_index = 0
 
 
     def __init__(self, i2c):
         try:
             self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
             self.__bme280.sea_level_pressure = SEA_LEVEL_PRESSURE
+            self.__input_file = open(INPUT_FILEPATH)
+            self.__input_array = np.loadtxt(self.__input_file)
         except ValueError:
             self.__bme280 = {
                 'pressure': 0,
@@ -64,10 +72,17 @@ class Bme:
             }
 
     def refresh(self):
-        self.__humidity = self.__read_humidity()
-        self.__pressure = self.__read_pressure()
-        self.__temperature = self.__read_temperature()
-        self.__altitude = self.__read_altitude()
+        try:
+            self.__humidity = self.__input_array[0][self.__y_index]
+            self.__pressure = self.__input_array[1][self.__y_index]
+            self.__temperature = self.__input_array[2][self.__y_index]
+            self.__altitude = self.__input_array[3][self.__y_index]
+            self.__y_index = self.__y_index + 1
+        except:
+            self.__humidity = None
+            self.__pressure = None
+            self.__temperature = None
+            self.__altitude = None
 
 
     @property
