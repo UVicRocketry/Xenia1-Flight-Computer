@@ -68,10 +68,17 @@ class Lsm:
             }
 
     def refresh(self):
-        self.__temperature = self.__input_array[4][self.__y_index]
-        self.__acceleration = (self.__input_array[5][self.__y_index], self.__input_array[6][self.__y_index], self.__input_array[7][self.__y_index])
-        self.__magnetometer = (self.__input_array[8][self.__y_index], self.__input_array[9][self.__y_index], self.__input_array[10][self.__y_index])
-        self.__gyroscope = (self.__input_array[11][self.__y_index], self.__input_array[12][self.__y_index], self.__input_array[13][self.__y_index])
+        try:
+            self.__temperature = self.__input_array[4][self.__y_index]
+            self.__acceleration = (self.__input_array[5][self.__y_index], self.__input_array[6][self.__y_index], self.__input_array[7][self.__y_index])
+            self.__magnetometer = (self.__input_array[8][self.__y_index], self.__input_array[9][self.__y_index], self.__input_array[10][self.__y_index])
+            self.__gyroscope = (self.__input_array[11][self.__y_index], self.__input_array[12][self.__y_index], self.__input_array[13][self.__y_index])
+            self.__y_index += 1
+        except:
+            self.__temperature = None
+            self.__acceleration = None
+            self.__magnetometer = None
+            self.__gyroscope = None
 
 
     @property
