@@ -238,6 +238,10 @@ class Airbrakes:
 
     # Return the final potentiometer value and percentage open
     return (self.potentiometer.value, percent_deployed)
+  
+  def get_position(self):
+    # TODO: ratio airbrakes is deployed between 0 and 1
+    return 1
 
   def sleep(self):
 
