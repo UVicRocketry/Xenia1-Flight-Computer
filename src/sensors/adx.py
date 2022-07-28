@@ -26,14 +26,20 @@ class Adx:
     __read_/.../(): Reads the sensor and returns sensor value or None if read was unsuccessful
 
     """
+    INPUT_FILEPATH = './test.csv'
 
     __adxl375 = None
 
     __acceleration = None
+    __input_file = None
+    __input_array = None
+    __y_index = 0
 
     def __init__(self, i2c):
         try:
             self.__adxl375 = adafruit_adxl34x.ADXL345(i2c)
+            self.__input_file = open(INPUT_FILEPATH)
+            self.__input_array = np.loadtxt(self.__input_file)
         except ValueError:
             self.__adxl375 = {
                 'acceleration': 0
@@ -42,7 +48,11 @@ class Adx:
 
     def refresh(self):
         #gets new data from sensors and uses update() function in safe_value class to place data in last_value and last_safe_value
-        self.__acceleration = self.__read_acceleration()
+        try:
+            self.__acceleration = (self.__input_array[14][self.__y_index], self.__input_array[15][self.__y_index], self.__input_array[16][self.__y_index])
+            self.__y_index += 1
+        except:
+            self.__acceleration = None
     
     @property
     def acceleration(self):
