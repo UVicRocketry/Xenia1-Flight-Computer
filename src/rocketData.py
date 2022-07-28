@@ -28,6 +28,8 @@ LAPSE_RATE = 0.0098
 ACCELERATION_DIRECTION_INDEX = 1
 
 
+
+
 class RocketData():
     """
     A class to store, manipulate, and send rocket data
@@ -164,6 +166,14 @@ class RocketData():
 
 
     def __all_rocket_data(self):
+        if not self.adx.acceleration:
+            self.adx.acceleration = (None, None, None)
+        if not self.lsm.acceleration:
+            self.lsm.acceleration = (None, None, None)
+        if not self.lsm.gyroscope:
+            self.lsm.gyroscope = (None, None, None)
+        if not self.lsm.magnetometer:
+            self.lsm.magnetometer = (None, None, None)
         all_data = [
             self.bme.temperature,
             self.bme.pressure,
