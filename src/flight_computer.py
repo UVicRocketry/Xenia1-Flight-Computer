@@ -6,17 +6,20 @@ import RPi.GPIO as GPIO
 import busio
 from rocketData import RocketData
 import numpy as np
+from camera import Camera
+import subprocess
 
 from HX711Multi import HX711_Multi
 
 #TODO: double check all these thresholds with @jj and @morgan
 STANDBY_EXIT_THRESHOLD = 10
 POWERED_FLIGHT_EXIT_THRESHOLD = -9
-POWERED_TIMEOUT = 5
-COAST_TIMEOUT = 300
+POWERED_TIMEOUT = 5 # Claire says 3 seconds expected
+COAST_TIMEOUT = 40 # Claire says 29 seconds expected
 RECOVERY_TIMEOUT = 480
 
-BLACKBOX_FILEPATH = "/media/pi/black_box"
+TIME_OF_SUSTAINED_ACCELERATION = 0.7
+BLACKBOX_FILEPATH = "./test_output.csv"
 
 class FlightComputer:
 
@@ -45,7 +48,7 @@ class FlightComputer:
             self.beep(1.2)
 
 
-    def __init_stepper():
+    def __init_stepper(self):
         """
         This should initialize the airbrakes stepper motor and open and close airbrakes
         The main driver for the airbrakes should automatically do this upon
@@ -60,11 +63,11 @@ class FlightComputer:
         airbrakes.calibrate()
 
 
-    def __config_buzzer():
+    def __config_buzzer(self):
         GPIO.setup(19, GPIO.OUT)
 
 
-    def beep(duration = 0.2):
+    def beep(self, duration = 0.2):
         """
         This method should buzz the buzzer. Different durations mean different
         things, default of 0.2 indicate success
@@ -74,20 +77,28 @@ class FlightComputer:
         GPIO.output(19, GPIO.LOW)
 
 
-    def vec_len(v):
-        return np.sqrt(np.dot(v, v))
+    # def vec_len(self, v):
+    #     return np.sqrt(np.dot(v, v))
 
 
     def __standby(self):
+        writer = csv.writer(self.black_box)
+        writer.writerow(['Standby!',,,,,,,,,,,,,,,,)
+        start_of_acceleration_time = time.time()
         while True:
             self.rocket_data.refresh()
-            if self.vec_len(self.rocket_data.current_acceleration) < STANDBY_EXIT_THRESHOLD:
+            if (abs(self.rocket_data.current_acceleration) < STANDBY_EXIT_THRESHOLD):
+                #if acceleration threshold is not met, reset time threshold
+                start_of_acceleration_time = time.time()
+            elif (abs(self.rocket_data.current_acceleration) > STANDBY_EXIT_THRESHOLD) and (time.time() > (start_of_acceleration_time + TIME_OF_SUSTAINED_ACCELERATION)):
+                #if acceleration is met and the time threshold is met, break into powered_flight
                 break
 
 
     def __powered_flight(self):
+        writer = csv.writer(self.black_box)
+        writer.writerow(['Powered!',,,,,,,,,,,,,,,,)
         time_at_start = time.time()
-
         while True:
             self.rocket_data.refresh()
             self.rocket_data.send_to_black_box(self.black_box)
@@ -98,19 +109,23 @@ class FlightComputer:
 
 
     def __coast_flight(self):
+        writer = csv.writer(self.black_box)
+        writer.writerow(['Coast!',,,,,,,,,,,,,,,,)
         time_at_start = time.time()
 
         while True:
             self.rocket_data.refresh()
             self.rocket_data.send_to_black_box(self.black_box)
             # TODO: send data to airbrakes
-            if time.time > (time_at_start + COAST_TIMEOUT):
+            if time.time() > (time_at_start + COAST_TIMEOUT):
                 break
             elif self.rocket_data.velocity < 0:
                 break
 
 
     def __recovery_flight(self):
+        writer = csv.writer(self.black_box)
+        writer.writerow(['Recovery!',,,,,,,,,,,,,,,,)
         time_at_start = time.time()
 
         while True:
