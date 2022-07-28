@@ -1,4 +1,5 @@
 import adafruit_lsm9ds1
+import numpy as np
 
 
 class Lsm:
@@ -40,18 +41,24 @@ class Lsm:
     __read_/.../: Reads the sensor and returns sensor value or None if read was unsuccessful
 
     """
-
+    INPUT_FILEPATH = './test.csv'
+    
     __lsm9ds1 = None
 
     __temperature = None
     __acceleration = None
     __magnetometer = None
     __gyroscope = None
+    __input_file = None
+    __input_array = None
+    __y_index = 0
 
     def __init__(self, i2c):
 
         try:
             self.__lsm9ds1 = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
+            self.__input_file = open(INPUT_FILEPATH)
+            self.__input_array = np.loadtxt(self.__input_file)
         except ValueError:
             self.__lsm9ds1 = {
                 'temperature': 0,
@@ -61,10 +68,10 @@ class Lsm:
             }
 
     def refresh(self):
-        self.__temperature = self.__read_temperature()
-        self.__acceleration = self.__read_acceleration()
-        self.__magnetometer = self.__read_magnetometer()
-        self.__gyroscope = self.__read_gyroscope()
+        self.__temperature = self.__input_array[4][self.__y_index]
+        self.__acceleration = (self.__input_array[5][self.__y_index], self.__input_array[6][self.__y_index], self.__input_array[7][self.__y_index])
+        self.__magnetometer = (self.__input_array[8][self.__y_index], self.__input_array[9][self.__y_index], self.__input_array[10][self.__y_index])
+        self.__gyroscope = (self.__input_array[11][self.__y_index], self.__input_array[12][self.__y_index], self.__input_array[13][self.__y_index])
 
 
     @property
