@@ -106,11 +106,11 @@ class FlightComputer:
         while True:
             self.rocket_data.refresh()
             self.rocket_data.send_to_black_box(self.black_box)
-            current_airbrakes = self.airbrakes.get_position()
+            current_airbrakes_position = self.airbrakes.get_position()
             (max_alt, max_time) = self.suborbit.run(self.rocket_data.current_altitude,self.rocket_data.velocity, self.rocket_data.current_acceleration, current_airbrakes)
-            new_airbrakes_position = suborbit.calc_airbrakes_position(max_alt, current_airbrakes)
-            # TODO: send data to airbrakes
-            if time.time > (time_at_start + COAST_TIMEOUT):
+            new_airbrakes_position = suborbit.calc_airbrakes_position(max_alt, current_airbrakes_position)
+            self.airbrakes.deploy_airbrakes(new_airbrakes_position)
+            if time.time() > (time_at_start + COAST_TIMEOUT):
                 break
             elif self.rocket_data.velocity < 0:
                 break
