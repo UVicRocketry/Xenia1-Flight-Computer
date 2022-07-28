@@ -113,7 +113,7 @@ class FlightComputer:
             self.rocket_data.refresh()
             self.rocket_data.send_to_black_box(self.black_box)
             # TODO: send data to airbrakes
-            if time.time > (time_at_start + COAST_TIMEOUT):
+            if time.time() > (time_at_start + COAST_TIMEOUT):
                 break
             elif self.rocket_data.velocity < 0:
                 break
