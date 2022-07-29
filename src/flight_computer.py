@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO
 import busio
 from rocketData import RocketData
 import numpy as np
+import suborbit
 
 from HX711Multi import HX711_Multi
 
@@ -23,6 +24,8 @@ class FlightComputer:
     def __init__(self):
         self.rocket_data = RocketData()
         self.black_box = open(BLACKBOX_FILEPATH, "a")
+        self.suborbit = suborbit.Suborbit()
+        self.airbrakes = Airbrakes()
         self.startup()
 
     def startup(self):
@@ -103,8 +106,11 @@ class FlightComputer:
         while True:
             self.rocket_data.refresh()
             self.rocket_data.send_to_black_box(self.black_box)
-            # TODO: send data to airbrakes
-            if time.time > (time_at_start + COAST_TIMEOUT):
+            current_airbrakes_position = self.airbrakes.get_position()
+            (max_alt, max_time) = self.suborbit.run(self.rocket_data.current_altitude,self.rocket_data.velocity, self.rocket_data.current_acceleration, current_airbrakes)
+            new_airbrakes_position = suborbit.calc_airbrakes_position(max_alt, current_airbrakes_position)
+            self.airbrakes.deploy_airbrakes(new_airbrakes_position)
+            if time.time() > (time_at_start + COAST_TIMEOUT):
                 break
             elif self.rocket_data.velocity < 0:
                 break

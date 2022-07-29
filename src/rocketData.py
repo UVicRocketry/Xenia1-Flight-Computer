@@ -5,7 +5,6 @@ import board
 from .sensors.bme import Bme
 from .sensors.adx import Adx
 from .sensors.lsm import Lsm
-from .sensors.hx711s import Hx711
 
 GRAVITY = 9.80665
 
