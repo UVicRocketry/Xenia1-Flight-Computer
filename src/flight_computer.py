@@ -19,7 +19,7 @@ COAST_TIMEOUT = 40 # Claire says 29 seconds expected
 RECOVERY_TIMEOUT = 480
 
 TIME_OF_SUSTAINED_ACCELERATION = 0.7
-BLACKBOX_FILEPATH = "/media/pi/black_box/requirements.txt"
+BLACKBOX_FILEPATH = "/media/black_box/zoomzoom.txt"
 
 class FlightComputer:
 
