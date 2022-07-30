@@ -11,12 +11,11 @@ import suborbit
 from HX711Multi import HX711_Multi
 
 #TODO: double check all these thresholds with @jj and @morgan
-STANDBY_EXIT_THRESHOLD = 10
-POWERED_FLIGHT_EXIT_THRESHOLD = -9
-POWERED_TIMEOUT = 5
-COAST_TIMEOUT = 300
-RECOVERY_TIMEOUT = 480
-
+STANDBY_EXIT_THRESHOLD = 10         # G
+POWERED_FLIGHT_EXIT_THRESHOLD = -9  # G
+POWERED_TIMEOUT = 5                 # s
+COAST_TIMEOUT = 300                 # s
+RECOVERY_TIMEOUT = 480              # s
 BLACKBOX_FILEPATH = "/media/pi/black_box"
 
 class FlightComputer:
@@ -33,23 +32,28 @@ class FlightComputer:
         self.__init_stepper()
 
         self.__config_buzzer()
+
+        # Startup sequence
+        # Missing beeps alert the user to a failed sensor
+        self.beep(3)
+        time.sleep(3)
+        
         if self.rocket_data.lsm_sensor_ready():
             # lsm sensors read correctly
-            self.beep()
+            self.beep(repetitions=1)
+            time.sleep(3)
+
         if self.rocket_data.bme_sensor_ready():
             # bme sensors read correctly
-            self.beep()
+            self.beep(repetitions=2)
+            time.sleep(3)
+
         if self.rocket_data.adx_sensor_ready():
             # adx sensors read correctly
-            self.beep()
+            self.beep(repetitions=3)
+            time.sleep(3)
 
-        if not (self.rocket_data.lsm_sensor_ready() or self.rocket_data.bme_sensor_ready() or self.rocket_data.adx_sensor_ready()):
-            # didnt read all sensors, not ready to go
-            self.beep(1.2)
-
-
-    def __init_stepper():
-        """
+"""
         This should initialize the airbrakes stepper motor and open and close airbrakes
         The main driver for the airbrakes should automatically do this upon
         initialization.
@@ -67,15 +71,13 @@ class FlightComputer:
         GPIO.setup(19, GPIO.OUT)
 
 
-    def beep(duration = 0.2):
-        """
-        This method should buzz the buzzer. Different durations mean different
-        things, default of 0.2 indicate success
-        """
-        GPIO.output(19, GPIO.HIGH)
-        time.sleep(duration)
-        GPIO.output(19, GPIO.LOW)
+    def beep(duration = 0.2, repetitions = 1):
 
+        for i in range(repetitions+1):
+            GPIO.output(19, GPIO.HIGH)
+            time.sleep(duration)
+            GPIO.output(19, GPIO.LOW)
+            time.sleep(0.2)
 
     def vec_len(v):
         return np.sqrt(np.dot(v, v))
