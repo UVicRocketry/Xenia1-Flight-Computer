@@ -94,7 +94,6 @@ class FlightComputer:
 
 
     def __powered_flight(self):
-        self.beep()
         time_at_start = time.time()
         while True:
             self.rocket_data.refresh()
@@ -106,7 +105,6 @@ class FlightComputer:
 
 
     def __coast_flight(self):
-        self.beep()
         time_at_start = time.time()
 
         while True:
