@@ -1,3 +1,4 @@
+from queue import Queue
 import time
 import csv
 import board
@@ -26,6 +27,8 @@ LAPSE_RATE = 0.0098
 
 ACCELERATION_DIRECTION_INDEX = 1
 
+VELOCITY_QUEUE_SIZE = 10
+
 
 class RocketData():
     """
@@ -48,7 +51,8 @@ class RocketData():
         sensor object for the 12 hx711s
 
     velocity : float
-        calculated velocity
+        velocity calculated from the average of velocity_queue
+
 
     Methods
     -------
@@ -66,6 +70,8 @@ class RocketData():
     send_to_black_box()
         Description: converts data to a csv string to be sent to blackbox
 
+    get_velocity() 
+        Description: Takes an average of 10 altitudes and calcuates a velocity
 
     """
     lsm = None
@@ -73,14 +79,20 @@ class RocketData():
     adx = None
     strain_gauges = None
     velocity = 0
+    airbrakes_percentage = 0
 
     def __init__(self):
         i2c = board.I2C()
         self.bme = Bme(i2c)
         self.lsm = Lsm(i2c)
         self.adx = Adx(i2c)
-        self.strain_gauges = Hx711()
         self.velocity = 0
+        self.velocity_queue = Queue(VELOCITY_QUEUE_SIZE)
+        # starting Queue must have 10 items
+        for i in range(9):
+            self.velocity_queue.put(0)
+
+        self.airbrakes_percentage = 0
         self.current_altitude = 0
         self.current_acceleration = 0
         self.timestamp = time.time()
@@ -173,7 +185,7 @@ class RocketData():
             self.lsm.gyroscope,
             self.lsm.magnetometer,
             self.adx.acceleration,
-            *self.strain_gauges,
+            self.airbrakes_percentage,
             self.timestamp,
         ]
         return all_data
@@ -210,13 +222,22 @@ class RocketData():
 
 
     def get_velocity(self, current_alt, prev_alt, current_timestamp, prev_timestamp):
-        if current_alt != type(None) and prev_alt != type(None):
-            dh = current_alt - prev_alt
-            dt = current_timestamp - prev_timestamp
-            return dh/dt
-            # TODO Ensure that dt is never 0
-        else:
+        """
+        Uses a queue to average data and remove outliers.
+        """
+
+        try:
+            new_velocity = (current_alt - prev_alt)/(current_timestamp - prev_timestamp)
+            self.velocity_queue.put(new_velocity)
+            
+            sum = 0
+            for val in self.velocity_queue:
+                sum += val
+            
+        except:
             return None
+
+        return sum/VELOCITY_QUEUE_SIZE
 
 
     def initialize_lapse_rate(moist, pressure, temperature):
