@@ -11,6 +11,7 @@ import suborbit
 from HX711Multi import HX711_Multi
 
 #TODO: double check all these thresholds with @jj and @morgan
+#TODO these need units or a better descriptor. These thresholds are in Gees?
 STANDBY_EXIT_THRESHOLD = 10
 POWERED_FLIGHT_EXIT_THRESHOLD = -9
 POWERED_TIMEOUT = 5
@@ -24,6 +25,8 @@ class FlightComputer:
     def __init__(self):
         self.rocket_data = RocketData()
         self.black_box = open(BLACKBOX_FILEPATH, "a")
+        #TODO is this gonna hang the data collection when it calculates apogee?
+        # suborbit takes several hundred ms to run. Should it be on a thread?
         self.suborbit = suborbit.Suborbit()
         self.airbrakes = Airbrakes()
         self.startup()
@@ -32,6 +35,7 @@ class FlightComputer:
         """Initialize all the things"""
         self.__init_stepper()
 
+        #TODO no way to tell which sensor is not working if one is failed
         self.__config_buzzer()
         if self.rocket_data.lsm_sensor_ready():
             # lsm sensors read correctly
@@ -55,6 +59,10 @@ class FlightComputer:
         initialization.
         Don't stand next to the airbrakes at this point.
         """
+
+        #TODO These GPIO are configured in the airbrakes init
+        # Make sure to update the pins in airbrakes.py
+
         GPIO.setup(18, GPIO.OUT)
         GPIO.setup(4, GPIO.OUT)
         airbrakes = Airbrakes(direction = True)
@@ -67,6 +75,8 @@ class FlightComputer:
         GPIO.setup(19, GPIO.OUT)
 
 
+    #TODO be absolutely sure this never gets called during flight
+    #TODO Consider passing a different amount of time for each sensor
     def beep(duration = 0.2):
         """
         This method should buzz the buzzer. Different durations mean different
