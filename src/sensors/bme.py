@@ -1,7 +1,6 @@
 from adafruit_bme280 import basic as adafruit_bme280
 
 
-# TODO: update sea level before final launch
 SEA_LEVEL_PRESSURE = 1013.25
 
 class Bme:
@@ -49,12 +48,13 @@ class Bme:
     __humidity = None
     __pressure = None
     __altitude = None
-
+    
 
     def __init__(self, i2c):
         try:
             self.__bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
             self.__bme280.sea_level_pressure = SEA_LEVEL_PRESSURE
+            self.is_error = False
         except ValueError:
             self.__bme280 = {
                 'pressure': 0,
@@ -62,6 +62,8 @@ class Bme:
                 'humidity': 0,
                 'altitude': 0
             }
+            self.is_error = True
+
 
     def refresh(self):
         self.__humidity = self.__read_humidity()
@@ -108,7 +110,7 @@ class Bme:
 
     @property
     def altitude(self):
-        return self.__altitude()
+        return self.__altitude
 
 
     def __read_altitude(self):
