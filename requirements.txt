@@ -1,0 +1,21 @@
+csv
+json
+time
+sys
+ast
+typing
+unittest.mock
+random
+io
+random
+picamera
+pydoc
+RPi.GPIO
+numpy
+pytest
+board
+adafruit_lsm9ds1
+adafruit_bme280 
+picamera
+
+#last updated 2022-05-25 by Sydney
