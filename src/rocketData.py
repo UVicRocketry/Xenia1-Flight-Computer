@@ -3,9 +3,9 @@ import time
 import csv
 import board
 
-from .sensors.bme import Bme
-from .sensors.adx import Adx
-from .sensors.lsm import Lsm
+from sensors.bme import Bme
+from sensors.adx import Adx
+from sensors.lsm import Lsm
 
 GRAVITY = 9.80665
 
@@ -64,7 +64,7 @@ class RocketData():
 
     send_to_airbrake()
         Description: sends an object that contains altitude, velocity, and acceleration
-        info to calculations, which will send it to airbrakes (idk if this is how it works
+        info to calculations, which will send it to  (idk if this is how it works
         but send_to_airbrakes will send an object with relevant info wherever it has to go)
 
     send_to_black_box()
@@ -80,29 +80,47 @@ class RocketData():
     strain_gauges = None
     velocity = 0
     airbrakes_percentage = 0
+    velocity_queue = []
 
     def __init__(self):
+
+
         i2c = board.I2C()
+
         self.bme = Bme(i2c)
         self.lsm = Lsm(i2c)
         self.adx = Adx(i2c)
+ 
         self.velocity = 0
-        self.velocity_queue = Queue(VELOCITY_QUEUE_SIZE)
-        # starting Queue must have 10 items
-        for i in range(9):
-            self.velocity_queue.put(0)
+
+
+        self.velocity_queue = []
+        
 
         self.airbrakes_percentage = 0
+ 
         self.current_altitude = 0
+
         self.current_acceleration = 0
+
         self.timestamp = time.time()
 
-        self.refresh()
 
-        self.initial_pressure = self.bme.pressure
+        self.bme.refresh()
+        self.lsm.refresh()
+        self.adx.refresh()
+
+
+        self.initial_pressure = self.bme.pressure or 1013.27 
+
+
         self.initial_humidity = self.bme.humidity
-        self.initial_altitude = self.bme.altitude
-        self.initial_temperature = self.bme.temperature or self.lsm.temperature
+
+
+        self.initial_temperature = self.bme.temperature or self.lsm.temperature or 21
+   
+        self.refresh()
+        print("Rocketdata refreshed")
 
 
     def bme_sensor_ready(self):
@@ -110,7 +128,8 @@ class RocketData():
             self.bme.pressure and
             self.bme.humidity and
             self.bme.altitude and
-            self.bme.temperature
+            self.bme.temperature and 
+            self.bme.is_error
         }
 
 
@@ -119,12 +138,21 @@ class RocketData():
             self.lsm.acceleration and
             self.lsm.temperature and
             self.lsm.gyroscope and
-            self.lsm.magnetometer
+            self.lsm.magnetometer and
+            self.lsm.is_error
         }
 
 
     def adx_sensor_ready(self):
-        return self.adx.acceleration
+        return { 
+            self.adx.acceleration and 
+            self.adx.is_error
+        }
+
+
+    def update_airbrakes_percentage(self, value):
+        if value:
+            self.airbrakes_percentage = value
 
 
     def refresh(self):
@@ -132,9 +160,11 @@ class RocketData():
         previous_timestamp = self.timestamp
 
         self.bme.refresh()
+
         self.lsm.refresh()
+
         self.adx.refresh()
-        self.strain_gauges.refresh()
+
         self.timestamp = time.time()
 
         self.__set_altitude()
@@ -147,6 +177,8 @@ class RocketData():
             self.timestamp,
             previous_timestamp
         )
+
+        print("Finsihed Refresh")
 
 
     def __set_acceleration(self):
@@ -165,26 +197,37 @@ class RocketData():
         """
         This function updates altitude with backup values if bme stops reading altitude
         """
-        if not self.bme.altitude and self.bme.pressure:
+        alt = self.bme.altitude
+
+        if alt:
+            self.current_altitude = alt
+            return
+        
+        if not alt and self.bme.pressure:
             self.current_altitude = self.altitude_barometric(self.bme.pressure, self.initial_pressure, self.initial_temperature)
         elif not self.bme.altitude and (self.bme.temperature or self.lsm.temperature):
             if self.bme.temperature:
                 self.current_altitude = self.altitude_temperature(self.bme.temperature, self.initial_temperature)
-            elif self.lsm.temperature:
+            else:
                 self.current_altitude = self.altitude_temperature(self.lsm.temperature, self.initial_temperature)
 
 
     def __all_rocket_data(self):
+        lsm_a = self.lsm.acceleration or (None, None, None)
+        lsm_g = self.lsm.gyroscope or (None, None, None)
+        lsm_m = self.lsm.magnetometer or (None, None, None)
+        adx_a = self.adx.acceleration or (None, None, None)
+        
         all_data = [
             self.bme.temperature,
             self.bme.pressure,
             self.bme.humidity,
             self.bme.altitude,
             self.lsm.temperature,
-            self.lsm.acceleration,
-            self.lsm.gyroscope,
-            self.lsm.magnetometer,
-            self.adx.acceleration,
+            *lsm_a,
+            *lsm_g,
+            *lsm_m,
+            *adx_a,
             self.airbrakes_percentage,
             self.timestamp,
         ]
@@ -203,11 +246,6 @@ class RocketData():
         return csv_string
 
 
-    def airbrakes_data(altitude, velocity, acceleration, init_altitude):
-        init_altitude = init_altitude or None
-        return init_altitude, altitude, velocity, acceleration
-
-
     def send_to_black_box(self, black_box):
         """
         Writes rocket data to a file on the black box
@@ -218,7 +256,7 @@ class RocketData():
 
         """
         writer = csv.writer(black_box)
-        writer.writerow(self.convert_to_csv_string())
+        writer.writerow(self.__all_rocket_data())
 
 
     def get_velocity(self, current_alt, prev_alt, current_timestamp, prev_timestamp):
@@ -227,20 +265,28 @@ class RocketData():
         """
 
         try:
+            print("Trying to calc velocity,", current_alt, prev_alt, current_timestamp, prev_timestamp)
             new_velocity = (current_alt - prev_alt)/(current_timestamp - prev_timestamp)
-            self.velocity_queue.put(new_velocity)
+
+            print("Putting it in the queue")
+            print(self.velocity_queue)
+            if len(self.velocity_queue) < VELOCITY_QUEUE_SIZE:
+                self.velocity_queue.append(new_velocity)
+            else:
+                del self.velocity_queue[0]
+                self.velocity_queue.append(new_velocity)
             
-            sum = 0
-            for val in self.velocity_queue:
-                sum += val
+            print("Summing the queue")
+            
+            print("Velocity avg", sum(self.velocity_queue))
+            return sum(self.velocity_queue) / VELOCITY_QUEUE_SIZE
             
         except:
+            print("Exception in get_velo, returning None")
             return None
 
-        return sum/VELOCITY_QUEUE_SIZE
 
-
-    def initialize_lapse_rate(moist, pressure, temperature):
+    def initialize_lapse_rate(self, moist, pressure, temperature):
         """
         Takes moistness, pressure, and temperature readings at launch site to find lapse rate.
         This should not be run after the initialization phase
@@ -268,7 +314,7 @@ class RocketData():
         return lapse_rate
 
 
-    def altitude_barometric(pressure, init_pressure, init_temperature):
+    def altitude_barometric(self, pressure, init_pressure, init_temperature):
         """
         Takes pressure reading, initial pressure reading, and initial temperature reading to get altitude
 
@@ -293,7 +339,7 @@ class RocketData():
         return alt_baro
 
 
-    def altitude_temperature(curr_temperature, init_temperature): # or altTemp if needed
+    def altitude_temperature(self, curr_temperature, init_temperature): # or altTemp if needed
         """
         Takes current temperature measurement and initialized temperature measurement change to get altitude from temperature.
         This version essentially turns the flight path into two linear directions (possibly ignore this, docstrings to be changed)

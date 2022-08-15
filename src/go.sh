@@ -1,3 +1,6 @@
 #!/bin/bash
+
+echo "STARTING FLIGHT COMPUTER $(date +%s-%H:%M:%S)"
+
 python3 camera.py &
-python3 /home/pi/flight/Xenia1-flight-Computer/src/mian.py
+sudo python3 /home/pi/Xenia1-flight-Computer/src/main.py

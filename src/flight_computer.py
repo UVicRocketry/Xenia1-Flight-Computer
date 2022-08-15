@@ -10,81 +10,110 @@ import suborbit
 
 from HX711Multi import HX711_Multi
 
-#TODO: double check all these thresholds with @jj and @morgan
-#TODO these need units or a better descriptor. These thresholds are in Gees?
-STANDBY_EXIT_THRESHOLD = 10
+# Gees required to exit standby. This G load must be sustained for a certain time
+# TODO CHECK THESE WITH CLAIRE AND FIGURE OUT IF THEY ARE IN G or m/s
+STANDBY_ACCELERATION_THRESHOLD = 3*9.81
 POWERED_FLIGHT_EXIT_THRESHOLD = -9
-POWERED_TIMEOUT = 5
-COAST_TIMEOUT = 300
-RECOVERY_TIMEOUT = 480
 
-BLACKBOX_FILEPATH = "/media/pi/black_box"
+# Motor burn time is 3s according to data sheet.
+POWERED_TIMEOUT = 3*1.15
+
+#  From flight dynamics.
+COAST_TIMEOUT = 300
+
+# Under parachute from max apogee of 14000ft, the rocket takes 310s to descend.
+RECOVERY_TIMEOUT = 310*1.5
+BUZZ_PIN = 21
+
+# BLACKBOX_FILEPATH = "/media/pi/black_box"
+BLACKBOX_FILEPATH = "/media/black_box/flight_data_" + str(time.strftime("%H-%M-%S")) + ".txt"
+
+def mach(n):
+    return 339.0 * n
 
 class FlightComputer:
-
     def __init__(self):
+        print("initting the FC")
         self.rocket_data = RocketData()
-        self.black_box = open(BLACKBOX_FILEPATH, "a")
-        #TODO is this gonna hang the data collection when it calculates apogee?
-        # suborbit takes several hundred ms to run. Should it be on a thread?
+
+        print("Attempting to open file")
+        self.black_box = open(BLACKBOX_FILEPATH , "a+")
+
+
+        print("Suborbit")
         self.suborbit = suborbit.Suborbit()
-        self.airbrakes = Airbrakes()
+
+        print("Airbrakes")
+        self.airbrakes = Airbrakes(False, 8, 4, 7)
+
+        print("Startup")
         self.startup()
+        print("Seatbelt sign is on (FC is initialized)")
+
 
     def startup(self):
         """Initialize all the things"""
-        self.__init_stepper()
 
-        #TODO no way to tell which sensor is not working if one is failed
+        print("Sensor roll call\n  buzzer")
         self.__config_buzzer()
+        self.beep(duration = 1) 
+        time.sleep(5)
+
         if self.rocket_data.lsm_sensor_ready():
             # lsm sensors read correctly
-            self.beep()
+            print("  lsm init successfully")
+        else:
+            self.beep(count = 1)
+            time.sleep(3.0)
+            print("  lsm failed to init")
+
         if self.rocket_data.bme_sensor_ready():
             # bme sensors read correctly
-            self.beep()
+            print("  bme init successfully")
+        else:
+            self.beep(count = 2)
+            time.sleep(3.0)
+            print("  bme failed to init")
+
         if self.rocket_data.adx_sensor_ready():
             # adx sensors read correctly
-            self.beep()
+            print("  adx init successfully")
+        else:
+            self.beep(count = 3)
+            time.sleep(3.0)
+            print("  adx failed to init")
 
-        if not (self.rocket_data.lsm_sensor_ready() or self.rocket_data.bme_sensor_ready() or self.rocket_data.adx_sensor_ready()):
-            # didnt read all sensors, not ready to go
-            self.beep(1.2)
+        if self.airbrakes.calibrate():
+            print("  airbrakes init successfully")
+        else:
+            self.beep(count = 4)
+            time.sleep(3.0)
+            print("  airbrakes failed to init")
+        self.airbrakes.deployBrakes(0)
+        self.beep(duration = 1) 
+        time.sleep(5)
 
-
-    def __init_stepper():
-        """
-        This should initialize the airbrakes stepper motor and open and close airbrakes
-        The main driver for the airbrakes should automatically do this upon
-        initialization.
-        Don't stand next to the airbrakes at this point.
-        """
-
-        #TODO These GPIO are configured in the airbrakes init
-        # Make sure to update the pins in airbrakes.py
-
-        GPIO.setup(18, GPIO.OUT)
-        GPIO.setup(4, GPIO.OUT)
-        airbrakes = Airbrakes(direction = True)
-        GPIO.output(18, GPIO.LOW)
-        GPIO.output(4, GPIO.HIGH)
-        airbrakes.calibrate()
+    def __config_buzzer(self):
+        GPIO.setup(BUZZ_PIN, GPIO.OUT)
 
 
-    def __config_buzzer():
-        GPIO.setup(19, GPIO.OUT)
-
-
-    #TODO be absolutely sure this never gets called during flight
-    #TODO Consider passing a different amount of time for each sensor
-    def beep(duration = 0.2):
+    def beep(self, duration = 0.2, count = 1):
         """
         This method should buzz the buzzer. Different durations mean different
         things, default of 0.2 indicate success
         """
-        GPIO.output(19, GPIO.HIGH)
-        time.sleep(duration)
-        GPIO.output(19, GPIO.LOW)
+        print("beeping", count, "times, for", duration, "seconds")
+        
+        return 
+
+        for i in range(count):
+            if not i is 0:
+                time.sleep(duration)
+            
+
+            GPIO.output(BUZZ_PIN, GPIO.HIGH)
+            time.sleep(duration)
+            GPIO.output(BUZZ_PIN, GPIO.LOW)
 
 
     def vec_len(v):
@@ -92,45 +121,68 @@ class FlightComputer:
 
 
     def __standby(self):
+        self.airbrakes.sleep()
         while True:
+            print("Stnadby")
             self.rocket_data.refresh()
-            if self.vec_len(self.rocket_data.current_acceleration) < STANDBY_EXIT_THRESHOLD:
-                break
+            self.rocket_data.send_to_black_box(self.black_box)
+            current_accel = FlightComputer.vec_len(self.rocket_data.current_acceleration)
+            if current_accel < STANDBY_ACCELERATION_THRESHOLD:
+                timer = time.time()
+                if abs(timer - time.time()) > 1:
+                    break
 
 
     def __powered_flight(self):
         time_at_start = time.time()
 
         while True:
+            print("Powered Flight")
             self.rocket_data.refresh()
             self.rocket_data.send_to_black_box(self.black_box)
-            if time.time() > (time_at_start + POWERED_TIMEOUT):
-                break
-            elif self.rocket_data.current_acceleration < POWERED_FLIGHT_EXIT_THRESHOLD:
+            if time.time() > (time_at_start + POWERED_TIMEOUT) or self.rocket_data.current_acceleration < POWERED_FLIGHT_EXIT_THRESHOLD:
                 break
 
 
     def __coast_flight(self):
         time_at_start = time.time()
+        self.airbrakes.wake()
+        subo = suborbit.Suborbit()
+
+
+        AIRBRAKES_HOLD_TIMEOUT = 4.0
+
+        ts = time.time()
+        airbrakes_released = False
 
         while True:
+            print("Coast flight")
             self.rocket_data.refresh()
             self.rocket_data.send_to_black_box(self.black_box)
 
-            self.rocket_data.airbrakes_percentage = self.airbrakes.get_position()
-            suborbit_options = {
-                'alt': self.rocket_data.current_altitude,
-                'vel': self.rocket_data.velocity,
-                'accel': self.rocket_data.current_acceleration,
-                'airbrakes': self.rocket_data.airbrakes_percentage
-            }
-            (max_alt, max_time) = self.suborbit.run(suborbit_options)
-            new_airbrakes_position = suborbit.calc_airbrakes_position(max_alt, current_airbrakes_position)
-            self.airbrakes.deploy_airbrakes(new_airbrakes_position)
+            if not (time.time() - ts >= AIRBRAKES_HOLD_TIMEOUT or airbrakes_released):
+                if (not self.rocket_data.velocity is None) and self.rocket_data.velocity < mach(0.75):
+                    airbrakes_released = True
+                    print("airbrakes set free because of velocity")
+                continue
 
-            if time.time() > (time_at_start + COAST_TIMEOUT):
-                break
-            elif self.rocket_data.velocity < 0:
+            if not airbrakes_released:
+                airbrakes_released = True
+                print("airbrakes set free because of timeout")
+
+            self.rocket_data.airbrakes_percentage = self.airbrakes.get_position()
+
+            alt = self.rocket_data.current_altitude
+            vel = self.rocket_data.velocity
+            accel = self.rocket_data.current_acceleration
+            self.rocket_data.update_airbrakes_percentage(self.airbrakes.get_position())
+            airbrakes = self.rocket_data.airbrakes_percentage
+
+            (max_alt, max_time) = self.suborbit.run(alt, vel, accel, airbrakes)
+            new_airbrakes_position = subo.calc_airbrakes_position(alt, max_alt, airbrakes)
+            self.airbrakes.deployBrakes(new_airbrakes_position)
+
+            if time.time() > (time_at_start + COAST_TIMEOUT) or (self.rocket_data.velocity and self.rocket_data.velocity < 0):
                 break
 
 
@@ -138,6 +190,7 @@ class FlightComputer:
         time_at_start = time.time()
 
         while True:
+            print("Recovery Flight")
             self.rocket_data.refresh()
             self.rocket_data.send_to_black_box(self.black_box)
             if time.time() > (time_at_start + RECOVERY_TIMEOUT):

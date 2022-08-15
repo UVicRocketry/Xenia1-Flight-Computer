@@ -210,12 +210,32 @@ def grav(alt):
 
 class Suborbit:
     def __init__(self):
-        self.data = DragData("drag_data/cda_no_airbrakes.csv")
+        self.data = DragData("/home/pi/Xenia1-flight-Computer/drag_data/cda_no_airbrakes.csv")
+        self.previous_sim = None
 
 
-    def calc_airbrakes_position(self, estimated_alt, current_brakes):
-        # TODO: Actually do the calculations
-        return current_brakes
+    def calc_airbrakes_position(self, current_alt, estimated_alt, current_brakes):
+        apogee_alt_diff = estimated_alt - 3048
+        current_alt_diff = current_alt - 3048
+
+        movement = 10.0
+        if abs(apogee_alt_diff < 1000):
+            movement *= 0.5
+        
+        if abs(apogee_alt_diff < 500):
+            movement *= 0.5
+
+        if abs(apogee_alt_diff < 100):
+            movement *= 0.5
+
+        movement *= apogee_alt_diff / abs(apogee_alt_diff)
+
+        result = current_brakes + movement
+
+        if result < 0:
+            return 0.0
+        elif result > 100:
+            return 100.0
 
     def run(self, alt, vel, accel, airbrakes, dry_mass = ROCKET_DRY_MASS):
         """
@@ -239,12 +259,22 @@ class Suborbit:
         The value returned with be of type (float, float), containing the max
         altitude in meters, and the time until the rocket gets there.
         """
+        if not ((not alt is None) and (not vel is None) and (not accel is None)):
+            if self.previous_sim:
+                return self.previous_sim
+            else:
+                return self.run(0, 0, 0, 0.0)
+
         initial_position = RocketPosition(alt, vel, accel)
 
         # Intentionally ignoring any sort of power phase because not needed.
 
         # This will return (float, float)
-        return self.__coast(initial_position, dry_mass, airbrakes, 0.0, self.data)
+        res = self.__coast(initial_position, dry_mass, airbrakes, 0.0, self.data)
+
+        self.previous_sim = res
+
+        return res
 
     def __coast(
             self,

@@ -1,4 +1,4 @@
-#this is to be imported into main and constructed with rocket_data object
+# this is to be imported into main and constructed with rocket_data object
 from pydoc import doc
 import RPi.GPIO as GPIO
 from time import sleep
@@ -121,7 +121,6 @@ class Airbrakes:
               step_delay_micro_sec=75,
               gear_box_ratio=14):
 
-    print("START YOUR ENGINES")
     # GPIO pins
     self.step_pin = stepper_pin
     self.dir_pin  = direction_pin
@@ -138,7 +137,7 @@ class Airbrakes:
    
     # Max steps to go from fully closed to fully open with 1.25 safety factor 
     # Division by 6 is because airbrakes only require 1/6 of a turn to open
-    self.__max_steps_to_open = int(1.25
+    self.__max_steps_to_open = int(1.20
                                 * (self.stepper_motor["gear_ratio"]
                                    *(360/self.stepper_motor["step_angle"])
                                    * self.stepper_motor["microsteps"])
@@ -161,10 +160,10 @@ class Airbrakes:
     self.wake()
 
     self.__step_brakes_good = True
-    print("Airbrakes do be initialized, frfr")
-
 
   def __singleStep(self, step_direction: bool):
+    if not self.__step_brakes_good:
+      return
 
     # ^ XORs the direction (inverting it if motor_direction dictates it)
     GPIO.output(self.dir_pin, step_direction ^ self.stepper_motor["direction"])
@@ -177,9 +176,7 @@ class Airbrakes:
     GPIO.output(self.step_pin, GPIO.LOW)
     sleep(self.stepper_motor["step_delay"] - 7e-6)
 
-  def calibrate(self):
-    print("broom broom, waving to the fans")
-
+  def calibrate(self): 
     # Fully open brakes and record pot value
     for _ in range(self.__max_steps_to_open):
       self.__singleStep(True)
@@ -191,16 +188,18 @@ class Airbrakes:
     self.__min_pot_val = self.potentiometer.value
 
     if abs(self.__min_pot_val - self.__max_pot_val) < 200:
-        print("Brakes do be sad")
-        self.__step_brakes_good = False
-        return False
-    
+      print("yo, your brakes aren't moving, ya dunce")
+      self.__step_brakes_good = False
+      return False
+
+    print("max pot val:", self.__max_pot_val, " min:", self.__min_pot_val)
+
     # Now this part will slowly open the airbrakes to get the exact number of steps from closed to open.
     total_steps = 0
     step_range = 0
 
     err = self.__max_pot_val - self.potentiometer.value
-    while abs(err) > 20 and total_steps < 10000:
+    while abs(err) > 20 and total_steps < self.__max_steps_to_open:
       if err < 0:
         self.__singleStep(False)
         step_range -= 1
@@ -211,36 +210,34 @@ class Airbrakes:
       err = self.__max_pot_val - self.potentiometer.value
 
     if self.__max_steps_to_open <= total_steps:
-        self.__step_brakes_good = False
+      self.__step_brakes_good = False
 
     # Store the number of steps between open and close.
     if self.__step_brakes_good:
-        self.__total_steps = step_range
+      self.__total_steps = step_range
     else:
-        self.__total_steps = 4000 
+      # TODO: use default step_range
+      print("Airbrakes: bad")
+      self.__total_steps = 4000 # THIS 4000 IS COMPLETE BS
 
     print("total_steps =", self.__total_steps, ", max: ", self.__max_pot_val, ", min: ", self.__min_pot_val)
-    return self.__step_brakes_good 
+    return self.__step_brakes_good
 
   def deployBrakes(self, percent):
-    print("Deploying le Brakes to", percent)
-
     # Convert percent to potentiometer value
     target_pot = self.__min_pot_val + (percent/100)*(self.__max_pot_val-self.__min_pot_val)
     curr_error = target_pot-self.potentiometer.value
     pot_range = abs(self.__max_pot_val - self.__min_pot_val)
-    if not pot_range:
-        return (self.potentiometer.value, 0)
-
     step_error = int((curr_error / pot_range) * self.__total_steps)
     print("step_error =", step_error)
 
+    # TODO set this based on the resolution of ADC/pot, slop in gears, etc. (requires testing)
     max_error = 50 
 
     # Move stepper to target position within some error
     # Prevent infinite loop by never stepping more than the max to open
     steps = 0
-    while abs(curr_error) > max_error and steps < self.__max_steps_to_open:
+    while abs(curr_error) > max_error and steps < self.__max_steps_to_open and self.__step_brakes_good:
       step_error = int((curr_error / pot_range) * self.__total_steps)
       
       while step_error < 0:
@@ -259,19 +256,6 @@ class Airbrakes:
 
     # Return the final potentiometer value and percentage open
     return (self.potentiometer.value, percent_deployed)
-  
-  def get_position(self):
-    r = self.__max_pot_val - self.__min_pot_val
-    if r == 0:
-      return 100.0
-    percent = (self.potentiometer.value - self.__min_pot_val) / r
-    percent *= 100.0
-    
-    if percent > 100:
-        percent = 100
-    elif percent < 0:
-        percent = 0
-    return percent 
 
   def sleep(self):
 
@@ -284,3 +268,6 @@ class Airbrakes:
     # The sleep pin is active low meaning pulling it high
     # powers up the driver.
     GPIO.output(self.sleep_pin, GPIO.HIGH)
+
+  def is_guchi_to_gochi(self):
+    return self.__step_brakes_good

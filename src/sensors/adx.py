@@ -34,10 +34,12 @@ class Adx:
     def __init__(self, i2c):
         try:
             self.__adxl375 = adafruit_adxl34x.ADXL345(i2c)
+            self.is_error = True
         except ValueError:
             self.__adxl375 = {
                 'acceleration': 0
             }
+            self.is_error = False
 
 
     def refresh(self):
